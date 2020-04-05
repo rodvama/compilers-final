@@ -1,4 +1,4 @@
-# compailers-final
+# compilers-final
 Final project for Compilers team name: Los contagiados por la pandemia
 Lenguage: Python
 Libraries: PLY

@@ -1,35 +1,11 @@
 
 import ply.lex as lex
-keywords = {
-    # MAIN 
-    'PROGRAM' : 'program',
-    'PRINCIPAL' : 'principal',
-    # DECLARATIONS
-    'VAR' : 'var',
-    'INT' : 'int',
-    'VOID' : 'void',
-    'CHAR' : 'char',
-    'FLOAT' : 'float',
-    'STRING' : 'string',
-    'REGRESA' : 'regresa',
-    'FUNCION' : 'funcion',
-    'DATAFRAME' : 'dataframe',
-    # UPLOAD
-    'LEE' : 'lee',
-    'CARGA' : 'carga', 
-    'ESCRIBE' : 'escribe',
-    # CONDITIONS
-    'SI' : 'si',
-    'HAZ' : 'haz',
-    'SINO' : 'sino',
-    'MIENTRAS' : 'mientras',
-    'ENTONCES' : 'entonces',
-    # LOOPS
-    'DESDE' : 'desde',
-    'HASTA' : 'hasta',
-    'HACER' : 'hacer'
-}
+import re
+import codecs
+import os
+import sys
 
+#Lista de Tokens
 tokens = [
     # OPERATOR
     'ADD',
@@ -43,7 +19,7 @@ tokens = [
     'GT',
     'GE',
     'EQUAL',
-    'ASSIGN'
+    'ASSIGN',
     'NOT_EQUAL',
     # COMMENT AND WHITESPACE
     'COMMENT',
@@ -57,42 +33,85 @@ tokens = [
     'RBRACK',
     'SEMICOLON',
     'COMMA',
-    'DOT'
+    'DOT',
+    'TWO_DOTS',
     # LITERALS
     'ID',
     'CTE_INT',
     'CTE_FLOAT',
-    'CTE_CHAR',
-    'CTE_STR',
-    'CTE_DF'
-] + list(keywords.values())
+    'CTE_STR'
+]
 
+#Palabras reservadas
+keywords = {
+    # MAIN 
+    'programa' : 'PROGRAMA',
+    'principal' : 'PRINCIPAL',
+    # DECLARATIONS
+    'var' : 'VAR',
+    'int' : 'INT',
+    'void' : 'VOID',
+    'char' : 'CHAR',
+    'float' : 'FLOAT',
+    'string' : 'STRING',
+    'regresa' : 'REGRESA',
+    'funcion' : 'FUNCION',
+    'dataframe' : 'DATAFRAME',
+    # UPLOAD
+    'lee' : 'LEE',
+    'cargaArchivo' : 'CARGA', 
+    'escribe' : 'ESCRIBE',
+    # CONDITIONS
+    'si' : 'SI',
+    'haz' : 'HAZ',
+    'sino' : 'SINO',
+    'mientras' : 'MIENTRAS',
+    'entonces' : 'ENTONCES',
+    # LOOPS
+    'desde' : 'DESDE',
+    'hasta' : 'HASTA',
+    'hacer' : 'HACER',
+    #FUNCIONES ESPECIALES
+    'Variables' : 'VARIABLES',
+    'Distribucion' : 'DISTRIBUCION',
+    'Tendencia' : 'TENDENCIA',
+    'Media' : 'MEDIA',
+    'Mediana' : 'MEDIANA',
+    'Moda' : 'MODA',
+    'Varianza' : 'VARIANZA',
+    'Correlaciona' : 'CORRELACIONA'
+}
+
+
+tokens = tokens + list(keywords.values())
+
+#Definir los Tokens
 t_ADD           = r'\+'
-t_SUB           = r'-'
+t_SUB           = r'\-'
 t_MUL           = r'\*'
 t_DIV           = r'/'
-t_OR            = r'||'
+t_OR            = r'\|'
 t_AND           = r'&'
 t_LT            = r'<'
 t_LE            = r'<='
 t_GT            = r'>'
-t_GE            = r'=>'
+t_GE            = r'>='
 t_EQUAL         = r'=='
 t_NOT_EQUAL     = r'!='
 t_ASSIGN        = r'='
 t_LPAREN        = r'\('
 t_RPAREN        = r'\)'
-t_LBRACE        = r'{'
-t_RBRACE        = r'}'
+t_LBRACE        = r'\{'
+t_RBRACE        = r'\}'
 t_LBRACK        = r'\['
-t_LBRACK        = r'\]'
+t_RBRACK        = r'\]'
 t_SEMICOLON     = r';'
 t_COMMA         = r','
-t_DOT           = r'.'
+t_DOT           = r'\.'
 t_TWO_DOTS      = r':'
-t_PRINT         = r'print'
 t_ignore        = ' \t'
 
+#Definicion de funciones necesarias
 def t_ID(t):
     r'[a-zA-Z_][a-zA-Z_0-9]*'
     t.type = keywords.get(t.value, 'ID')
@@ -104,14 +123,10 @@ def t_CTE_INT(t):
     return t
 
 def t_CTE_FLOAT(t):
-    r'([0-9]+[.])[0-9]+'
+    r'\d+\.\d+'
     t.value = float(t.value)
     return t
 
-def t_CTE_CHAR(t):
-    r'[A-Za-z]'
-    t.value = chr(t.value)
-    return t
 
 def t_CTE_STR(t):
     r'\".*"'
@@ -119,7 +134,7 @@ def t_CTE_STR(t):
     return t
 
 def t_COMMENT(t):
-    r'\#.*'
+    r'\%\%.*'
     pass
 
 def t_newline(t):
@@ -133,4 +148,5 @@ def t_error(t):
     else:
         print ("Error from lex")
 
-lex.lex()
+
+analizador = lex.lex()

@@ -1,4 +1,6 @@
-
+#Jose Arturo Villalobos A00818214
+#Rodrigo Valencia 
+#Scanner del proyecto de Compiladores
 import ply.lex as lex
 import re
 import codecs

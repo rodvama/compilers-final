@@ -25,7 +25,7 @@ tokens = [
     'NOT_EQUAL',
     # COMMENT AND WHITESPACE
     'COMMENT',
-    'WS',
+    #'WS',
     # SEPARATORS
     'LPAREN',
     'RPAREN',
@@ -35,7 +35,7 @@ tokens = [
     'RBRACK',
     'SEMICOLON',
     'COMMA',
-    'DOT',
+    #'DOT',
     'TWO_DOTS',
     # LITERALS
     'ID',
@@ -109,7 +109,7 @@ t_LBRACK        = r'\['
 t_RBRACK        = r'\]'
 t_SEMICOLON     = r';'
 t_COMMA         = r','
-t_DOT           = r'\.'
+#t_DOT           = r'\.'
 t_TWO_DOTS      = r':'
 t_ignore        = ' \t'
 

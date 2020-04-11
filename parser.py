@@ -288,6 +288,7 @@ def p_var_cte(p):
     '''
     var_cte : CTE_INT
             | CTE_FLOAT
+            | CTE_CH
     '''
 
 #EXPRESIONES

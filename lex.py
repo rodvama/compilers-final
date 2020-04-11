@@ -41,7 +41,8 @@ tokens = [
     'ID',
     'CTE_INT',
     'CTE_FLOAT',
-    'CTE_STR'
+    'CTE_STR',
+    'CTE_CH'
 ]
 
 #Palabras reservadas
@@ -131,8 +132,13 @@ def t_CTE_FLOAT(t):
 
 
 def t_CTE_STR(t):
-    r'\".*"'
+    r''
     t.value = str(t.value)
+    return t
+
+def t_CTE_CH(t):
+    r''
+    t.value = chr(t.value)
     return t
 
 def t_COMMENT(t):
@@ -151,4 +157,10 @@ def t_error(t):
         print ("Error from lex")
 
 
+
 analizador = lex.lex()
+analizador.input("hola  'T'")
+while True:
+    tok = analizador.token()
+    if not tok : break
+    print(tok)

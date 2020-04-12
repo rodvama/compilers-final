@@ -386,7 +386,13 @@ def p_error(p):
         print("Syntax error at EOF")
 
 
+# Test it out
+data =''' 
+
+
+'''
+
 parser = yacc.yacc()
-result = parser.parse("programa Covid19 ;  principal () { }")
+result = parser.parse(data)
 
 print(result)

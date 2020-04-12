@@ -132,13 +132,13 @@ def t_CTE_FLOAT(t):
 
 
 def t_CTE_STR(t):
-    r''
+    r"(\"([^\\\"]|\\.)+\")|(\'([^\\\']|\\.)+\')"
     t.value = str(t.value)
     return t
 
 def t_CTE_CH(t):
-    r''
-    t.value = chr(t.value)
+    r"'[a-zA-Z]'"
+    t.value = str(t.value)
     return t
 
 def t_COMMENT(t):
@@ -157,10 +157,18 @@ def t_error(t):
         print ("Error from lex")
 
 
+lexer = lex.lex()
 
-analizador = lex.lex()
-analizador.input("hola  'T'")
-while True:
-    tok = analizador.token()
-    if not tok : break
-    print(tok)
+
+# # Test it out
+# data =''' 
+# "hola fds"
+
+# '''
+
+
+# lexer.input(data)
+# while True:
+#     tok = lexer.token()
+#     if not tok : break
+#     print(tok)

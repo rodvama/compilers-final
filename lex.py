@@ -1,4 +1,6 @@
-
+#Jose Arturo Villalobos A00818214
+#Rodrigo Valencia 
+#Scanner del proyecto de Compiladores
 import ply.lex as lex
 import re
 import codecs
@@ -23,7 +25,7 @@ tokens = [
     'NOT_EQUAL',
     # COMMENT AND WHITESPACE
     'COMMENT',
-    'WS',
+    #'WS',
     # SEPARATORS
     'LPAREN',
     'RPAREN',
@@ -33,13 +35,14 @@ tokens = [
     'RBRACK',
     'SEMICOLON',
     'COMMA',
-    'DOT',
+    #'DOT',
     'TWO_DOTS',
     # LITERALS
     'ID',
     'CTE_INT',
     'CTE_FLOAT',
-    'CTE_STR'
+    'CTE_STR',
+    'CTE_CH'
 ]
 
 #Palabras reservadas
@@ -107,7 +110,7 @@ t_LBRACK        = r'\['
 t_RBRACK        = r'\]'
 t_SEMICOLON     = r';'
 t_COMMA         = r','
-t_DOT           = r'\.'
+#t_DOT           = r'\.'
 t_TWO_DOTS      = r':'
 t_ignore        = ' \t'
 
@@ -129,7 +132,12 @@ def t_CTE_FLOAT(t):
 
 
 def t_CTE_STR(t):
-    r'\".*"'
+    r"(\"([^\\\"]|\\.)+\")|(\'([^\\\']|\\.)+\')"
+    t.value = str(t.value)
+    return t
+
+def t_CTE_CH(t):
+    r"'[a-zA-Z]'"
     t.value = str(t.value)
     return t
 
@@ -149,4 +157,18 @@ def t_error(t):
         print ("Error from lex")
 
 
-analizador = lex.lex()
+lexer = lex.lex()
+
+
+# # Test it out
+# data =''' 
+# "hola fds"
+
+# '''
+
+
+# lexer.input(data)
+# while True:
+#     tok = lexer.token()
+#     if not tok : break
+#     print(tok)

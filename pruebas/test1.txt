@@ -1,0 +1,15 @@
+programa COVID19;
+
+var 
+int: i, j, p;
+
+funcion int fact(int j)
+var float: k;
+{
+regresa(j);
+}
+
+principal()
+{
+lee(p);
+}

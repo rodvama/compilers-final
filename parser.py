@@ -210,7 +210,7 @@ def p_retorno(p):
     'retorno : REGRESA LPAREN exp RPAREN SEMICOLON'
 
 def p_lectura(p):
-    'lectura : LEE LPAREN lista_ids RPAREN SEMICOLON'
+    'lectura : LEE LPAREN variable RPAREN SEMICOLON'
 
 def p_escritura(p):
     'escritura : ESCRIBE LPAREN esc RPAREN SEMICOLON'
@@ -379,20 +379,35 @@ def p_empty(p):
 
 def p_error(p):
     if p:
-        print("Error de sintaxis ",p.type)
+        print("Error de sintaxis ",p.type, p.value)
         print("Error en la linea "+str(p.lineno))
         parser.errok()
     else:
         print("Syntax error at EOF")
 
-
-# Test it out
-data =''' 
-
-
-'''
-
 parser = yacc.yacc()
-result = parser.parse(data)
 
-print(result)
+# Put all test inside prueba folder
+def main():
+    name = input('File name: ')
+    name = "pruebas/" + name
+    print(name)
+    try:
+        f = open(name,'r', encoding='utf-8')
+        parser.parse(f.read())
+        f.close()
+    except EOFError:
+        print (EOFError)
+
+main()
+
+# # Test it out
+# data =''' 
+
+
+# '''
+
+# parser = yacc.yacc()
+# result = parser.parse(data)
+
+# print(result)

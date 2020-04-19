@@ -32,7 +32,7 @@ def p_var1(p):
 
 def p_func1(p):
     '''
-    func1 : funcion
+    func1 : funcion func1
           | empty
     '''
     print("FUNC'")
@@ -401,10 +401,29 @@ def main():
 
 main()
 
-# # Test it out
+# Test it out
 # data =''' 
+# programa COVID19;
 
+# var 
+# int : i, j, p;
 
+# funcion int fact(int j)
+# var float : k;
+# {
+# regresa(j);
+# }
+
+# funcion int fibo(int j)
+# var float : m;
+# {
+# regresa(j);
+# }
+
+# principal()
+# {
+# lee(p);
+# }
 # '''
 
 # parser = yacc.yacc()

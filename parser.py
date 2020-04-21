@@ -1,9 +1,20 @@
+# Jose Arturo Villalobos A00818214
+# Rodrigo Valencia
+# Diseno de compiladores
+# Directorio de Funciones
 import ply.yacc as yacc
 import os
 import codecs
 import re
 from lex import tokens
 from sys import stdin
+from DirFunc import *
+
+directorioFunciones = DirFunc()
+
+currentFunc = "global"
+currentType = "void"
+nombre = ""
 
 #Se define la precedencia
 precedence = (
@@ -21,41 +32,41 @@ precedence = (
 #INICIO
 def p_programa(p):
     'programa : PROGRAMA ID SEMICOLON var1 func1 principal'
-    print("PROGRAMA")
+    # print("PROGRAMA")
 
 def p_var1(p):
     '''
     var1 : var
          | empty
     '''
-    print("VAR1")
+    # print("VAR1")
 
 def p_func1(p):
     '''
     func1 : funcion func1
           | empty
     '''
-    print("FUNC'")
+    # print("FUNC'")
 
 def p_principal(p):
     'principal : PRINCIPAL LPAREN RPAREN bloque'
-    print("PRINCIPAL")
+    # print("PRINCIPAL")
 
 #DECLARACION DE VARIABLES
 def p_var(p):
     'var : VAR var2'
-    print("VAR")
+    # print("VAR")
 
 def p_var2(p):
     'var2 : type TWO_DOTS lista_ids var3'
-    print("VAR2")
+    # print("VAR2")
 
 def p_var3(p):
     '''
     var3 : var2
          | empty
     '''
-    print("VAR3")
+    # print("VAR3")
 
 def p_type(p):
     '''
@@ -66,25 +77,25 @@ def p_type(p):
 #DECLARACION DE FUNCIONES
 def p_funcion(p):
     'funcion : FUNCION tipo_fun ID LPAREN parametros RPAREN var1 bloque'
-    print("FUNCION")
+    # print("FUNCION")
 
 def p_tipo_fun(p):
     '''
     tipo_fun : VOID
              | tipo_simple
     '''
-    print("TIPO_FUN")
+    # print("TIPO_FUN")
 
 def p_parametros(p):
     '''
     parametros : param
                | empty
     '''
-    print("PARAMETROS")
+    # print("PARAMETROS")
 
 def p_param(p):
     'param : tipo_simple ID param1'
-    print("PARAM")
+    # print("PARAM")
 
 def p_param1(p):
     '''
@@ -95,7 +106,7 @@ def p_param1(p):
 #TIPOS
 def p_tipo_simple(p):
     '''
-    tipo_simple : INT
+    tipo_simple : INT pn_1_setCurrentType
                 | FLOAT
                 | CHAR
     '''
@@ -111,7 +122,7 @@ def p_lista_ids(p):
     'lista_ids : lista SEMICOLON'
 
 def p_lista(p):
-    'lista : ID dd lista1'
+    'lista : ID pn_2_addVariable dd lista1'
 
 def p_dd(p):
     '''
@@ -148,14 +159,14 @@ def p_dim_index1(p):
 #Bloque
 def p_bloque(p):
     'bloque : LBRACE est RBRACE'
-    print("BLOQUE")
+    # print("BLOQUE")
 
 def p_est(p):
     '''
     est : estatutos est
         | empty
     '''
-    print("EST")
+    # print("EST")
 
 def p_estatutos(p):
     '''
@@ -375,7 +386,7 @@ def p_factor(p):
 def p_empty(p):
     '''empty :'''
     pass
-    print("nulo")
+    # print("nulo")
 
 def p_error(p):
     if p:
@@ -385,7 +396,34 @@ def p_error(p):
     else:
         print("Syntax error at EOF")
 
-parser = yacc.yacc()
+
+
+################ PUNTOS NEURALGICOS ###################
+def p_pn_1_setCurrentType(p):
+    '''
+    pn_1_setCurrentType :
+    '''
+    global currentType
+    currentType = p[-1]
+
+def p_pn_2_addVariable(p):
+    '''
+    pn_2_addVariable : 
+    '''
+    global currentFunc
+    global nombre
+    global currentType
+
+    nombre = p[-1]
+    
+    directorioFunciones.func_addVar(currentFunc, nombre, currentType, 0, 0)
+
+
+
+
+
+
+# parser = yacc.yacc()
 
 # Put all test inside prueba folder
 def main():
@@ -399,34 +437,24 @@ def main():
     except EOFError:
         print (EOFError)
 
-main()
+#main()
 
-# Test it out
-# data =''' 
-# programa COVID19;
+#Test it out
+data =''' 
+programa COVID19;
 
-# var 
-# int : i, j, p;
+var 
+int : i, k;
 
-# funcion int fact(int j)
-# var float : k;
-# {
-# regresa(j);
-# }
+principal()
+{
 
-# funcion int fibo(int j)
-# var float : m;
-# {
-# regresa(j);
-# }
+}
+'''
 
-# principal()
-# {
-# lee(p);
-# }
-# '''
+parser = yacc.yacc()
+result = parser.parse(data)
 
-# parser = yacc.yacc()
-# result = parser.parse(data)
+print(result)
 
-# print(result)
+print(directorioFunciones.func_search("global"))

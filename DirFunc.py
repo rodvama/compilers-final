@@ -34,7 +34,8 @@ class DirFunc:
     '''
     def func_add(self, nombre, tipo, cantParametros):
         if self.func_exist(nombre):
-            print("Error: Funcion ", str(nombre), " ya existe")
+            #Error Multiple declaration
+            print "Error: Funcion ", str(nombre), " ya existe", "\n"
         else:
             self.diccionario[nombre] = {
                 'nombre': nombre,
@@ -42,7 +43,7 @@ class DirFunc:
                 'cantParametros': cantParametros,
                 'variables': TablaVars()
             }
-            print("Funcion creada en el diccionario: ", nombre, " de tipo: ", tipo)
+            print "Funcion creada en el diccionario: ", nombre, " de tipo: ", tipo, "\n"
 
     '''
     Funcion que busca y regresa una funcion y sus datos
@@ -63,11 +64,11 @@ class DirFunc:
         Si regresa verdadero se pudo crear, si regresa falso ya existia esa variable.
         '''
         if self.diccionario[nombre]['variables'].var_add(nombreVar, tipoVar, renglonesVar, columnasVar):
-            print("Variable: ", nombreVar, " creada en la funcion ", nombre)
+            print "Variable: ", nombreVar, " creada en la funcion ", nombre
         else:
-            print("Error: No se pudo crear la variable: ", nombreVar, " en la funcion: ", nombre)
+            print "Error: No se pudo crear la variable: ", nombreVar, " en la funcion: ", nombre
         
-        print(self.diccionario[nombre]['variables'].diccionario)
+        print self.diccionario[nombre]['variables'].diccionario, "\n"
     
     
     # '''
@@ -102,3 +103,20 @@ class DirFunc:
             return True
         else:
             return False
+
+    '''
+    Funcion para actualizar el numero de parametros de una funcion previamente creada
+    '''
+    def func_UpdateParams(self, nombre, cantParametros):
+        #Si ya existe la funcion actualizar su cantidad  de parametros directamente
+        if self.func_exist(nombre):
+            self.diccionario[nombre]['cantParametros'] = cantParametros
+
+        #Si no existe desplegar error
+        else:
+            print("Error: Imposible actualizar parametros de una funcion no existente: ", nombre)
+
+        #print("Funcion creada: ", nombre, " de tipo: ", self.diccionario[nombre]['tipo'], " con cantParametros: ", cantParametros)
+
+    def func_deleteDic(self):
+        self.diccionario.clear()

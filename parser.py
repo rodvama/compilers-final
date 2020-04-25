@@ -14,7 +14,8 @@ directorioFunciones = DirFunc()
 
 currentFunc = "global"
 currentType = "void"
-nombre = ""
+varName = ""
+currentContParams = 0
 
 #Se define la precedencia
 precedence = (
@@ -31,7 +32,7 @@ precedence = (
 
 #INICIO
 def p_programa(p):
-    'programa : PROGRAMA ID SEMICOLON var1 func1 principal'
+    'programa : PROGRAMA ID SEMICOLON var1 func1 principal pn_6_end'
     # print("PROGRAMA")
 
 def p_var1(p):
@@ -76,12 +77,12 @@ def p_type(p):
 
 #DECLARACION DE FUNCIONES
 def p_funcion(p):
-    'funcion : FUNCION tipo_fun ID LPAREN parametros RPAREN var1 bloque'
+    'funcion : FUNCION tipo_fun ID pn_3_addFunction LPAREN parametros RPAREN pn_5_updateContParams var1 bloque'
     # print("FUNCION")
 
 def p_tipo_fun(p):
     '''
-    tipo_fun : VOID
+    tipo_fun : VOID pn_1_setCurrentType
              | tipo_simple
     '''
     # print("TIPO_FUN")
@@ -94,7 +95,7 @@ def p_parametros(p):
     # print("PARAMETROS")
 
 def p_param(p):
-    'param : tipo_simple ID param1'
+    'param : tipo_simple ID pn_4_params param1'
     # print("PARAM")
 
 def p_param1(p):
@@ -107,14 +108,14 @@ def p_param1(p):
 def p_tipo_simple(p):
     '''
     tipo_simple : INT pn_1_setCurrentType
-                | FLOAT
-                | CHAR
+                | FLOAT pn_1_setCurrentType
+                | CHAR pn_1_setCurrentType
     '''
 
 def p_tipo_compuesto(p):
     '''
-    tipo_compuesto : DATAFRAME
-                   | STRING
+    tipo_compuesto : DATAFRAME pn_1_setCurrentType
+                   | STRING pn_1_setCurrentType
     '''
 
 #Lista de IDS
@@ -411,16 +412,53 @@ def p_pn_2_addVariable(p):
     pn_2_addVariable : 
     '''
     global currentFunc
-    global nombre
+    global varName
     global currentType
 
-    nombre = p[-1]
+    varName = p[-1]
     
-    directorioFunciones.func_addVar(currentFunc, nombre, currentType, 0, 0)
+    directorioFunciones.func_addVar(currentFunc, varName, currentType, 0, 0)
 
+def p_pn_3_addFunction(p):
+    '''
+    pn_3_addFunction : 
+    '''
+    global currentFunc
+    global currentType
+    global currentContParams
 
+    currentContParams = 0
 
+    currentFunc = p[-1]
+    directorioFunciones.func_add(currentFunc, currentType, currentContParams)
 
+def p_pn_4_params(p):
+    '''
+    pn_4_params :
+    '''
+    global currentFunc
+    global currentType
+    global currentContParams
+    global varName
+
+    varName = p[-1]
+    directorioFunciones.func_addVar(currentFunc, varName, currentType, 0, 0)
+    currentContParams += 1
+
+def p_pn_5_updateContParams(p):
+    '''
+    pn_5_updateContParams :  
+    '''
+    global currentFunc
+    global currentContParams
+
+    directorioFunciones.func_UpdateParams(currentFunc, currentContParams)
+
+def p_pn_6_end(p):
+    '''
+    pn_6_end :
+    '''
+    #directorioFunciones.func_deleteDic()
 
 
 # parser = yacc.yacc()
@@ -446,6 +484,13 @@ programa COVID19;
 var 
 int : i, k;
 
+funcion int sumar (int x, int y, float z)
+var
+float : j, i;
+{
+
+}
+
 principal()
 {
 
@@ -455,6 +500,8 @@ principal()
 parser = yacc.yacc()
 result = parser.parse(data)
 
+directorioFunciones.func_search("sumar")
+
 print(result)
 
-print(directorioFunciones.func_search("global"))
+# print(directorioFunciones.func_search("global"))

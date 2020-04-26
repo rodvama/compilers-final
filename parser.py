@@ -12,11 +12,17 @@ from DirFunc import *
 from CuboSemantico import *
 
 directorioFunciones = DirFunc()
+cubo = CuboSemantico()
+
+pOperandos = [] #Pila de operandos
+pOperadores = [] #Pila de operadores
 
 currentFunc = "global"
 currentType = "void"
 varName = ""
 currentContParams = 0
+numRenglones = 0
+numColumnas = 0
 
 #Se define la precedencia
 precedence = (
@@ -124,7 +130,7 @@ def p_lista_ids(p):
     'lista_ids : lista SEMICOLON'
 
 def p_lista(p):
-    'lista : ID pn_2_addVariable dd lista1'
+    'lista : ID dd pn_2_addVariable lista1'
 
 def p_dd(p):
     '''
@@ -140,11 +146,11 @@ def p_lista1(p):
 
 #Dimensiones
 def p_dim_dec(p):
-    'dim_dec : LBRACK CTE_INT RBRACK dim_dec1'
+    'dim_dec : LBRACK CTE_INT RBRACK pn_7_decRenglones dim_dec1'
 
 def p_dim_dec1(p):
     '''
-    dim_dec1 : LBRACK CTE_INT RBRACK
+    dim_dec1 : LBRACK CTE_INT RBRACK pn_8_decColumnas
              | empty
     '''
 
@@ -415,10 +421,14 @@ def p_pn_2_addVariable(p):
     global currentFunc
     global varName
     global currentType
+    global numColumnas
+    global numRenglones
 
-    varName = p[-1]
+    varName = p[-2]
     
-    directorioFunciones.func_addVar(currentFunc, varName, currentType, 0, 0)
+    directorioFunciones.func_addVar(currentFunc, varName, currentType, numRenglones, numColumnas)
+    numColumnas = 0
+    numRenglones = 0
 
 def p_pn_3_addFunction(p):
     '''
@@ -461,6 +471,21 @@ def p_pn_6_end(p):
     '''
     #directorioFunciones.func_deleteDic()
 
+def p_pn_7_decRenglones(p):
+    '''
+    pn_7_decRenglones :
+    '''
+
+    global numRenglones
+    numRenglones = p[-2]
+
+def p_pn_8_decColumnas(p):
+    '''
+    pn_8_decColumnas : 
+    '''
+    global numColumnas
+    numColumnas = p[-2]
+
 
 # parser = yacc.yacc()
 
@@ -483,7 +508,7 @@ data ='''
 programa COVID19;
 
 var 
-int : i, k;
+int : i[3], k[4][6];
 
 funcion int sumar (int x, int y, float z)
 var
@@ -501,9 +526,5 @@ principal()
 parser = yacc.yacc()
 result = parser.parse(data)
 
-directorioFunciones.func_search("sumar")
-
 print(result)
-cubo = CuboSemantico()
-print(cubo.getType("float", "int", "+"))
 # print(directorioFunciones.func_search("global"))

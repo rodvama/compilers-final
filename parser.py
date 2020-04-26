@@ -9,6 +9,7 @@ import re
 from lex import tokens
 from sys import stdin
 from DirFunc import *
+from CuboSemantico import *
 
 directorioFunciones = DirFunc()
 
@@ -503,5 +504,6 @@ result = parser.parse(data)
 directorioFunciones.func_search("sumar")
 
 print(result)
-
+cubo = CuboSemantico()
+print(cubo.getType("float", "int", "+"))
 # print(directorioFunciones.func_search("global"))

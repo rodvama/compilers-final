@@ -3,7 +3,7 @@
 # Diseno de compiladores
 # Cubo Semantico
 #Creacion: 25 de Abril 2020
-#Ultima modificacion: 25 Abril 2020
+#Ultima modificacion: 27 Abril 2020
 
 class CuboSemantico:
     def __init__(self):
@@ -378,6 +378,19 @@ class CuboSemantico:
             ('dataframe' , 'dataframe' , '!=' ) : 'error',
             ('dataframe' , 'dataframe' , '|' ) : 'error',
             ('dataframe' , 'dataframe' , '&' ) : 'error',
+
+            ('lee', 'int', '') : 'char',
+            ('lee', 'float', '') : 'char',
+            ('lee', 'char', '') : 'char',
+            ('lee', 'string', '') : 'char',
+            ('lee', 'dataframe', '') : 'char',
+
+            ('escribe', 'int', '') : 'char',
+            ('escribe', 'float', '') : 'char',
+            ('escribe', 'char', '') : 'char',
+            ('escribe', 'string', '') : 'char',
+            ('escribe', 'dataframe', '') : 'char'
+
             
         }
 

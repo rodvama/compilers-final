@@ -57,3 +57,32 @@ class TablaVars:
             return self.diccionario[nombre]['tipo']
         else:
             return None
+
+    
+    # '''
+    # Funcion para actualizar renglones y columnas de una variable que es arreglo y ya esta creada
+    # '''
+    # def var_upadateDims(self, nombre, renglones, columnas):
+
+    #     if self.var_exist(nombre):
+    #         if columnas < 0: #Se actualizan solo renglones
+    #             self.diccionario[nombre]['renglones'] = renglones
+    #         else:
+    #             self.diccionario[nombre]['columnas'] = columnas
+    #             self.diccionario[nombre]['renglones']= renglones #?
+            
+    #         print("Dimensiones actualizadas de la variable: ", nombre)
+    #         print("Renglones: ", self.diccionario[nombre]['renglones'], "Columnas: ", self.diccionario[nombre]['columnas'])
+
+    #     else:
+    #         print("Error. No es posible actializar las dimensaiones de una variable que no existe: ", nombre)
+
+    
+    # '''
+    # Funcion que busca y regresa la posicion de memoria de una variables
+    # '''
+    # def var_searchMemPos(self, nombre):
+    #     if self.var_exist(nombre):
+    #         return self.diccionario[nombre]['posMem']
+    #     else:
+    #         return None

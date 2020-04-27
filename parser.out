@@ -69,8 +69,8 @@ Rule 59    llamada1 -> empty
 Rule 60    llamada2 -> COMMA llamada1
 Rule 61    llamada2 -> empty
 Rule 62    retorno -> REGRESA LPAREN exp RPAREN SEMICOLON
-Rule 63    lectura -> LEE LPAREN variable RPAREN SEMICOLON
-Rule 64    escritura -> ESCRIBE LPAREN esc RPAREN SEMICOLON
+Rule 63    lectura -> LEE pnQuadGenSec3 LPAREN variable RPAREN SEMICOLON pnQuadGenSec4
+Rule 64    escritura -> ESCRIBE pnQuadGenSec3 LPAREN esc RPAREN SEMICOLON pnQuadGenSec4
 Rule 65    esc -> esc1 esc2
 Rule 66    esc1 -> exp
 Rule 67    esc1 -> CTE_STR
@@ -139,19 +139,21 @@ Rule 129   pn_5_updateContParams -> <empty>
 Rule 130   pn_6_end -> <empty>
 Rule 131   pn_7_decRenglones -> <empty>
 Rule 132   pn_8_decColumnas -> <empty>
-Rule 133   pnQuadGenExp8 -> <empty>
-Rule 134   pnQuadGenExp9 -> <empty>
-Rule 135   pnQuadGenExp4 -> <empty>
-Rule 136   pnQuadGenExp2 -> <empty>
+Rule 133   pnQuadGenExp1 -> <empty>
+Rule 134   pnQuadGenExp2 -> <empty>
+Rule 135   pnQuadGenExp3 -> <empty>
+Rule 136   pnQuadGenExp4 -> <empty>
 Rule 137   pnQuadGenExp5 -> <empty>
-Rule 138   pnQuadGenExp3 -> <empty>
-Rule 139   pnQuadGenExp1 -> <empty>
-Rule 140   pnQuadGenExp6 -> <empty>
-Rule 141   pnQuadGenExp7 -> <empty>
+Rule 138   pnQuadGenExp6 -> <empty>
+Rule 139   pnQuadGenExp7 -> <empty>
+Rule 140   pnQuadGenExp8 -> <empty>
+Rule 141   pnQuadGenExp9 -> <empty>
 Rule 142   pnQuadGenExp10 -> <empty>
 Rule 143   pnQuadGenExp11 -> <empty>
 Rule 144   pnQuadGenSec1 -> <empty>
 Rule 145   pnQuadGenSec2 -> <empty>
+Rule 146   pnQuadGenSec3 -> <empty>
+Rule 147   pnQuadGenSec4 -> <empty>
 
 Terminals, with rules where they appear
 
@@ -278,6 +280,8 @@ pnQuadGenExp8        : 103 104 105 106 107 108
 pnQuadGenExp9        : 101
 pnQuadGenSec1        : 51
 pnQuadGenSec2        : 53
+pnQuadGenSec3        : 63 64
+pnQuadGenSec4        : 63 64
 pn_1_setCurrentType  : 14 21 22 23 24 25
 pn_2_addVariable     : 27
 pn_3_addFunction     : 13
@@ -823,8 +827,8 @@ state 51
     (51) asignacion -> . variable ASSIGN pnQuadGenSec1 asig
     (57) llamada -> . ID LPAREN llamada1 RPAREN SEMICOLON
     (62) retorno -> . REGRESA LPAREN exp RPAREN SEMICOLON
-    (63) lectura -> . LEE LPAREN variable RPAREN SEMICOLON
-    (64) escritura -> . ESCRIBE LPAREN esc RPAREN SEMICOLON
+    (63) lectura -> . LEE pnQuadGenSec3 LPAREN variable RPAREN SEMICOLON pnQuadGenSec4
+    (64) escritura -> . ESCRIBE pnQuadGenSec3 LPAREN esc RPAREN SEMICOLON pnQuadGenSec4
     (70) carga_datos -> . CARGA LPAREN ID COMMA CTE_STR COMMA ca COMMA ca RPAREN SEMICOLON
     (73) decision -> . SI LPAREN expresion RPAREN ENTONCES bloque sino
     (76) condicional -> . MIENTRAS LPAREN expresion RPAREN HAZ bloque
@@ -967,10 +971,12 @@ state 61
 
 state 62
 
-    (64) escritura -> ESCRIBE . LPAREN esc RPAREN SEMICOLON
+    (64) escritura -> ESCRIBE . pnQuadGenSec3 LPAREN esc RPAREN SEMICOLON pnQuadGenSec4
+    (146) pnQuadGenSec3 -> .
 
-    LPAREN          shift and go to state 94
+    LPAREN          reduce using rule 146 (pnQuadGenSec3 -> .)
 
+    pnQuadGenSec3                  shift and go to state 94
 
 state 63
 
@@ -1066,8 +1072,8 @@ state 69
     (51) asignacion -> . variable ASSIGN pnQuadGenSec1 asig
     (57) llamada -> . ID LPAREN llamada1 RPAREN SEMICOLON
     (62) retorno -> . REGRESA LPAREN exp RPAREN SEMICOLON
-    (63) lectura -> . LEE LPAREN variable RPAREN SEMICOLON
-    (64) escritura -> . ESCRIBE LPAREN esc RPAREN SEMICOLON
+    (63) lectura -> . LEE pnQuadGenSec3 LPAREN variable RPAREN SEMICOLON pnQuadGenSec4
+    (64) escritura -> . ESCRIBE pnQuadGenSec3 LPAREN esc RPAREN SEMICOLON pnQuadGenSec4
     (70) carga_datos -> . CARGA LPAREN ID COMMA CTE_STR COMMA ca COMMA ca RPAREN SEMICOLON
     (73) decision -> . SI LPAREN expresion RPAREN ENTONCES bloque sino
     (76) condicional -> . MIENTRAS LPAREN expresion RPAREN HAZ bloque
@@ -1145,16 +1151,16 @@ state 73
 
     (57) llamada -> ID . LPAREN llamada1 RPAREN SEMICOLON
     (54) variable -> ID . pnQuadGenExp1 di
-    (139) pnQuadGenExp1 -> .
+    (133) pnQuadGenExp1 -> .
 
     LPAREN          shift and go to state 101
-    LBRACK          reduce using rule 139 (pnQuadGenExp1 -> .)
-    ASSIGN          reduce using rule 139 (pnQuadGenExp1 -> .)
-    MUL             reduce using rule 139 (pnQuadGenExp1 -> .)
-    DIV             reduce using rule 139 (pnQuadGenExp1 -> .)
-    ADD             reduce using rule 139 (pnQuadGenExp1 -> .)
-    SUB             reduce using rule 139 (pnQuadGenExp1 -> .)
-    SEMICOLON       reduce using rule 139 (pnQuadGenExp1 -> .)
+    LBRACK          reduce using rule 133 (pnQuadGenExp1 -> .)
+    ASSIGN          reduce using rule 133 (pnQuadGenExp1 -> .)
+    MUL             reduce using rule 133 (pnQuadGenExp1 -> .)
+    DIV             reduce using rule 133 (pnQuadGenExp1 -> .)
+    ADD             reduce using rule 133 (pnQuadGenExp1 -> .)
+    SUB             reduce using rule 133 (pnQuadGenExp1 -> .)
+    SEMICOLON       reduce using rule 133 (pnQuadGenExp1 -> .)
 
     pnQuadGenExp1                  shift and go to state 100
 
@@ -1178,10 +1184,12 @@ state 74
 
 state 75
 
-    (63) lectura -> LEE . LPAREN variable RPAREN SEMICOLON
+    (63) lectura -> LEE . pnQuadGenSec3 LPAREN variable RPAREN SEMICOLON pnQuadGenSec4
+    (146) pnQuadGenSec3 -> .
 
-    LPAREN          shift and go to state 102
+    LPAREN          reduce using rule 146 (pnQuadGenSec3 -> .)
 
+    pnQuadGenSec3                  shift and go to state 102
 
 state 76
 
@@ -1432,6 +1440,8 @@ state 93
 
     (38) bloque -> LBRACE est RBRACE .
 
+    FUNCION         reduce using rule 38 (bloque -> LBRACE est RBRACE .)
+    PRINCIPAL       reduce using rule 38 (bloque -> LBRACE est RBRACE .)
     ID              reduce using rule 38 (bloque -> LBRACE est RBRACE .)
     REGRESA         reduce using rule 38 (bloque -> LBRACE est RBRACE .)
     LEE             reduce using rule 38 (bloque -> LBRACE est RBRACE .)
@@ -1446,63 +1456,20 @@ state 93
     RBRACE          reduce using rule 38 (bloque -> LBRACE est RBRACE .)
     $end            reduce using rule 38 (bloque -> LBRACE est RBRACE .)
     SINO            reduce using rule 38 (bloque -> LBRACE est RBRACE .)
-    FUNCION         reduce using rule 38 (bloque -> LBRACE est RBRACE .)
-    PRINCIPAL       reduce using rule 38 (bloque -> LBRACE est RBRACE .)
 
 
 state 94
 
-    (64) escritura -> ESCRIBE LPAREN . esc RPAREN SEMICOLON
-    (65) esc -> . esc1 esc2
-    (66) esc1 -> . exp
-    (67) esc1 -> . CTE_STR
-    (109) exp -> . termino pnQuadGenExp4 exp1
-    (114) termino -> . factor pnQuadGenExp5 term
-    (119) factor -> . var_cte
-    (120) factor -> . LPAREN pnQuadGenExp6 exp RPAREN pnQuadGenExp7
-    (121) factor -> . variable
-    (122) factor -> . llamada
-    (123) factor -> . funciones_especiales
-    (89) var_cte -> . CTE_INT pnQuadGenExp1
-    (90) var_cte -> . CTE_FLOAT pnQuadGenExp1
-    (91) var_cte -> . CTE_CH
-    (54) variable -> . ID pnQuadGenExp1 di
-    (57) llamada -> . ID LPAREN llamada1 RPAREN SEMICOLON
-    (82) funciones_especiales -> . fe LPAREN ID COMMA v_exp RPAREN
-    (83) funciones_especiales -> . CORRELACIONA LPAREN ID COMMA v_exp COMMA v_exp RPAREN
-    (84) fe -> . MEDIA
-    (85) fe -> . MEDIANA
-    (86) fe -> . MODA
-    (87) fe -> . VARIANZA
+    (64) escritura -> ESCRIBE pnQuadGenSec3 . LPAREN esc RPAREN SEMICOLON pnQuadGenSec4
 
-    CTE_STR         shift and go to state 134
-    LPAREN          shift and go to state 123
-    CTE_INT         shift and go to state 125
-    CTE_FLOAT       shift and go to state 128
-    CTE_CH          shift and go to state 111
-    ID              shift and go to state 126
-    CORRELACIONA    shift and go to state 129
-    MEDIA           shift and go to state 120
-    MEDIANA         shift and go to state 119
-    MODA            shift and go to state 116
-    VARIANZA        shift and go to state 113
+    LPAREN          shift and go to state 132
 
-    funciones_especiales           shift and go to state 115
-    var_cte                        shift and go to state 110
-    esc1                           shift and go to state 133
-    llamada                        shift and go to state 117
-    esc                            shift and go to state 132
-    termino                        shift and go to state 112
-    exp                            shift and go to state 135
-    factor                         shift and go to state 118
-    variable                       shift and go to state 124
-    fe                             shift and go to state 122
 
 state 95
 
     (78) funciones_especiales_void -> VARIABLES LPAREN . ID COMMA ID COMMA ID RPAREN SEMICOLON
 
-    ID              shift and go to state 136
+    ID              shift and go to state 133
 
 
 state 96
@@ -1515,11 +1482,11 @@ state 96
 state 97
 
     (54) variable -> ID . pnQuadGenExp1 di
-    (139) pnQuadGenExp1 -> .
+    (133) pnQuadGenExp1 -> .
 
-    LBRACK          reduce using rule 139 (pnQuadGenExp1 -> .)
-    ASSIGN          reduce using rule 139 (pnQuadGenExp1 -> .)
-    RPAREN          reduce using rule 139 (pnQuadGenExp1 -> .)
+    LBRACK          reduce using rule 133 (pnQuadGenExp1 -> .)
+    ASSIGN          reduce using rule 133 (pnQuadGenExp1 -> .)
+    RPAREN          reduce using rule 133 (pnQuadGenExp1 -> .)
 
     pnQuadGenExp1                  shift and go to state 100
 
@@ -1527,7 +1494,7 @@ state 98
 
     (77) no_condicional -> DESDE variable . ASSIGN exp HASTA exp HACER bloque
 
-    ASSIGN          shift and go to state 137
+    ASSIGN          shift and go to state 134
 
 
 state 99
@@ -1546,7 +1513,7 @@ state 99
     MODA            reduce using rule 144 (pnQuadGenSec1 -> .)
     VARIANZA        reduce using rule 144 (pnQuadGenSec1 -> .)
 
-    pnQuadGenSec1                  shift and go to state 138
+    pnQuadGenSec1                  shift and go to state 135
 
 state 100
 
@@ -1556,7 +1523,7 @@ state 100
     (35) dim_index -> . LBRACK exp RBRACK dim_index1
     (124) empty -> .
 
-    LBRACK          shift and go to state 141
+    LBRACK          shift and go to state 138
     ASSIGN          reduce using rule 124 (empty -> .)
     MUL             reduce using rule 124 (empty -> .)
     DIV             reduce using rule 124 (empty -> .)
@@ -1577,9 +1544,9 @@ state 100
     RBRACK          reduce using rule 124 (empty -> .)
     HACER           reduce using rule 124 (empty -> .)
 
-    dim_index                      shift and go to state 139
-    di                             shift and go to state 140
-    empty                          shift and go to state 142
+    dim_index                      shift and go to state 136
+    di                             shift and go to state 137
+    empty                          shift and go to state 139
 
 state 101
 
@@ -1623,26 +1590,24 @@ state 101
     var_cte                        shift and go to state 110
     variable                       shift and go to state 124
     termino                        shift and go to state 112
-    exp                            shift and go to state 145
+    exp                            shift and go to state 142
     factor                         shift and go to state 118
-    llamada1                       shift and go to state 143
-    empty                          shift and go to state 144
+    llamada1                       shift and go to state 140
+    empty                          shift and go to state 141
     fe                             shift and go to state 122
 
 state 102
 
-    (63) lectura -> LEE LPAREN . variable RPAREN SEMICOLON
-    (54) variable -> . ID pnQuadGenExp1 di
+    (63) lectura -> LEE pnQuadGenSec3 . LPAREN variable RPAREN SEMICOLON pnQuadGenSec4
 
-    ID              shift and go to state 97
+    LPAREN          shift and go to state 143
 
-    variable                       shift and go to state 146
 
 state 103
 
     (79) funciones_especiales_void -> fev LPAREN . ID COMMA v_exp RPAREN SEMICOLON
 
-    ID              shift and go to state 147
+    ID              shift and go to state 144
 
 
 state 104
@@ -1690,7 +1655,7 @@ state 104
     mega_exp                       shift and go to state 121
     fe                             shift and go to state 122
     variable                       shift and go to state 124
-    expresion                      shift and go to state 148
+    expresion                      shift and go to state 145
     exp                            shift and go to state 130
 
 state 105
@@ -1701,7 +1666,7 @@ state 105
     COMMA           reduce using rule 128 (pn_4_params -> .)
     RPAREN          reduce using rule 128 (pn_4_params -> .)
 
-    pn_4_params                    shift and go to state 149
+    pn_4_params                    shift and go to state 146
 
 state 106
 
@@ -1711,7 +1676,7 @@ state 106
     VAR             reduce using rule 129 (pn_5_updateContParams -> .)
     LBRACE          reduce using rule 129 (pn_5_updateContParams -> .)
 
-    pn_5_updateContParams          shift and go to state 150
+    pn_5_updateContParams          shift and go to state 147
 
 state 107
 
@@ -1727,18 +1692,18 @@ state 108
     (34) dim_dec1 -> . empty
     (124) empty -> .
 
-    LBRACK          shift and go to state 152
+    LBRACK          shift and go to state 149
     COMMA           reduce using rule 124 (empty -> .)
     SEMICOLON       reduce using rule 124 (empty -> .)
 
-    dim_dec1                       shift and go to state 151
-    empty                          shift and go to state 153
+    dim_dec1                       shift and go to state 148
+    empty                          shift and go to state 150
 
 state 109
 
     (70) carga_datos -> CARGA LPAREN ID . COMMA CTE_STR COMMA ca COMMA ca RPAREN SEMICOLON
 
-    COMMA           shift and go to state 154
+    COMMA           shift and go to state 151
 
 
 state 110
@@ -1749,10 +1714,9 @@ state 110
     DIV             reduce using rule 119 (factor -> var_cte .)
     ADD             reduce using rule 119 (factor -> var_cte .)
     SUB             reduce using rule 119 (factor -> var_cte .)
-    HASTA           reduce using rule 119 (factor -> var_cte .)
     COMMA           reduce using rule 119 (factor -> var_cte .)
     RPAREN          reduce using rule 119 (factor -> var_cte .)
-    RBRACK          reduce using rule 119 (factor -> var_cte .)
+    HASTA           reduce using rule 119 (factor -> var_cte .)
     LT              reduce using rule 119 (factor -> var_cte .)
     GT              reduce using rule 119 (factor -> var_cte .)
     LE              reduce using rule 119 (factor -> var_cte .)
@@ -1762,8 +1726,9 @@ state 110
     AND             reduce using rule 119 (factor -> var_cte .)
     OR              reduce using rule 119 (factor -> var_cte .)
     ASSIGN          reduce using rule 119 (factor -> var_cte .)
-    HACER           reduce using rule 119 (factor -> var_cte .)
     SEMICOLON       reduce using rule 119 (factor -> var_cte .)
+    RBRACK          reduce using rule 119 (factor -> var_cte .)
+    HACER           reduce using rule 119 (factor -> var_cte .)
 
 
 state 111
@@ -1784,37 +1749,37 @@ state 111
     OR              reduce using rule 91 (var_cte -> CTE_CH .)
     ASSIGN          reduce using rule 91 (var_cte -> CTE_CH .)
     RPAREN          reduce using rule 91 (var_cte -> CTE_CH .)
-    RBRACK          reduce using rule 91 (var_cte -> CTE_CH .)
     COMMA           reduce using rule 91 (var_cte -> CTE_CH .)
-    HACER           reduce using rule 91 (var_cte -> CTE_CH .)
     HASTA           reduce using rule 91 (var_cte -> CTE_CH .)
     SEMICOLON       reduce using rule 91 (var_cte -> CTE_CH .)
+    RBRACK          reduce using rule 91 (var_cte -> CTE_CH .)
+    HACER           reduce using rule 91 (var_cte -> CTE_CH .)
 
 
 state 112
 
     (109) exp -> termino . pnQuadGenExp4 exp1
-    (135) pnQuadGenExp4 -> .
+    (136) pnQuadGenExp4 -> .
 
-    ADD             reduce using rule 135 (pnQuadGenExp4 -> .)
-    SUB             reduce using rule 135 (pnQuadGenExp4 -> .)
-    LT              reduce using rule 135 (pnQuadGenExp4 -> .)
-    GT              reduce using rule 135 (pnQuadGenExp4 -> .)
-    LE              reduce using rule 135 (pnQuadGenExp4 -> .)
-    GE              reduce using rule 135 (pnQuadGenExp4 -> .)
-    NOT_EQUAL       reduce using rule 135 (pnQuadGenExp4 -> .)
-    EQUAL           reduce using rule 135 (pnQuadGenExp4 -> .)
-    AND             reduce using rule 135 (pnQuadGenExp4 -> .)
-    OR              reduce using rule 135 (pnQuadGenExp4 -> .)
-    ASSIGN          reduce using rule 135 (pnQuadGenExp4 -> .)
-    RPAREN          reduce using rule 135 (pnQuadGenExp4 -> .)
-    COMMA           reduce using rule 135 (pnQuadGenExp4 -> .)
-    HASTA           reduce using rule 135 (pnQuadGenExp4 -> .)
-    SEMICOLON       reduce using rule 135 (pnQuadGenExp4 -> .)
-    RBRACK          reduce using rule 135 (pnQuadGenExp4 -> .)
-    HACER           reduce using rule 135 (pnQuadGenExp4 -> .)
+    ADD             reduce using rule 136 (pnQuadGenExp4 -> .)
+    SUB             reduce using rule 136 (pnQuadGenExp4 -> .)
+    LT              reduce using rule 136 (pnQuadGenExp4 -> .)
+    GT              reduce using rule 136 (pnQuadGenExp4 -> .)
+    LE              reduce using rule 136 (pnQuadGenExp4 -> .)
+    GE              reduce using rule 136 (pnQuadGenExp4 -> .)
+    NOT_EQUAL       reduce using rule 136 (pnQuadGenExp4 -> .)
+    EQUAL           reduce using rule 136 (pnQuadGenExp4 -> .)
+    AND             reduce using rule 136 (pnQuadGenExp4 -> .)
+    OR              reduce using rule 136 (pnQuadGenExp4 -> .)
+    ASSIGN          reduce using rule 136 (pnQuadGenExp4 -> .)
+    RPAREN          reduce using rule 136 (pnQuadGenExp4 -> .)
+    COMMA           reduce using rule 136 (pnQuadGenExp4 -> .)
+    HASTA           reduce using rule 136 (pnQuadGenExp4 -> .)
+    SEMICOLON       reduce using rule 136 (pnQuadGenExp4 -> .)
+    RBRACK          reduce using rule 136 (pnQuadGenExp4 -> .)
+    HACER           reduce using rule 136 (pnQuadGenExp4 -> .)
 
-    pnQuadGenExp4                  shift and go to state 155
+    pnQuadGenExp4                  shift and go to state 152
 
 state 113
 
@@ -1832,14 +1797,14 @@ state 114
     (99) op_l -> . OR
     (124) empty -> .
 
-    AND             shift and go to state 156
-    OR              shift and go to state 159
+    AND             shift and go to state 153
+    OR              shift and go to state 156
     ASSIGN          reduce using rule 124 (empty -> .)
     RPAREN          reduce using rule 124 (empty -> .)
 
-    meg                            shift and go to state 157
-    op_l                           shift and go to state 158
-    empty                          shift and go to state 160
+    meg                            shift and go to state 154
+    op_l                           shift and go to state 155
+    empty                          shift and go to state 157
 
 state 115
 
@@ -1849,10 +1814,9 @@ state 115
     DIV             reduce using rule 123 (factor -> funciones_especiales .)
     ADD             reduce using rule 123 (factor -> funciones_especiales .)
     SUB             reduce using rule 123 (factor -> funciones_especiales .)
-    HASTA           reduce using rule 123 (factor -> funciones_especiales .)
     COMMA           reduce using rule 123 (factor -> funciones_especiales .)
     RPAREN          reduce using rule 123 (factor -> funciones_especiales .)
-    RBRACK          reduce using rule 123 (factor -> funciones_especiales .)
+    HASTA           reduce using rule 123 (factor -> funciones_especiales .)
     LT              reduce using rule 123 (factor -> funciones_especiales .)
     GT              reduce using rule 123 (factor -> funciones_especiales .)
     LE              reduce using rule 123 (factor -> funciones_especiales .)
@@ -1862,8 +1826,9 @@ state 115
     AND             reduce using rule 123 (factor -> funciones_especiales .)
     OR              reduce using rule 123 (factor -> funciones_especiales .)
     ASSIGN          reduce using rule 123 (factor -> funciones_especiales .)
-    HACER           reduce using rule 123 (factor -> funciones_especiales .)
     SEMICOLON       reduce using rule 123 (factor -> funciones_especiales .)
+    RBRACK          reduce using rule 123 (factor -> funciones_especiales .)
+    HACER           reduce using rule 123 (factor -> funciones_especiales .)
 
 
 state 116
@@ -1881,10 +1846,9 @@ state 117
     DIV             reduce using rule 122 (factor -> llamada .)
     ADD             reduce using rule 122 (factor -> llamada .)
     SUB             reduce using rule 122 (factor -> llamada .)
-    HASTA           reduce using rule 122 (factor -> llamada .)
     COMMA           reduce using rule 122 (factor -> llamada .)
     RPAREN          reduce using rule 122 (factor -> llamada .)
-    RBRACK          reduce using rule 122 (factor -> llamada .)
+    HASTA           reduce using rule 122 (factor -> llamada .)
     LT              reduce using rule 122 (factor -> llamada .)
     GT              reduce using rule 122 (factor -> llamada .)
     LE              reduce using rule 122 (factor -> llamada .)
@@ -1894,8 +1858,9 @@ state 117
     AND             reduce using rule 122 (factor -> llamada .)
     OR              reduce using rule 122 (factor -> llamada .)
     ASSIGN          reduce using rule 122 (factor -> llamada .)
-    HACER           reduce using rule 122 (factor -> llamada .)
     SEMICOLON       reduce using rule 122 (factor -> llamada .)
+    RBRACK          reduce using rule 122 (factor -> llamada .)
+    HACER           reduce using rule 122 (factor -> llamada .)
 
 
 state 118
@@ -1923,7 +1888,7 @@ state 118
     RBRACK          reduce using rule 137 (pnQuadGenExp5 -> .)
     HACER           reduce using rule 137 (pnQuadGenExp5 -> .)
 
-    pnQuadGenExp5                  shift and go to state 161
+    pnQuadGenExp5                  shift and go to state 158
 
 state 119
 
@@ -1946,36 +1911,36 @@ state 121
     (94) expresion1 -> . empty
     (124) empty -> .
 
-    ASSIGN          shift and go to state 164
+    ASSIGN          shift and go to state 161
     RPAREN          reduce using rule 124 (empty -> .)
 
-    expresion1                     shift and go to state 162
-    empty                          shift and go to state 163
+    expresion1                     shift and go to state 159
+    empty                          shift and go to state 160
 
 state 122
 
     (82) funciones_especiales -> fe . LPAREN ID COMMA v_exp RPAREN
 
-    LPAREN          shift and go to state 165
+    LPAREN          shift and go to state 162
 
 
 state 123
 
     (120) factor -> LPAREN . pnQuadGenExp6 exp RPAREN pnQuadGenExp7
-    (140) pnQuadGenExp6 -> .
+    (138) pnQuadGenExp6 -> .
 
-    LPAREN          reduce using rule 140 (pnQuadGenExp6 -> .)
-    CTE_INT         reduce using rule 140 (pnQuadGenExp6 -> .)
-    CTE_FLOAT       reduce using rule 140 (pnQuadGenExp6 -> .)
-    CTE_CH          reduce using rule 140 (pnQuadGenExp6 -> .)
-    ID              reduce using rule 140 (pnQuadGenExp6 -> .)
-    CORRELACIONA    reduce using rule 140 (pnQuadGenExp6 -> .)
-    MEDIA           reduce using rule 140 (pnQuadGenExp6 -> .)
-    MEDIANA         reduce using rule 140 (pnQuadGenExp6 -> .)
-    MODA            reduce using rule 140 (pnQuadGenExp6 -> .)
-    VARIANZA        reduce using rule 140 (pnQuadGenExp6 -> .)
+    LPAREN          reduce using rule 138 (pnQuadGenExp6 -> .)
+    CTE_INT         reduce using rule 138 (pnQuadGenExp6 -> .)
+    CTE_FLOAT       reduce using rule 138 (pnQuadGenExp6 -> .)
+    CTE_CH          reduce using rule 138 (pnQuadGenExp6 -> .)
+    ID              reduce using rule 138 (pnQuadGenExp6 -> .)
+    CORRELACIONA    reduce using rule 138 (pnQuadGenExp6 -> .)
+    MEDIA           reduce using rule 138 (pnQuadGenExp6 -> .)
+    MEDIANA         reduce using rule 138 (pnQuadGenExp6 -> .)
+    MODA            reduce using rule 138 (pnQuadGenExp6 -> .)
+    VARIANZA        reduce using rule 138 (pnQuadGenExp6 -> .)
 
-    pnQuadGenExp6                  shift and go to state 166
+    pnQuadGenExp6                  shift and go to state 163
 
 state 124
 
@@ -1985,10 +1950,9 @@ state 124
     DIV             reduce using rule 121 (factor -> variable .)
     ADD             reduce using rule 121 (factor -> variable .)
     SUB             reduce using rule 121 (factor -> variable .)
-    HASTA           reduce using rule 121 (factor -> variable .)
     COMMA           reduce using rule 121 (factor -> variable .)
     RPAREN          reduce using rule 121 (factor -> variable .)
-    RBRACK          reduce using rule 121 (factor -> variable .)
+    HASTA           reduce using rule 121 (factor -> variable .)
     LT              reduce using rule 121 (factor -> variable .)
     GT              reduce using rule 121 (factor -> variable .)
     LE              reduce using rule 121 (factor -> variable .)
@@ -1998,64 +1962,65 @@ state 124
     AND             reduce using rule 121 (factor -> variable .)
     OR              reduce using rule 121 (factor -> variable .)
     ASSIGN          reduce using rule 121 (factor -> variable .)
-    HACER           reduce using rule 121 (factor -> variable .)
     SEMICOLON       reduce using rule 121 (factor -> variable .)
+    RBRACK          reduce using rule 121 (factor -> variable .)
+    HACER           reduce using rule 121 (factor -> variable .)
 
 
 state 125
 
     (89) var_cte -> CTE_INT . pnQuadGenExp1
-    (139) pnQuadGenExp1 -> .
+    (133) pnQuadGenExp1 -> .
 
-    MUL             reduce using rule 139 (pnQuadGenExp1 -> .)
-    DIV             reduce using rule 139 (pnQuadGenExp1 -> .)
-    ADD             reduce using rule 139 (pnQuadGenExp1 -> .)
-    SUB             reduce using rule 139 (pnQuadGenExp1 -> .)
-    LT              reduce using rule 139 (pnQuadGenExp1 -> .)
-    GT              reduce using rule 139 (pnQuadGenExp1 -> .)
-    LE              reduce using rule 139 (pnQuadGenExp1 -> .)
-    GE              reduce using rule 139 (pnQuadGenExp1 -> .)
-    NOT_EQUAL       reduce using rule 139 (pnQuadGenExp1 -> .)
-    EQUAL           reduce using rule 139 (pnQuadGenExp1 -> .)
-    AND             reduce using rule 139 (pnQuadGenExp1 -> .)
-    OR              reduce using rule 139 (pnQuadGenExp1 -> .)
-    ASSIGN          reduce using rule 139 (pnQuadGenExp1 -> .)
-    RPAREN          reduce using rule 139 (pnQuadGenExp1 -> .)
-    COMMA           reduce using rule 139 (pnQuadGenExp1 -> .)
-    HASTA           reduce using rule 139 (pnQuadGenExp1 -> .)
-    SEMICOLON       reduce using rule 139 (pnQuadGenExp1 -> .)
-    RBRACK          reduce using rule 139 (pnQuadGenExp1 -> .)
-    HACER           reduce using rule 139 (pnQuadGenExp1 -> .)
+    MUL             reduce using rule 133 (pnQuadGenExp1 -> .)
+    DIV             reduce using rule 133 (pnQuadGenExp1 -> .)
+    ADD             reduce using rule 133 (pnQuadGenExp1 -> .)
+    SUB             reduce using rule 133 (pnQuadGenExp1 -> .)
+    LT              reduce using rule 133 (pnQuadGenExp1 -> .)
+    GT              reduce using rule 133 (pnQuadGenExp1 -> .)
+    LE              reduce using rule 133 (pnQuadGenExp1 -> .)
+    GE              reduce using rule 133 (pnQuadGenExp1 -> .)
+    NOT_EQUAL       reduce using rule 133 (pnQuadGenExp1 -> .)
+    EQUAL           reduce using rule 133 (pnQuadGenExp1 -> .)
+    AND             reduce using rule 133 (pnQuadGenExp1 -> .)
+    OR              reduce using rule 133 (pnQuadGenExp1 -> .)
+    ASSIGN          reduce using rule 133 (pnQuadGenExp1 -> .)
+    RPAREN          reduce using rule 133 (pnQuadGenExp1 -> .)
+    COMMA           reduce using rule 133 (pnQuadGenExp1 -> .)
+    HASTA           reduce using rule 133 (pnQuadGenExp1 -> .)
+    SEMICOLON       reduce using rule 133 (pnQuadGenExp1 -> .)
+    RBRACK          reduce using rule 133 (pnQuadGenExp1 -> .)
+    HACER           reduce using rule 133 (pnQuadGenExp1 -> .)
 
-    pnQuadGenExp1                  shift and go to state 167
+    pnQuadGenExp1                  shift and go to state 164
 
 state 126
 
     (54) variable -> ID . pnQuadGenExp1 di
     (57) llamada -> ID . LPAREN llamada1 RPAREN SEMICOLON
-    (139) pnQuadGenExp1 -> .
+    (133) pnQuadGenExp1 -> .
 
     LPAREN          shift and go to state 101
-    LBRACK          reduce using rule 139 (pnQuadGenExp1 -> .)
-    MUL             reduce using rule 139 (pnQuadGenExp1 -> .)
-    DIV             reduce using rule 139 (pnQuadGenExp1 -> .)
-    ADD             reduce using rule 139 (pnQuadGenExp1 -> .)
-    SUB             reduce using rule 139 (pnQuadGenExp1 -> .)
-    LT              reduce using rule 139 (pnQuadGenExp1 -> .)
-    GT              reduce using rule 139 (pnQuadGenExp1 -> .)
-    LE              reduce using rule 139 (pnQuadGenExp1 -> .)
-    GE              reduce using rule 139 (pnQuadGenExp1 -> .)
-    NOT_EQUAL       reduce using rule 139 (pnQuadGenExp1 -> .)
-    EQUAL           reduce using rule 139 (pnQuadGenExp1 -> .)
-    AND             reduce using rule 139 (pnQuadGenExp1 -> .)
-    OR              reduce using rule 139 (pnQuadGenExp1 -> .)
-    ASSIGN          reduce using rule 139 (pnQuadGenExp1 -> .)
-    RPAREN          reduce using rule 139 (pnQuadGenExp1 -> .)
-    COMMA           reduce using rule 139 (pnQuadGenExp1 -> .)
-    HASTA           reduce using rule 139 (pnQuadGenExp1 -> .)
-    RBRACK          reduce using rule 139 (pnQuadGenExp1 -> .)
-    SEMICOLON       reduce using rule 139 (pnQuadGenExp1 -> .)
-    HACER           reduce using rule 139 (pnQuadGenExp1 -> .)
+    LBRACK          reduce using rule 133 (pnQuadGenExp1 -> .)
+    MUL             reduce using rule 133 (pnQuadGenExp1 -> .)
+    DIV             reduce using rule 133 (pnQuadGenExp1 -> .)
+    ADD             reduce using rule 133 (pnQuadGenExp1 -> .)
+    SUB             reduce using rule 133 (pnQuadGenExp1 -> .)
+    LT              reduce using rule 133 (pnQuadGenExp1 -> .)
+    GT              reduce using rule 133 (pnQuadGenExp1 -> .)
+    LE              reduce using rule 133 (pnQuadGenExp1 -> .)
+    GE              reduce using rule 133 (pnQuadGenExp1 -> .)
+    NOT_EQUAL       reduce using rule 133 (pnQuadGenExp1 -> .)
+    EQUAL           reduce using rule 133 (pnQuadGenExp1 -> .)
+    AND             reduce using rule 133 (pnQuadGenExp1 -> .)
+    OR              reduce using rule 133 (pnQuadGenExp1 -> .)
+    ASSIGN          reduce using rule 133 (pnQuadGenExp1 -> .)
+    RPAREN          reduce using rule 133 (pnQuadGenExp1 -> .)
+    COMMA           reduce using rule 133 (pnQuadGenExp1 -> .)
+    HASTA           reduce using rule 133 (pnQuadGenExp1 -> .)
+    RBRACK          reduce using rule 133 (pnQuadGenExp1 -> .)
+    SEMICOLON       reduce using rule 133 (pnQuadGenExp1 -> .)
+    HACER           reduce using rule 133 (pnQuadGenExp1 -> .)
 
     pnQuadGenExp1                  shift and go to state 100
 
@@ -2063,41 +2028,41 @@ state 127
 
     (76) condicional -> MIENTRAS LPAREN expresion . RPAREN HAZ bloque
 
-    RPAREN          shift and go to state 168
+    RPAREN          shift and go to state 165
 
 
 state 128
 
     (90) var_cte -> CTE_FLOAT . pnQuadGenExp1
-    (139) pnQuadGenExp1 -> .
+    (133) pnQuadGenExp1 -> .
 
-    MUL             reduce using rule 139 (pnQuadGenExp1 -> .)
-    DIV             reduce using rule 139 (pnQuadGenExp1 -> .)
-    ADD             reduce using rule 139 (pnQuadGenExp1 -> .)
-    SUB             reduce using rule 139 (pnQuadGenExp1 -> .)
-    LT              reduce using rule 139 (pnQuadGenExp1 -> .)
-    GT              reduce using rule 139 (pnQuadGenExp1 -> .)
-    LE              reduce using rule 139 (pnQuadGenExp1 -> .)
-    GE              reduce using rule 139 (pnQuadGenExp1 -> .)
-    NOT_EQUAL       reduce using rule 139 (pnQuadGenExp1 -> .)
-    EQUAL           reduce using rule 139 (pnQuadGenExp1 -> .)
-    AND             reduce using rule 139 (pnQuadGenExp1 -> .)
-    OR              reduce using rule 139 (pnQuadGenExp1 -> .)
-    ASSIGN          reduce using rule 139 (pnQuadGenExp1 -> .)
-    RPAREN          reduce using rule 139 (pnQuadGenExp1 -> .)
-    COMMA           reduce using rule 139 (pnQuadGenExp1 -> .)
-    HASTA           reduce using rule 139 (pnQuadGenExp1 -> .)
-    SEMICOLON       reduce using rule 139 (pnQuadGenExp1 -> .)
-    RBRACK          reduce using rule 139 (pnQuadGenExp1 -> .)
-    HACER           reduce using rule 139 (pnQuadGenExp1 -> .)
+    MUL             reduce using rule 133 (pnQuadGenExp1 -> .)
+    DIV             reduce using rule 133 (pnQuadGenExp1 -> .)
+    ADD             reduce using rule 133 (pnQuadGenExp1 -> .)
+    SUB             reduce using rule 133 (pnQuadGenExp1 -> .)
+    LT              reduce using rule 133 (pnQuadGenExp1 -> .)
+    GT              reduce using rule 133 (pnQuadGenExp1 -> .)
+    LE              reduce using rule 133 (pnQuadGenExp1 -> .)
+    GE              reduce using rule 133 (pnQuadGenExp1 -> .)
+    NOT_EQUAL       reduce using rule 133 (pnQuadGenExp1 -> .)
+    EQUAL           reduce using rule 133 (pnQuadGenExp1 -> .)
+    AND             reduce using rule 133 (pnQuadGenExp1 -> .)
+    OR              reduce using rule 133 (pnQuadGenExp1 -> .)
+    ASSIGN          reduce using rule 133 (pnQuadGenExp1 -> .)
+    RPAREN          reduce using rule 133 (pnQuadGenExp1 -> .)
+    COMMA           reduce using rule 133 (pnQuadGenExp1 -> .)
+    HASTA           reduce using rule 133 (pnQuadGenExp1 -> .)
+    SEMICOLON       reduce using rule 133 (pnQuadGenExp1 -> .)
+    RBRACK          reduce using rule 133 (pnQuadGenExp1 -> .)
+    HACER           reduce using rule 133 (pnQuadGenExp1 -> .)
 
-    pnQuadGenExp1                  shift and go to state 169
+    pnQuadGenExp1                  shift and go to state 166
 
 state 129
 
     (83) funciones_especiales -> CORRELACIONA . LPAREN ID COMMA v_exp COMMA v_exp RPAREN
 
-    LPAREN          shift and go to state 170
+    LPAREN          shift and go to state 167
 
 
 state 130
@@ -2113,72 +2078,84 @@ state 130
     (108) op_r -> . EQUAL pnQuadGenExp8
     (124) empty -> .
 
-    LT              shift and go to state 177
-    GT              shift and go to state 171
-    LE              shift and go to state 178
-    GE              shift and go to state 174
-    NOT_EQUAL       shift and go to state 172
-    EQUAL           shift and go to state 176
+    LT              shift and go to state 174
+    GT              shift and go to state 168
+    LE              shift and go to state 175
+    GE              shift and go to state 171
+    NOT_EQUAL       shift and go to state 169
+    EQUAL           shift and go to state 173
     AND             reduce using rule 124 (empty -> .)
     OR              reduce using rule 124 (empty -> .)
     ASSIGN          reduce using rule 124 (empty -> .)
     RPAREN          reduce using rule 124 (empty -> .)
 
-    sp                             shift and go to state 173
-    op_r                           shift and go to state 175
-    empty                          shift and go to state 179
+    sp                             shift and go to state 170
+    op_r                           shift and go to state 172
+    empty                          shift and go to state 176
 
 state 131
 
     (62) retorno -> REGRESA LPAREN exp . RPAREN SEMICOLON
 
-    RPAREN          shift and go to state 180
+    RPAREN          shift and go to state 177
 
 
 state 132
 
-    (64) escritura -> ESCRIBE LPAREN esc . RPAREN SEMICOLON
+    (64) escritura -> ESCRIBE pnQuadGenSec3 LPAREN . esc RPAREN SEMICOLON pnQuadGenSec4
+    (65) esc -> . esc1 esc2
+    (66) esc1 -> . exp
+    (67) esc1 -> . CTE_STR
+    (109) exp -> . termino pnQuadGenExp4 exp1
+    (114) termino -> . factor pnQuadGenExp5 term
+    (119) factor -> . var_cte
+    (120) factor -> . LPAREN pnQuadGenExp6 exp RPAREN pnQuadGenExp7
+    (121) factor -> . variable
+    (122) factor -> . llamada
+    (123) factor -> . funciones_especiales
+    (89) var_cte -> . CTE_INT pnQuadGenExp1
+    (90) var_cte -> . CTE_FLOAT pnQuadGenExp1
+    (91) var_cte -> . CTE_CH
+    (54) variable -> . ID pnQuadGenExp1 di
+    (57) llamada -> . ID LPAREN llamada1 RPAREN SEMICOLON
+    (82) funciones_especiales -> . fe LPAREN ID COMMA v_exp RPAREN
+    (83) funciones_especiales -> . CORRELACIONA LPAREN ID COMMA v_exp COMMA v_exp RPAREN
+    (84) fe -> . MEDIA
+    (85) fe -> . MEDIANA
+    (86) fe -> . MODA
+    (87) fe -> . VARIANZA
 
-    RPAREN          shift and go to state 181
+    CTE_STR         shift and go to state 180
+    LPAREN          shift and go to state 123
+    CTE_INT         shift and go to state 125
+    CTE_FLOAT       shift and go to state 128
+    CTE_CH          shift and go to state 111
+    ID              shift and go to state 126
+    CORRELACIONA    shift and go to state 129
+    MEDIA           shift and go to state 120
+    MEDIANA         shift and go to state 119
+    MODA            shift and go to state 116
+    VARIANZA        shift and go to state 113
 
+    var_cte                        shift and go to state 110
+    termino                        shift and go to state 112
+    funciones_especiales           shift and go to state 115
+    llamada                        shift and go to state 117
+    esc                            shift and go to state 178
+    factor                         shift and go to state 118
+    esc1                           shift and go to state 179
+    fe                             shift and go to state 122
+    variable                       shift and go to state 124
+    exp                            shift and go to state 181
 
 state 133
 
-    (65) esc -> esc1 . esc2
-    (68) esc2 -> . COMMA esc
-    (69) esc2 -> . empty
-    (124) empty -> .
-
-    COMMA           shift and go to state 183
-    RPAREN          reduce using rule 124 (empty -> .)
-
-    esc2                           shift and go to state 182
-    empty                          shift and go to state 184
-
-state 134
-
-    (67) esc1 -> CTE_STR .
-
-    COMMA           reduce using rule 67 (esc1 -> CTE_STR .)
-    RPAREN          reduce using rule 67 (esc1 -> CTE_STR .)
-
-
-state 135
-
-    (66) esc1 -> exp .
-
-    COMMA           reduce using rule 66 (esc1 -> exp .)
-    RPAREN          reduce using rule 66 (esc1 -> exp .)
-
-
-state 136
-
     (78) funciones_especiales_void -> VARIABLES LPAREN ID . COMMA ID COMMA ID RPAREN SEMICOLON
 
-    COMMA           shift and go to state 185
+    COMMA           shift and go to state 182
 
 
-state 137
+state 134
 
     (77) no_condicional -> DESDE variable ASSIGN . exp HASTA exp HACER bloque
     (109) exp -> . termino pnQuadGenExp4 exp1
@@ -2215,12 +2192,12 @@ state 137
     var_cte                        shift and go to state 110
     llamada                        shift and go to state 117
     termino                        shift and go to state 112
-    exp                            shift and go to state 186
+    exp                            shift and go to state 183
     factor                         shift and go to state 118
     variable                       shift and go to state 124
     fe                             shift and go to state 122
 
-state 138
+state 135
 
     (51) asignacion -> variable ASSIGN pnQuadGenSec1 . asig
     (52) asig -> . llamada
@@ -2256,16 +2233,16 @@ state 138
     VARIANZA        shift and go to state 113
 
     funciones_especiales           shift and go to state 115
-    asig                           shift and go to state 187
+    asig                           shift and go to state 184
     var_cte                        shift and go to state 110
-    llamada                        shift and go to state 188
+    llamada                        shift and go to state 185
     termino                        shift and go to state 112
-    exp                            shift and go to state 189
+    exp                            shift and go to state 186
     factor                         shift and go to state 118
     variable                       shift and go to state 124
     fe                             shift and go to state 122
 
-state 139
+state 136
 
     (55) di -> dim_index .
 
@@ -2290,7 +2267,7 @@ state 139
     HACER           reduce using rule 55 (di -> dim_index .)
 
 
-state 140
+state 137
 
     (54) variable -> ID pnQuadGenExp1 di .
 
@@ -2299,9 +2276,6 @@ state 140
     ADD             reduce using rule 54 (variable -> ID pnQuadGenExp1 di .)
     SUB             reduce using rule 54 (variable -> ID pnQuadGenExp1 di .)
     RBRACK          reduce using rule 54 (variable -> ID pnQuadGenExp1 di .)
-    SEMICOLON       reduce using rule 54 (variable -> ID pnQuadGenExp1 di .)
-    COMMA           reduce using rule 54 (variable -> ID pnQuadGenExp1 di .)
-    RPAREN          reduce using rule 54 (variable -> ID pnQuadGenExp1 di .)
     LT              reduce using rule 54 (variable -> ID pnQuadGenExp1 di .)
     GT              reduce using rule 54 (variable -> ID pnQuadGenExp1 di .)
     LE              reduce using rule 54 (variable -> ID pnQuadGenExp1 di .)
@@ -2311,11 +2285,14 @@ state 140
     AND             reduce using rule 54 (variable -> ID pnQuadGenExp1 di .)
     OR              reduce using rule 54 (variable -> ID pnQuadGenExp1 di .)
     ASSIGN          reduce using rule 54 (variable -> ID pnQuadGenExp1 di .)
+    RPAREN          reduce using rule 54 (variable -> ID pnQuadGenExp1 di .)
+    COMMA           reduce using rule 54 (variable -> ID pnQuadGenExp1 di .)
     HASTA           reduce using rule 54 (variable -> ID pnQuadGenExp1 di .)
+    SEMICOLON       reduce using rule 54 (variable -> ID pnQuadGenExp1 di .)
     HACER           reduce using rule 54 (variable -> ID pnQuadGenExp1 di .)
 
 
-state 141
+state 138
 
     (35) dim_index -> LBRACK . exp RBRACK dim_index1
     (109) exp -> . termino pnQuadGenExp4 exp1
@@ -2352,12 +2329,12 @@ state 141
     var_cte                        shift and go to state 110
     llamada                        shift and go to state 117
     termino                        shift and go to state 112
-    exp                            shift and go to state 190
+    exp                            shift and go to state 187
     factor                         shift and go to state 118
     variable                       shift and go to state 124
     fe                             shift and go to state 122
 
-state 142
+state 139
 
     (56) di -> empty .
 
@@ -2382,68 +2359,70 @@ state 142
     HACER           reduce using rule 56 (di -> empty .)
 
 
-state 143
+state 140
 
     (57) llamada -> ID LPAREN llamada1 . RPAREN SEMICOLON
 
-    RPAREN          shift and go to state 191
+    RPAREN          shift and go to state 188
 
 
-state 144
+state 141
 
     (59) llamada1 -> empty .
 
     RPAREN          reduce using rule 59 (llamada1 -> empty .)
 
 
-state 145
+state 142
 
     (58) llamada1 -> exp . llamada2
     (60) llamada2 -> . COMMA llamada1
     (61) llamada2 -> . empty
     (124) empty -> .
 
-    COMMA           shift and go to state 193
+    COMMA           shift and go to state 190
     RPAREN          reduce using rule 124 (empty -> .)
 
-    llamada2                       shift and go to state 192
-    empty                          shift and go to state 194
+    llamada2                       shift and go to state 189
+    empty                          shift and go to state 191
 
-state 146
+state 143
 
-    (63) lectura -> LEE LPAREN variable . RPAREN SEMICOLON
+    (63) lectura -> LEE pnQuadGenSec3 LPAREN . variable RPAREN SEMICOLON pnQuadGenSec4
+    (54) variable -> . ID pnQuadGenExp1 di
 
-    RPAREN          shift and go to state 195
+    ID              shift and go to state 97
 
+    variable                       shift and go to state 192
 
-state 147
+state 144
 
     (79) funciones_especiales_void -> fev LPAREN ID . COMMA v_exp RPAREN SEMICOLON
 
-    COMMA           shift and go to state 196
+    COMMA           shift and go to state 193
 
 
-state 148
+state 145
 
     (73) decision -> SI LPAREN expresion . RPAREN ENTONCES bloque sino
 
-    RPAREN          shift and go to state 197
+    RPAREN          shift and go to state 194
 
 
-state 149
+state 146
 
     (18) param -> tipo_simple ID pn_4_params . param1
     (19) param1 -> . COMMA param
     (20) param1 -> . empty
     (124) empty -> .
 
-    COMMA           shift and go to state 198
+    COMMA           shift and go to state 195
     RPAREN          reduce using rule 124 (empty -> .)
 
-    empty                          shift and go to state 200
-    param1                         shift and go to state 199
+    empty                          shift and go to state 197
+    param1                         shift and go to state 196
 
-state 150
+state 147
 
     (13) funcion -> FUNCION tipo_fun ID pn_3_addFunction LPAREN parametros RPAREN pn_5_updateContParams . var1 bloque
     (2) var1 -> . var
@@ -2454,11 +2433,11 @@ state 150
     VAR             shift and go to state 6
     LBRACE          reduce using rule 124 (empty -> .)
 
-    var1                           shift and go to state 201
+    var1                           shift and go to state 198
     var                            shift and go to state 7
     empty                          shift and go to state 8
 
-state 151
+state 148
 
     (32) dim_dec -> LBRACK CTE_INT RBRACK pn_7_decRenglones dim_dec1 .
 
@@ -2466,14 +2445,14 @@ state 151
     SEMICOLON       reduce using rule 32 (dim_dec -> LBRACK CTE_INT RBRACK pn_7_decRenglones dim_dec1 .)
 
 
-state 152
+state 149
 
     (33) dim_dec1 -> LBRACK . CTE_INT RBRACK pn_8_decColumnas
 
-    CTE_INT         shift and go to state 202
+    CTE_INT         shift and go to state 199
 
 
-state 153
+state 150
 
     (34) dim_dec1 -> empty .
 
@@ -2481,14 +2460,14 @@ state 153
     SEMICOLON       reduce using rule 34 (dim_dec1 -> empty .)
 
 
-state 154
+state 151
 
     (70) carga_datos -> CARGA LPAREN ID COMMA . CTE_STR COMMA ca COMMA ca RPAREN SEMICOLON
 
-    CTE_STR         shift and go to state 203
+    CTE_STR         shift and go to state 200
 
 
-state 155
+state 152
 
     (109) exp -> termino pnQuadGenExp4 . exp1
     (110) exp1 -> . op_a exp
@@ -2497,8 +2476,8 @@ state 155
     (113) op_a -> . SUB pnQuadGenExp2
     (124) empty -> .
 
-    ADD             shift and go to state 205
-    SUB             shift and go to state 208
+    ADD             shift and go to state 202
+    SUB             shift and go to state 205
     LT              reduce using rule 124 (empty -> .)
     GT              reduce using rule 124 (empty -> .)
     LE              reduce using rule 124 (empty -> .)
@@ -2515,11 +2494,11 @@ state 155
     RBRACK          reduce using rule 124 (empty -> .)
     HACER           reduce using rule 124 (empty -> .)
 
-    exp1                           shift and go to state 204
-    op_a                           shift and go to state 206
-    empty                          shift and go to state 207
+    exp1                           shift and go to state 201
+    op_a                           shift and go to state 203
+    empty                          shift and go to state 204
 
-state 156
+state 153
 
     (98) op_l -> AND .
 
@@ -2535,7 +2514,7 @@ state 156
     VARIANZA        reduce using rule 98 (op_l -> AND .)
 
 
-state 157
+state 154
 
     (95) mega_exp -> super_exp meg .
 
@@ -2543,7 +2522,7 @@ state 157
     RPAREN          reduce using rule 95 (mega_exp -> super_exp meg .)
 
 
-state 158
+state 155
 
     (96) meg -> op_l . pnQuadGenExp10 mega_exp pnQuadGenExp11
     (142) pnQuadGenExp10 -> .
@@ -2559,9 +2538,9 @@ state 158
     MODA            reduce using rule 142 (pnQuadGenExp10 -> .)
     VARIANZA        reduce using rule 142 (pnQuadGenExp10 -> .)
 
-    pnQuadGenExp10                 shift and go to state 209
+    pnQuadGenExp10                 shift and go to state 206
 
-state 159
+state 156
 
     (99) op_l -> OR .
 
@@ -2577,7 +2556,7 @@ state 159
     VARIANZA        reduce using rule 99 (op_l -> OR .)
 
 
-state 160
+state 157
 
     (97) meg -> empty .
 
@@ -2585,7 +2564,7 @@ state 160
     RPAREN          reduce using rule 97 (meg -> empty .)
 
 
-state 161
+state 158
 
     (114) termino -> factor pnQuadGenExp5 . term
     (115) term -> . op_a1 termino
@@ -2594,8 +2573,8 @@ state 161
     (118) op_a1 -> . DIV pnQuadGenExp3
     (124) empty -> .
 
-    MUL             shift and go to state 211
-    DIV             shift and go to state 212
+    MUL             shift and go to state 208
+    DIV             shift and go to state 209
     ADD             reduce using rule 124 (empty -> .)
     SUB             reduce using rule 124 (empty -> .)
     LT              reduce using rule 124 (empty -> .)
@@ -2614,25 +2593,25 @@ state 161
     RBRACK          reduce using rule 124 (empty -> .)
     HACER           reduce using rule 124 (empty -> .)
 
-    term                           shift and go to state 210
-    empty                          shift and go to state 213
-    op_a1                          shift and go to state 214
+    term                           shift and go to state 207
+    empty                          shift and go to state 210
+    op_a1                          shift and go to state 211
 
-state 162
+state 159
 
     (92) expresion -> mega_exp expresion1 .
 
     RPAREN          reduce using rule 92 (expresion -> mega_exp expresion1 .)
 
 
-state 163
+state 160
 
     (94) expresion1 -> empty .
 
     RPAREN          reduce using rule 94 (expresion1 -> empty .)
 
 
-state 164
+state 161
 
     (93) expresion1 -> ASSIGN . expresion
     (92) expresion -> . mega_exp expresion1
@@ -2677,17 +2656,17 @@ state 164
     mega_exp                       shift and go to state 121
     fe                             shift and go to state 122
     variable                       shift and go to state 124
-    expresion                      shift and go to state 215
+    expresion                      shift and go to state 212
     exp                            shift and go to state 130
 
-state 165
+state 162
 
     (82) funciones_especiales -> fe LPAREN . ID COMMA v_exp RPAREN
 
-    ID              shift and go to state 216
+    ID              shift and go to state 213
 
 
-state 166
+state 163
 
     (120) factor -> LPAREN pnQuadGenExp6 . exp RPAREN pnQuadGenExp7
     (109) exp -> . termino pnQuadGenExp4 exp1
@@ -2724,12 +2703,12 @@ state 166
     var_cte                        shift and go to state 110
     llamada                        shift and go to state 117
     termino                        shift and go to state 112
-    exp                            shift and go to state 217
+    exp                            shift and go to state 214
     factor                         shift and go to state 118
     variable                       shift and go to state 124
     fe                             shift and go to state 122
 
-state 167
+state 164
 
     (89) var_cte -> CTE_INT pnQuadGenExp1 .
 
@@ -2747,21 +2726,21 @@ state 167
     OR              reduce using rule 89 (var_cte -> CTE_INT pnQuadGenExp1 .)
     ASSIGN          reduce using rule 89 (var_cte -> CTE_INT pnQuadGenExp1 .)
     RPAREN          reduce using rule 89 (var_cte -> CTE_INT pnQuadGenExp1 .)
-    RBRACK          reduce using rule 89 (var_cte -> CTE_INT pnQuadGenExp1 .)
     COMMA           reduce using rule 89 (var_cte -> CTE_INT pnQuadGenExp1 .)
-    HACER           reduce using rule 89 (var_cte -> CTE_INT pnQuadGenExp1 .)
     HASTA           reduce using rule 89 (var_cte -> CTE_INT pnQuadGenExp1 .)
     SEMICOLON       reduce using rule 89 (var_cte -> CTE_INT pnQuadGenExp1 .)
+    RBRACK          reduce using rule 89 (var_cte -> CTE_INT pnQuadGenExp1 .)
+    HACER           reduce using rule 89 (var_cte -> CTE_INT pnQuadGenExp1 .)
 
 
-state 168
+state 165
 
     (76) condicional -> MIENTRAS LPAREN expresion RPAREN . HAZ bloque
 
-    HAZ             shift and go to state 218
+    HAZ             shift and go to state 215
 
 
-state 169
+state 166
 
     (90) var_cte -> CTE_FLOAT pnQuadGenExp1 .
 
@@ -2779,57 +2758,57 @@ state 169
     OR              reduce using rule 90 (var_cte -> CTE_FLOAT pnQuadGenExp1 .)
     ASSIGN          reduce using rule 90 (var_cte -> CTE_FLOAT pnQuadGenExp1 .)
     RPAREN          reduce using rule 90 (var_cte -> CTE_FLOAT pnQuadGenExp1 .)
-    RBRACK          reduce using rule 90 (var_cte -> CTE_FLOAT pnQuadGenExp1 .)
     COMMA           reduce using rule 90 (var_cte -> CTE_FLOAT pnQuadGenExp1 .)
-    HACER           reduce using rule 90 (var_cte -> CTE_FLOAT pnQuadGenExp1 .)
     HASTA           reduce using rule 90 (var_cte -> CTE_FLOAT pnQuadGenExp1 .)
     SEMICOLON       reduce using rule 90 (var_cte -> CTE_FLOAT pnQuadGenExp1 .)
+    RBRACK          reduce using rule 90 (var_cte -> CTE_FLOAT pnQuadGenExp1 .)
+    HACER           reduce using rule 90 (var_cte -> CTE_FLOAT pnQuadGenExp1 .)
 
 
-state 170
+state 167
 
     (83) funciones_especiales -> CORRELACIONA LPAREN . ID COMMA v_exp COMMA v_exp RPAREN
 
-    ID              shift and go to state 219
+    ID              shift and go to state 216
 
 
-state 171
+state 168
 
     (104) op_r -> GT . pnQuadGenExp8
-    (133) pnQuadGenExp8 -> .
+    (140) pnQuadGenExp8 -> .
 
-    LPAREN          reduce using rule 133 (pnQuadGenExp8 -> .)
-    CTE_INT         reduce using rule 133 (pnQuadGenExp8 -> .)
-    CTE_FLOAT       reduce using rule 133 (pnQuadGenExp8 -> .)
-    CTE_CH          reduce using rule 133 (pnQuadGenExp8 -> .)
-    ID              reduce using rule 133 (pnQuadGenExp8 -> .)
-    CORRELACIONA    reduce using rule 133 (pnQuadGenExp8 -> .)
-    MEDIA           reduce using rule 133 (pnQuadGenExp8 -> .)
-    MEDIANA         reduce using rule 133 (pnQuadGenExp8 -> .)
-    MODA            reduce using rule 133 (pnQuadGenExp8 -> .)
-    VARIANZA        reduce using rule 133 (pnQuadGenExp8 -> .)
+    LPAREN          reduce using rule 140 (pnQuadGenExp8 -> .)
+    CTE_INT         reduce using rule 140 (pnQuadGenExp8 -> .)
+    CTE_FLOAT       reduce using rule 140 (pnQuadGenExp8 -> .)
+    CTE_CH          reduce using rule 140 (pnQuadGenExp8 -> .)
+    ID              reduce using rule 140 (pnQuadGenExp8 -> .)
+    CORRELACIONA    reduce using rule 140 (pnQuadGenExp8 -> .)
+    MEDIA           reduce using rule 140 (pnQuadGenExp8 -> .)
+    MEDIANA         reduce using rule 140 (pnQuadGenExp8 -> .)
+    MODA            reduce using rule 140 (pnQuadGenExp8 -> .)
+    VARIANZA        reduce using rule 140 (pnQuadGenExp8 -> .)
 
-    pnQuadGenExp8                  shift and go to state 220
+    pnQuadGenExp8                  shift and go to state 217
 
-state 172
+state 169
 
     (107) op_r -> NOT_EQUAL . pnQuadGenExp8
-    (133) pnQuadGenExp8 -> .
+    (140) pnQuadGenExp8 -> .
 
-    LPAREN          reduce using rule 133 (pnQuadGenExp8 -> .)
-    CTE_INT         reduce using rule 133 (pnQuadGenExp8 -> .)
-    CTE_FLOAT       reduce using rule 133 (pnQuadGenExp8 -> .)
-    CTE_CH          reduce using rule 133 (pnQuadGenExp8 -> .)
-    ID              reduce using rule 133 (pnQuadGenExp8 -> .)
-    CORRELACIONA    reduce using rule 133 (pnQuadGenExp8 -> .)
-    MEDIA           reduce using rule 133 (pnQuadGenExp8 -> .)
-    MEDIANA         reduce using rule 133 (pnQuadGenExp8 -> .)
-    MODA            reduce using rule 133 (pnQuadGenExp8 -> .)
-    VARIANZA        reduce using rule 133 (pnQuadGenExp8 -> .)
+    LPAREN          reduce using rule 140 (pnQuadGenExp8 -> .)
+    CTE_INT         reduce using rule 140 (pnQuadGenExp8 -> .)
+    CTE_FLOAT       reduce using rule 140 (pnQuadGenExp8 -> .)
+    CTE_CH          reduce using rule 140 (pnQuadGenExp8 -> .)
+    ID              reduce using rule 140 (pnQuadGenExp8 -> .)
+    CORRELACIONA    reduce using rule 140 (pnQuadGenExp8 -> .)
+    MEDIA           reduce using rule 140 (pnQuadGenExp8 -> .)
+    MEDIANA         reduce using rule 140 (pnQuadGenExp8 -> .)
+    MODA            reduce using rule 140 (pnQuadGenExp8 -> .)
+    VARIANZA        reduce using rule 140 (pnQuadGenExp8 -> .)
 
-    pnQuadGenExp8                  shift and go to state 221
+    pnQuadGenExp8                  shift and go to state 218
 
-state 173
+state 170
 
     (100) super_exp -> exp sp .
 
@@ -2839,25 +2818,25 @@ state 173
     RPAREN          reduce using rule 100 (super_exp -> exp sp .)
 
 
-state 174
+state 171
 
     (106) op_r -> GE . pnQuadGenExp8
-    (133) pnQuadGenExp8 -> .
+    (140) pnQuadGenExp8 -> .
 
-    LPAREN          reduce using rule 133 (pnQuadGenExp8 -> .)
-    CTE_INT         reduce using rule 133 (pnQuadGenExp8 -> .)
-    CTE_FLOAT       reduce using rule 133 (pnQuadGenExp8 -> .)
-    CTE_CH          reduce using rule 133 (pnQuadGenExp8 -> .)
-    ID              reduce using rule 133 (pnQuadGenExp8 -> .)
-    CORRELACIONA    reduce using rule 133 (pnQuadGenExp8 -> .)
-    MEDIA           reduce using rule 133 (pnQuadGenExp8 -> .)
-    MEDIANA         reduce using rule 133 (pnQuadGenExp8 -> .)
-    MODA            reduce using rule 133 (pnQuadGenExp8 -> .)
-    VARIANZA        reduce using rule 133 (pnQuadGenExp8 -> .)
+    LPAREN          reduce using rule 140 (pnQuadGenExp8 -> .)
+    CTE_INT         reduce using rule 140 (pnQuadGenExp8 -> .)
+    CTE_FLOAT       reduce using rule 140 (pnQuadGenExp8 -> .)
+    CTE_CH          reduce using rule 140 (pnQuadGenExp8 -> .)
+    ID              reduce using rule 140 (pnQuadGenExp8 -> .)
+    CORRELACIONA    reduce using rule 140 (pnQuadGenExp8 -> .)
+    MEDIA           reduce using rule 140 (pnQuadGenExp8 -> .)
+    MEDIANA         reduce using rule 140 (pnQuadGenExp8 -> .)
+    MODA            reduce using rule 140 (pnQuadGenExp8 -> .)
+    VARIANZA        reduce using rule 140 (pnQuadGenExp8 -> .)
 
-    pnQuadGenExp8                  shift and go to state 222
+    pnQuadGenExp8                  shift and go to state 219
 
-state 175
+state 172
 
     (101) sp -> op_r . exp pnQuadGenExp9
     (109) exp -> . termino pnQuadGenExp4 exp1
@@ -2894,66 +2873,66 @@ state 175
     var_cte                        shift and go to state 110
     llamada                        shift and go to state 117
     termino                        shift and go to state 112
-    exp                            shift and go to state 223
+    exp                            shift and go to state 220
     factor                         shift and go to state 118
     variable                       shift and go to state 124
     fe                             shift and go to state 122
 
-state 176
+state 173
 
     (108) op_r -> EQUAL . pnQuadGenExp8
-    (133) pnQuadGenExp8 -> .
+    (140) pnQuadGenExp8 -> .
 
-    LPAREN          reduce using rule 133 (pnQuadGenExp8 -> .)
-    CTE_INT         reduce using rule 133 (pnQuadGenExp8 -> .)
-    CTE_FLOAT       reduce using rule 133 (pnQuadGenExp8 -> .)
-    CTE_CH          reduce using rule 133 (pnQuadGenExp8 -> .)
-    ID              reduce using rule 133 (pnQuadGenExp8 -> .)
-    CORRELACIONA    reduce using rule 133 (pnQuadGenExp8 -> .)
-    MEDIA           reduce using rule 133 (pnQuadGenExp8 -> .)
-    MEDIANA         reduce using rule 133 (pnQuadGenExp8 -> .)
-    MODA            reduce using rule 133 (pnQuadGenExp8 -> .)
-    VARIANZA        reduce using rule 133 (pnQuadGenExp8 -> .)
+    LPAREN          reduce using rule 140 (pnQuadGenExp8 -> .)
+    CTE_INT         reduce using rule 140 (pnQuadGenExp8 -> .)
+    CTE_FLOAT       reduce using rule 140 (pnQuadGenExp8 -> .)
+    CTE_CH          reduce using rule 140 (pnQuadGenExp8 -> .)
+    ID              reduce using rule 140 (pnQuadGenExp8 -> .)
+    CORRELACIONA    reduce using rule 140 (pnQuadGenExp8 -> .)
+    MEDIA           reduce using rule 140 (pnQuadGenExp8 -> .)
+    MEDIANA         reduce using rule 140 (pnQuadGenExp8 -> .)
+    MODA            reduce using rule 140 (pnQuadGenExp8 -> .)
+    VARIANZA        reduce using rule 140 (pnQuadGenExp8 -> .)
 
-    pnQuadGenExp8                  shift and go to state 224
+    pnQuadGenExp8                  shift and go to state 221
 
-state 177
+state 174
 
     (103) op_r -> LT . pnQuadGenExp8
-    (133) pnQuadGenExp8 -> .
+    (140) pnQuadGenExp8 -> .
 
-    LPAREN          reduce using rule 133 (pnQuadGenExp8 -> .)
-    CTE_INT         reduce using rule 133 (pnQuadGenExp8 -> .)
-    CTE_FLOAT       reduce using rule 133 (pnQuadGenExp8 -> .)
-    CTE_CH          reduce using rule 133 (pnQuadGenExp8 -> .)
-    ID              reduce using rule 133 (pnQuadGenExp8 -> .)
-    CORRELACIONA    reduce using rule 133 (pnQuadGenExp8 -> .)
-    MEDIA           reduce using rule 133 (pnQuadGenExp8 -> .)
-    MEDIANA         reduce using rule 133 (pnQuadGenExp8 -> .)
-    MODA            reduce using rule 133 (pnQuadGenExp8 -> .)
-    VARIANZA        reduce using rule 133 (pnQuadGenExp8 -> .)
+    LPAREN          reduce using rule 140 (pnQuadGenExp8 -> .)
+    CTE_INT         reduce using rule 140 (pnQuadGenExp8 -> .)
+    CTE_FLOAT       reduce using rule 140 (pnQuadGenExp8 -> .)
+    CTE_CH          reduce using rule 140 (pnQuadGenExp8 -> .)
+    ID              reduce using rule 140 (pnQuadGenExp8 -> .)
+    CORRELACIONA    reduce using rule 140 (pnQuadGenExp8 -> .)
+    MEDIA           reduce using rule 140 (pnQuadGenExp8 -> .)
+    MEDIANA         reduce using rule 140 (pnQuadGenExp8 -> .)
+    MODA            reduce using rule 140 (pnQuadGenExp8 -> .)
+    VARIANZA        reduce using rule 140 (pnQuadGenExp8 -> .)
 
-    pnQuadGenExp8                  shift and go to state 225
+    pnQuadGenExp8                  shift and go to state 222
 
-state 178
+state 175
 
     (105) op_r -> LE . pnQuadGenExp8
-    (133) pnQuadGenExp8 -> .
+    (140) pnQuadGenExp8 -> .
 
-    LPAREN          reduce using rule 133 (pnQuadGenExp8 -> .)
-    CTE_INT         reduce using rule 133 (pnQuadGenExp8 -> .)
-    CTE_FLOAT       reduce using rule 133 (pnQuadGenExp8 -> .)
-    CTE_CH          reduce using rule 133 (pnQuadGenExp8 -> .)
-    ID              reduce using rule 133 (pnQuadGenExp8 -> .)
-    CORRELACIONA    reduce using rule 133 (pnQuadGenExp8 -> .)
-    MEDIA           reduce using rule 133 (pnQuadGenExp8 -> .)
-    MEDIANA         reduce using rule 133 (pnQuadGenExp8 -> .)
-    MODA            reduce using rule 133 (pnQuadGenExp8 -> .)
-    VARIANZA        reduce using rule 133 (pnQuadGenExp8 -> .)
+    LPAREN          reduce using rule 140 (pnQuadGenExp8 -> .)
+    CTE_INT         reduce using rule 140 (pnQuadGenExp8 -> .)
+    CTE_FLOAT       reduce using rule 140 (pnQuadGenExp8 -> .)
+    CTE_CH          reduce using rule 140 (pnQuadGenExp8 -> .)
+    ID              reduce using rule 140 (pnQuadGenExp8 -> .)
+    CORRELACIONA    reduce using rule 140 (pnQuadGenExp8 -> .)
+    MEDIA           reduce using rule 140 (pnQuadGenExp8 -> .)
+    MEDIANA         reduce using rule 140 (pnQuadGenExp8 -> .)
+    MODA            reduce using rule 140 (pnQuadGenExp8 -> .)
+    VARIANZA        reduce using rule 140 (pnQuadGenExp8 -> .)
 
-    pnQuadGenExp8                  shift and go to state 226
+    pnQuadGenExp8                  shift and go to state 223
 
-state 179
+state 176
 
     (102) sp -> empty .
 
@@ -2963,97 +2942,64 @@ state 179
     RPAREN          reduce using rule 102 (sp -> empty .)
 
 
-state 180
+state 177
 
     (62) retorno -> REGRESA LPAREN exp RPAREN . SEMICOLON
 
-    SEMICOLON       shift and go to state 227
+    SEMICOLON       shift and go to state 224
+
+
+state 178
+
+    (64) escritura -> ESCRIBE pnQuadGenSec3 LPAREN esc . RPAREN SEMICOLON pnQuadGenSec4
+
+    RPAREN          shift and go to state 225
+
+
+state 179
+
+    (65) esc -> esc1 . esc2
+    (68) esc2 -> . COMMA esc
+    (69) esc2 -> . empty
+    (124) empty -> .
+
+    COMMA           shift and go to state 227
+    RPAREN          reduce using rule 124 (empty -> .)
+
+    esc2                           shift and go to state 226
+    empty                          shift and go to state 228
+
+state 180
+
+    (67) esc1 -> CTE_STR .
+
+    COMMA           reduce using rule 67 (esc1 -> CTE_STR .)
+    RPAREN          reduce using rule 67 (esc1 -> CTE_STR .)
 
 
 state 181
 
-    (64) escritura -> ESCRIBE LPAREN esc RPAREN . SEMICOLON
+    (66) esc1 -> exp .
 
-    SEMICOLON       shift and go to state 228
+    COMMA           reduce using rule 66 (esc1 -> exp .)
+    RPAREN          reduce using rule 66 (esc1 -> exp .)
 
 
 state 182
 
-    (65) esc -> esc1 esc2 .
+    (78) funciones_especiales_void -> VARIABLES LPAREN ID COMMA . ID COMMA ID RPAREN SEMICOLON
 
-    RPAREN          reduce using rule 65 (esc -> esc1 esc2 .)
+    ID              shift and go to state 229
 
 
 state 183
 
-    (68) esc2 -> COMMA . esc
-    (65) esc -> . esc1 esc2
-    (66) esc1 -> . exp
-    (67) esc1 -> . CTE_STR
-    (109) exp -> . termino pnQuadGenExp4 exp1
-    (114) termino -> . factor pnQuadGenExp5 term
-    (119) factor -> . var_cte
-    (120) factor -> . LPAREN pnQuadGenExp6 exp RPAREN pnQuadGenExp7
-    (121) factor -> . variable
-    (122) factor -> . llamada
-    (123) factor -> . funciones_especiales
-    (89) var_cte -> . CTE_INT pnQuadGenExp1
-    (90) var_cte -> . CTE_FLOAT pnQuadGenExp1
-    (91) var_cte -> . CTE_CH
-    (54) variable -> . ID pnQuadGenExp1 di
-    (57) llamada -> . ID LPAREN llamada1 RPAREN SEMICOLON
-    (82) funciones_especiales -> . fe LPAREN ID COMMA v_exp RPAREN
-    (83) funciones_especiales -> . CORRELACIONA LPAREN ID COMMA v_exp COMMA v_exp RPAREN
-    (84) fe -> . MEDIA
-    (85) fe -> . MEDIANA
-    (86) fe -> . MODA
-    (87) fe -> . VARIANZA
-
-    CTE_STR         shift and go to state 134
-    LPAREN          shift and go to state 123
-    CTE_INT         shift and go to state 125
-    CTE_FLOAT       shift and go to state 128
-    CTE_CH          shift and go to state 111
-    ID              shift and go to state 126
-    CORRELACIONA    shift and go to state 129
-    MEDIA           shift and go to state 120
-    MEDIANA         shift and go to state 119
-    MODA            shift and go to state 116
-    VARIANZA        shift and go to state 113
-
-    funciones_especiales           shift and go to state 115
-    var_cte                        shift and go to state 110
-    esc1                           shift and go to state 133
-    llamada                        shift and go to state 117
-    esc                            shift and go to state 229
-    termino                        shift and go to state 112
-    exp                            shift and go to state 135
-    factor                         shift and go to state 118
-    variable                       shift and go to state 124
-    fe                             shift and go to state 122
-
-state 184
-
-    (69) esc2 -> empty .
-
-    RPAREN          reduce using rule 69 (esc2 -> empty .)
-
-
-state 185
-
-    (78) funciones_especiales_void -> VARIABLES LPAREN ID COMMA . ID COMMA ID RPAREN SEMICOLON
-
-    ID              shift and go to state 230
-
-
-state 186
-
     (77) no_condicional -> DESDE variable ASSIGN exp . HASTA exp HACER bloque
 
-    HASTA           shift and go to state 231
+    HASTA           shift and go to state 230
 
 
-state 187
+state 184
 
     (51) asignacion -> variable ASSIGN pnQuadGenSec1 asig .
 
@@ -3071,7 +3017,7 @@ state 187
     RBRACE          reduce using rule 51 (asignacion -> variable ASSIGN pnQuadGenSec1 asig .)
 
 
-state 188
+state 185
 
     (52) asig -> llamada .
     (122) factor -> llamada .
@@ -3095,35 +3041,35 @@ state 188
     SEMICOLON       reduce using rule 122 (factor -> llamada .)
 
 
-state 189
+state 186
 
     (53) asig -> exp . SEMICOLON pnQuadGenSec2
 
-    SEMICOLON       shift and go to state 232
+    SEMICOLON       shift and go to state 231
 
 
-state 190
+state 187
 
     (35) dim_index -> LBRACK exp . RBRACK dim_index1
 
-    RBRACK          shift and go to state 233
+    RBRACK          shift and go to state 232
 
 
-state 191
+state 188
 
     (57) llamada -> ID LPAREN llamada1 RPAREN . SEMICOLON
 
-    SEMICOLON       shift and go to state 234
+    SEMICOLON       shift and go to state 233
 
 
-state 192
+state 189
 
     (58) llamada1 -> exp llamada2 .
 
     RPAREN          reduce using rule 58 (llamada1 -> exp llamada2 .)
 
 
-state 193
+state 190
 
     (60) llamada2 -> COMMA . llamada1
     (58) llamada1 -> . exp llamada2
@@ -3165,43 +3111,43 @@ state 193
     var_cte                        shift and go to state 110
     variable                       shift and go to state 124
     termino                        shift and go to state 112
-    exp                            shift and go to state 145
+    exp                            shift and go to state 142
     factor                         shift and go to state 118
-    llamada1                       shift and go to state 235
-    empty                          shift and go to state 144
+    llamada1                       shift and go to state 234
+    empty                          shift and go to state 141
     fe                             shift and go to state 122
 
-state 194
+state 191
 
     (61) llamada2 -> empty .
 
     RPAREN          reduce using rule 61 (llamada2 -> empty .)
 
 
-state 195
+state 192
 
-    (63) lectura -> LEE LPAREN variable RPAREN . SEMICOLON
+    (63) lectura -> LEE pnQuadGenSec3 LPAREN variable . RPAREN SEMICOLON pnQuadGenSec4
 
-    SEMICOLON       shift and go to state 236
+    RPAREN          shift and go to state 235
 
 
-state 196
+state 193
 
     (79) funciones_especiales_void -> fev LPAREN ID COMMA . v_exp RPAREN SEMICOLON
     (88) v_exp -> . VARIABLES LBRACK exp RBRACK
 
-    VARIABLES       shift and go to state 237
+    VARIABLES       shift and go to state 236
 
-    v_exp                          shift and go to state 238
+    v_exp                          shift and go to state 237
 
-state 197
+state 194
 
     (73) decision -> SI LPAREN expresion RPAREN . ENTONCES bloque sino
 
-    ENTONCES        shift and go to state 239
+    ENTONCES        shift and go to state 238
 
 
-state 198
+state 195
 
     (19) param1 -> COMMA . param
     (18) param -> . tipo_simple ID pn_4_params param1
@@ -3214,46 +3160,46 @@ state 198
     CHAR            shift and go to state 19
 
     tipo_simple                    shift and go to state 82
-    param                          shift and go to state 240
+    param                          shift and go to state 239
 
-state 199
+state 196
 
     (18) param -> tipo_simple ID pn_4_params param1 .
 
     RPAREN          reduce using rule 18 (param -> tipo_simple ID pn_4_params param1 .)
 
 
-state 200
+state 197
 
     (20) param1 -> empty .
 
     RPAREN          reduce using rule 20 (param1 -> empty .)
 
 
-state 201
+state 198
 
     (13) funcion -> FUNCION tipo_fun ID pn_3_addFunction LPAREN parametros RPAREN pn_5_updateContParams var1 . bloque
     (38) bloque -> . LBRACE est RBRACE
 
     LBRACE          shift and go to state 51
 
-    bloque                         shift and go to state 241
+    bloque                         shift and go to state 240
 
-state 202
+state 199
 
     (33) dim_dec1 -> LBRACK CTE_INT . RBRACK pn_8_decColumnas
 
-    RBRACK          shift and go to state 242
+    RBRACK          shift and go to state 241
 
 
-state 203
+state 200
 
     (70) carga_datos -> CARGA LPAREN ID COMMA CTE_STR . COMMA ca COMMA ca RPAREN SEMICOLON
 
-    COMMA           shift and go to state 243
+    COMMA           shift and go to state 242
 
 
-state 204
+state 201
 
     (109) exp -> termino pnQuadGenExp4 exp1 .
 
@@ -3274,25 +3220,25 @@ state 204
     HACER           reduce using rule 109 (exp -> termino pnQuadGenExp4 exp1 .)
 
 
-state 205
+state 202
 
     (112) op_a -> ADD . pnQuadGenExp2
-    (136) pnQuadGenExp2 -> .
+    (134) pnQuadGenExp2 -> .
 
-    LPAREN          reduce using rule 136 (pnQuadGenExp2 -> .)
-    CTE_INT         reduce using rule 136 (pnQuadGenExp2 -> .)
-    CTE_FLOAT       reduce using rule 136 (pnQuadGenExp2 -> .)
-    CTE_CH          reduce using rule 136 (pnQuadGenExp2 -> .)
-    ID              reduce using rule 136 (pnQuadGenExp2 -> .)
-    CORRELACIONA    reduce using rule 136 (pnQuadGenExp2 -> .)
-    MEDIA           reduce using rule 136 (pnQuadGenExp2 -> .)
-    MEDIANA         reduce using rule 136 (pnQuadGenExp2 -> .)
-    MODA            reduce using rule 136 (pnQuadGenExp2 -> .)
-    VARIANZA        reduce using rule 136 (pnQuadGenExp2 -> .)
+    LPAREN          reduce using rule 134 (pnQuadGenExp2 -> .)
+    CTE_INT         reduce using rule 134 (pnQuadGenExp2 -> .)
+    CTE_FLOAT       reduce using rule 134 (pnQuadGenExp2 -> .)
+    CTE_CH          reduce using rule 134 (pnQuadGenExp2 -> .)
+    ID              reduce using rule 134 (pnQuadGenExp2 -> .)
+    CORRELACIONA    reduce using rule 134 (pnQuadGenExp2 -> .)
+    MEDIA           reduce using rule 134 (pnQuadGenExp2 -> .)
+    MEDIANA         reduce using rule 134 (pnQuadGenExp2 -> .)
+    MODA            reduce using rule 134 (pnQuadGenExp2 -> .)
+    VARIANZA        reduce using rule 134 (pnQuadGenExp2 -> .)
 
-    pnQuadGenExp2                  shift and go to state 244
+    pnQuadGenExp2                  shift and go to state 243
 
-state 206
+state 203
 
     (110) exp1 -> op_a . exp
     (109) exp -> . termino pnQuadGenExp4 exp1
@@ -3329,12 +3275,12 @@ state 206
     var_cte                        shift and go to state 110
     llamada                        shift and go to state 117
     termino                        shift and go to state 112
-    exp                            shift and go to state 245
+    exp                            shift and go to state 244
     factor                         shift and go to state 118
     variable                       shift and go to state 124
     fe                             shift and go to state 122
 
-state 207
+state 204
 
     (111) exp1 -> empty .
 
@@ -3355,25 +3301,25 @@ state 207
     HACER           reduce using rule 111 (exp1 -> empty .)
 
 
-state 208
+state 205
 
     (113) op_a -> SUB . pnQuadGenExp2
-    (136) pnQuadGenExp2 -> .
+    (134) pnQuadGenExp2 -> .
 
-    LPAREN          reduce using rule 136 (pnQuadGenExp2 -> .)
-    CTE_INT         reduce using rule 136 (pnQuadGenExp2 -> .)
-    CTE_FLOAT       reduce using rule 136 (pnQuadGenExp2 -> .)
-    CTE_CH          reduce using rule 136 (pnQuadGenExp2 -> .)
-    ID              reduce using rule 136 (pnQuadGenExp2 -> .)
-    CORRELACIONA    reduce using rule 136 (pnQuadGenExp2 -> .)
-    MEDIA           reduce using rule 136 (pnQuadGenExp2 -> .)
-    MEDIANA         reduce using rule 136 (pnQuadGenExp2 -> .)
-    MODA            reduce using rule 136 (pnQuadGenExp2 -> .)
-    VARIANZA        reduce using rule 136 (pnQuadGenExp2 -> .)
+    LPAREN          reduce using rule 134 (pnQuadGenExp2 -> .)
+    CTE_INT         reduce using rule 134 (pnQuadGenExp2 -> .)
+    CTE_FLOAT       reduce using rule 134 (pnQuadGenExp2 -> .)
+    CTE_CH          reduce using rule 134 (pnQuadGenExp2 -> .)
+    ID              reduce using rule 134 (pnQuadGenExp2 -> .)
+    CORRELACIONA    reduce using rule 134 (pnQuadGenExp2 -> .)
+    MEDIA           reduce using rule 134 (pnQuadGenExp2 -> .)
+    MEDIANA         reduce using rule 134 (pnQuadGenExp2 -> .)
+    MODA            reduce using rule 134 (pnQuadGenExp2 -> .)
+    VARIANZA        reduce using rule 134 (pnQuadGenExp2 -> .)
 
-    pnQuadGenExp2                  shift and go to state 246
+    pnQuadGenExp2                  shift and go to state 245
 
-state 209
+state 206
 
     (96) meg -> op_l pnQuadGenExp10 . mega_exp pnQuadGenExp11
     (95) mega_exp -> . super_exp meg
@@ -3414,19 +3360,22 @@ state 209
     funciones_especiales           shift and go to state 115
     llamada                        shift and go to state 117
     factor                         shift and go to state 118
-    mega_exp                       shift and go to state 247
+    mega_exp                       shift and go to state 246
     fe                             shift and go to state 122
     variable                       shift and go to state 124
     exp                            shift and go to state 130
 
-state 210
+state 207
 
     (114) termino -> factor pnQuadGenExp5 term .
 
     ADD             reduce using rule 114 (termino -> factor pnQuadGenExp5 term .)
     SUB             reduce using rule 114 (termino -> factor pnQuadGenExp5 term .)
-    SEMICOLON       reduce using rule 114 (termino -> factor pnQuadGenExp5 term .)
+    HASTA           reduce using rule 114 (termino -> factor pnQuadGenExp5 term .)
+    COMMA           reduce using rule 114 (termino -> factor pnQuadGenExp5 term .)
+    RPAREN          reduce using rule 114 (termino -> factor pnQuadGenExp5 term .)
     RBRACK          reduce using rule 114 (termino -> factor pnQuadGenExp5 term .)
+    SEMICOLON       reduce using rule 114 (termino -> factor pnQuadGenExp5 term .)
     LT              reduce using rule 114 (termino -> factor pnQuadGenExp5 term .)
     GT              reduce using rule 114 (termino -> factor pnQuadGenExp5 term .)
     LE              reduce using rule 114 (termino -> factor pnQuadGenExp5 term .)
@@ -3436,49 +3385,46 @@ state 210
     AND             reduce using rule 114 (termino -> factor pnQuadGenExp5 term .)
     OR              reduce using rule 114 (termino -> factor pnQuadGenExp5 term .)
     ASSIGN          reduce using rule 114 (termino -> factor pnQuadGenExp5 term .)
-    RPAREN          reduce using rule 114 (termino -> factor pnQuadGenExp5 term .)
-    COMMA           reduce using rule 114 (termino -> factor pnQuadGenExp5 term .)
     HACER           reduce using rule 114 (termino -> factor pnQuadGenExp5 term .)
-    HASTA           reduce using rule 114 (termino -> factor pnQuadGenExp5 term .)
 
 
-state 211
+state 208
 
     (117) op_a1 -> MUL . pnQuadGenExp3
-    (138) pnQuadGenExp3 -> .
+    (135) pnQuadGenExp3 -> .
 
-    LPAREN          reduce using rule 138 (pnQuadGenExp3 -> .)
-    CTE_INT         reduce using rule 138 (pnQuadGenExp3 -> .)
-    CTE_FLOAT       reduce using rule 138 (pnQuadGenExp3 -> .)
-    CTE_CH          reduce using rule 138 (pnQuadGenExp3 -> .)
-    ID              reduce using rule 138 (pnQuadGenExp3 -> .)
-    CORRELACIONA    reduce using rule 138 (pnQuadGenExp3 -> .)
-    MEDIA           reduce using rule 138 (pnQuadGenExp3 -> .)
-    MEDIANA         reduce using rule 138 (pnQuadGenExp3 -> .)
-    MODA            reduce using rule 138 (pnQuadGenExp3 -> .)
-    VARIANZA        reduce using rule 138 (pnQuadGenExp3 -> .)
+    LPAREN          reduce using rule 135 (pnQuadGenExp3 -> .)
+    CTE_INT         reduce using rule 135 (pnQuadGenExp3 -> .)
+    CTE_FLOAT       reduce using rule 135 (pnQuadGenExp3 -> .)
+    CTE_CH          reduce using rule 135 (pnQuadGenExp3 -> .)
+    ID              reduce using rule 135 (pnQuadGenExp3 -> .)
+    CORRELACIONA    reduce using rule 135 (pnQuadGenExp3 -> .)
+    MEDIA           reduce using rule 135 (pnQuadGenExp3 -> .)
+    MEDIANA         reduce using rule 135 (pnQuadGenExp3 -> .)
+    MODA            reduce using rule 135 (pnQuadGenExp3 -> .)
+    VARIANZA        reduce using rule 135 (pnQuadGenExp3 -> .)
+
+    pnQuadGenExp3                  shift and go to state 247
+
+state 209
+
+    (118) op_a1 -> DIV . pnQuadGenExp3
+    (135) pnQuadGenExp3 -> .
+
+    LPAREN          reduce using rule 135 (pnQuadGenExp3 -> .)
+    CTE_INT         reduce using rule 135 (pnQuadGenExp3 -> .)
+    CTE_FLOAT       reduce using rule 135 (pnQuadGenExp3 -> .)
+    CTE_CH          reduce using rule 135 (pnQuadGenExp3 -> .)
+    ID              reduce using rule 135 (pnQuadGenExp3 -> .)
+    CORRELACIONA    reduce using rule 135 (pnQuadGenExp3 -> .)
+    MEDIA           reduce using rule 135 (pnQuadGenExp3 -> .)
+    MEDIANA         reduce using rule 135 (pnQuadGenExp3 -> .)
+    MODA            reduce using rule 135 (pnQuadGenExp3 -> .)
+    VARIANZA        reduce using rule 135 (pnQuadGenExp3 -> .)
 
     pnQuadGenExp3                  shift and go to state 248
 
-state 212
-
-    (118) op_a1 -> DIV . pnQuadGenExp3
-    (138) pnQuadGenExp3 -> .
-
-    LPAREN          reduce using rule 138 (pnQuadGenExp3 -> .)
-    CTE_INT         reduce using rule 138 (pnQuadGenExp3 -> .)
-    CTE_FLOAT       reduce using rule 138 (pnQuadGenExp3 -> .)
-    CTE_CH          reduce using rule 138 (pnQuadGenExp3 -> .)
-    ID              reduce using rule 138 (pnQuadGenExp3 -> .)
-    CORRELACIONA    reduce using rule 138 (pnQuadGenExp3 -> .)
-    MEDIA           reduce using rule 138 (pnQuadGenExp3 -> .)
-    MEDIANA         reduce using rule 138 (pnQuadGenExp3 -> .)
-    MODA            reduce using rule 138 (pnQuadGenExp3 -> .)
-    VARIANZA        reduce using rule 138 (pnQuadGenExp3 -> .)
-
-    pnQuadGenExp3                  shift and go to state 249
-
-state 213
+state 210
 
     (116) term -> empty .
 
@@ -3501,7 +3447,7 @@ state 213
     HACER           reduce using rule 116 (term -> empty .)
 
 
-state 214
+state 211
 
     (115) term -> op_a1 . termino
     (114) termino -> . factor pnQuadGenExp5 term
@@ -3537,48 +3483,48 @@ state 214
     fe                             shift and go to state 122
     var_cte                        shift and go to state 110
     llamada                        shift and go to state 117
-    termino                        shift and go to state 250
+    termino                        shift and go to state 249
     factor                         shift and go to state 118
     variable                       shift and go to state 124
 
-state 215
+state 212
 
     (93) expresion1 -> ASSIGN expresion .
 
     RPAREN          reduce using rule 93 (expresion1 -> ASSIGN expresion .)
 
 
-state 216
+state 213
 
     (82) funciones_especiales -> fe LPAREN ID . COMMA v_exp RPAREN
 
-    COMMA           shift and go to state 251
+    COMMA           shift and go to state 250
 
 
-state 217
+state 214
 
     (120) factor -> LPAREN pnQuadGenExp6 exp . RPAREN pnQuadGenExp7
 
-    RPAREN          shift and go to state 252
+    RPAREN          shift and go to state 251
 
 
-state 218
+state 215
 
     (76) condicional -> MIENTRAS LPAREN expresion RPAREN HAZ . bloque
     (38) bloque -> . LBRACE est RBRACE
 
     LBRACE          shift and go to state 51
 
-    bloque                         shift and go to state 253
+    bloque                         shift and go to state 252
 
-state 219
+state 216
 
     (83) funciones_especiales -> CORRELACIONA LPAREN ID . COMMA v_exp COMMA v_exp RPAREN
 
-    COMMA           shift and go to state 254
+    COMMA           shift and go to state 253
 
 
-state 220
+state 217
 
     (104) op_r -> GT pnQuadGenExp8 .
 
@@ -3594,7 +3540,7 @@ state 220
     VARIANZA        reduce using rule 104 (op_r -> GT pnQuadGenExp8 .)
 
 
-state 221
+state 218
 
     (107) op_r -> NOT_EQUAL pnQuadGenExp8 .
 
@@ -3610,7 +3556,7 @@ state 221
     VARIANZA        reduce using rule 107 (op_r -> NOT_EQUAL pnQuadGenExp8 .)
 
 
-state 222
+state 219
 
     (106) op_r -> GE pnQuadGenExp8 .
 
@@ -3626,19 +3572,19 @@ state 222
     VARIANZA        reduce using rule 106 (op_r -> GE pnQuadGenExp8 .)
 
 
-state 223
+state 220
 
     (101) sp -> op_r exp . pnQuadGenExp9
-    (134) pnQuadGenExp9 -> .
+    (141) pnQuadGenExp9 -> .
 
-    AND             reduce using rule 134 (pnQuadGenExp9 -> .)
-    OR              reduce using rule 134 (pnQuadGenExp9 -> .)
-    ASSIGN          reduce using rule 134 (pnQuadGenExp9 -> .)
-    RPAREN          reduce using rule 134 (pnQuadGenExp9 -> .)
+    AND             reduce using rule 141 (pnQuadGenExp9 -> .)
+    OR              reduce using rule 141 (pnQuadGenExp9 -> .)
+    ASSIGN          reduce using rule 141 (pnQuadGenExp9 -> .)
+    RPAREN          reduce using rule 141 (pnQuadGenExp9 -> .)
 
-    pnQuadGenExp9                  shift and go to state 255
+    pnQuadGenExp9                  shift and go to state 254
 
-state 224
+state 221
 
     (108) op_r -> EQUAL pnQuadGenExp8 .
 
@@ -3654,7 +3600,7 @@ state 224
     VARIANZA        reduce using rule 108 (op_r -> EQUAL pnQuadGenExp8 .)
 
 
-state 225
+state 222
 
     (103) op_r -> LT pnQuadGenExp8 .
 
@@ -3670,7 +3616,7 @@ state 225
     VARIANZA        reduce using rule 103 (op_r -> LT pnQuadGenExp8 .)
 
 
-state 226
+state 223
 
     (105) op_r -> LE pnQuadGenExp8 .
 
@@ -3686,7 +3632,7 @@ state 226
     VARIANZA        reduce using rule 105 (op_r -> LE pnQuadGenExp8 .)
 
 
-state 227
+state 224
 
     (62) retorno -> REGRESA LPAREN exp RPAREN SEMICOLON .
 
@@ -3704,39 +3650,83 @@ state 227
     RBRACE          reduce using rule 62 (retorno -> REGRESA LPAREN exp RPAREN SEMICOLON .)
 
 
+state 225
+
+    (64) escritura -> ESCRIBE pnQuadGenSec3 LPAREN esc RPAREN . SEMICOLON pnQuadGenSec4
+
+    SEMICOLON       shift and go to state 255
+
+
+state 226
+
+    (65) esc -> esc1 esc2 .
+
+    RPAREN          reduce using rule 65 (esc -> esc1 esc2 .)
+
+
+state 227
+
+    (68) esc2 -> COMMA . esc
+    (65) esc -> . esc1 esc2
+    (66) esc1 -> . exp
+    (67) esc1 -> . CTE_STR
+    (109) exp -> . termino pnQuadGenExp4 exp1
+    (114) termino -> . factor pnQuadGenExp5 term
+    (119) factor -> . var_cte
+    (120) factor -> . LPAREN pnQuadGenExp6 exp RPAREN pnQuadGenExp7
+    (121) factor -> . variable
+    (122) factor -> . llamada
+    (123) factor -> . funciones_especiales
+    (89) var_cte -> . CTE_INT pnQuadGenExp1
+    (90) var_cte -> . CTE_FLOAT pnQuadGenExp1
+    (91) var_cte -> . CTE_CH
+    (54) variable -> . ID pnQuadGenExp1 di
+    (57) llamada -> . ID LPAREN llamada1 RPAREN SEMICOLON
+    (82) funciones_especiales -> . fe LPAREN ID COMMA v_exp RPAREN
+    (83) funciones_especiales -> . CORRELACIONA LPAREN ID COMMA v_exp COMMA v_exp RPAREN
+    (84) fe -> . MEDIA
+    (85) fe -> . MEDIANA
+    (86) fe -> . MODA
+    (87) fe -> . VARIANZA
+
+    CTE_STR         shift and go to state 180
+    LPAREN          shift and go to state 123
+    CTE_INT         shift and go to state 125
+    CTE_FLOAT       shift and go to state 128
+    CTE_CH          shift and go to state 111
+    ID              shift and go to state 126
+    CORRELACIONA    shift and go to state 129
+    MEDIA           shift and go to state 120
+    MEDIANA         shift and go to state 119
+    MODA            shift and go to state 116
+    VARIANZA        shift and go to state 113
+
+    funciones_especiales           shift and go to state 115
+    var_cte                        shift and go to state 110
+    esc1                           shift and go to state 179
+    llamada                        shift and go to state 117
+    esc                            shift and go to state 256
+    termino                        shift and go to state 112
+    exp                            shift and go to state 181
+    factor                         shift and go to state 118
+    variable                       shift and go to state 124
+    fe                             shift and go to state 122
+
 state 228
 
-    (64) escritura -> ESCRIBE LPAREN esc RPAREN SEMICOLON .
+    (69) esc2 -> empty .
 
-    ID              reduce using rule 64 (escritura -> ESCRIBE LPAREN esc RPAREN SEMICOLON .)
-    REGRESA         reduce using rule 64 (escritura -> ESCRIBE LPAREN esc RPAREN SEMICOLON .)
-    LEE             reduce using rule 64 (escritura -> ESCRIBE LPAREN esc RPAREN SEMICOLON .)
-    ESCRIBE         reduce using rule 64 (escritura -> ESCRIBE LPAREN esc RPAREN SEMICOLON .)
-    CARGA           reduce using rule 64 (escritura -> ESCRIBE LPAREN esc RPAREN SEMICOLON .)
-    SI              reduce using rule 64 (escritura -> ESCRIBE LPAREN esc RPAREN SEMICOLON .)
-    MIENTRAS        reduce using rule 64 (escritura -> ESCRIBE LPAREN esc RPAREN SEMICOLON .)
-    DESDE           reduce using rule 64 (escritura -> ESCRIBE LPAREN esc RPAREN SEMICOLON .)
-    VARIABLES       reduce using rule 64 (escritura -> ESCRIBE LPAREN esc RPAREN SEMICOLON .)
-    DISTRIBUCION    reduce using rule 64 (escritura -> ESCRIBE LPAREN esc RPAREN SEMICOLON .)
-    TENDENCIA       reduce using rule 64 (escritura -> ESCRIBE LPAREN esc RPAREN SEMICOLON .)
-    RBRACE          reduce using rule 64 (escritura -> ESCRIBE LPAREN esc RPAREN SEMICOLON .)
+    RPAREN          reduce using rule 69 (esc2 -> empty .)
 
 
 state 229
 
-    (68) esc2 -> COMMA esc .
+    (78) funciones_especiales_void -> VARIABLES LPAREN ID COMMA ID . COMMA ID RPAREN SEMICOLON
 
-    RPAREN          reduce using rule 68 (esc2 -> COMMA esc .)
+    COMMA           shift and go to state 257
 
 
 state 230
-
-    (78) funciones_especiales_void -> VARIABLES LPAREN ID COMMA ID . COMMA ID RPAREN SEMICOLON
-
-    COMMA           shift and go to state 256
-
-
-state 231
 
     (77) no_condicional -> DESDE variable ASSIGN exp HASTA . exp HACER bloque
     (109) exp -> . termino pnQuadGenExp4 exp1
@@ -3773,12 +3763,12 @@ state 231
     var_cte                        shift and go to state 110
     llamada                        shift and go to state 117
     termino                        shift and go to state 112
-    exp                            shift and go to state 257
+    exp                            shift and go to state 258
     factor                         shift and go to state 118
     variable                       shift and go to state 124
     fe                             shift and go to state 122
 
-state 232
+state 231
 
     (53) asig -> exp SEMICOLON . pnQuadGenSec2
     (145) pnQuadGenSec2 -> .
@@ -3796,16 +3786,16 @@ state 232
     TENDENCIA       reduce using rule 145 (pnQuadGenSec2 -> .)
     RBRACE          reduce using rule 145 (pnQuadGenSec2 -> .)
 
-    pnQuadGenSec2                  shift and go to state 258
+    pnQuadGenSec2                  shift and go to state 259
 
-state 233
+state 232
 
     (35) dim_index -> LBRACK exp RBRACK . dim_index1
     (36) dim_index1 -> . LBRACK exp RBRACK
     (37) dim_index1 -> . empty
     (124) empty -> .
 
-    LBRACK          shift and go to state 261
+    LBRACK          shift and go to state 262
     ASSIGN          reduce using rule 124 (empty -> .)
     MUL             reduce using rule 124 (empty -> .)
     DIV             reduce using rule 124 (empty -> .)
@@ -3826,32 +3816,13 @@ state 233
     RBRACK          reduce using rule 124 (empty -> .)
     HACER           reduce using rule 124 (empty -> .)
 
-    dim_index1                     shift and go to state 260
-    empty                          shift and go to state 259
+    dim_index1                     shift and go to state 261
+    empty                          shift and go to state 260
 
-state 234
+state 233
 
     (57) llamada -> ID LPAREN llamada1 RPAREN SEMICOLON .
 
-    MUL             reduce using rule 57 (llamada -> ID LPAREN llamada1 RPAREN SEMICOLON .)
-    DIV             reduce using rule 57 (llamada -> ID LPAREN llamada1 RPAREN SEMICOLON .)
-    ADD             reduce using rule 57 (llamada -> ID LPAREN llamada1 RPAREN SEMICOLON .)
-    SUB             reduce using rule 57 (llamada -> ID LPAREN llamada1 RPAREN SEMICOLON .)
-    LT              reduce using rule 57 (llamada -> ID LPAREN llamada1 RPAREN SEMICOLON .)
-    GT              reduce using rule 57 (llamada -> ID LPAREN llamada1 RPAREN SEMICOLON .)
-    LE              reduce using rule 57 (llamada -> ID LPAREN llamada1 RPAREN SEMICOLON .)
-    GE              reduce using rule 57 (llamada -> ID LPAREN llamada1 RPAREN SEMICOLON .)
-    NOT_EQUAL       reduce using rule 57 (llamada -> ID LPAREN llamada1 RPAREN SEMICOLON .)
-    EQUAL           reduce using rule 57 (llamada -> ID LPAREN llamada1 RPAREN SEMICOLON .)
-    AND             reduce using rule 57 (llamada -> ID LPAREN llamada1 RPAREN SEMICOLON .)
-    OR              reduce using rule 57 (llamada -> ID LPAREN llamada1 RPAREN SEMICOLON .)
-    ASSIGN          reduce using rule 57 (llamada -> ID LPAREN llamada1 RPAREN SEMICOLON .)
-    RPAREN          reduce using rule 57 (llamada -> ID LPAREN llamada1 RPAREN SEMICOLON .)
-    RBRACK          reduce using rule 57 (llamada -> ID LPAREN llamada1 RPAREN SEMICOLON .)
-    COMMA           reduce using rule 57 (llamada -> ID LPAREN llamada1 RPAREN SEMICOLON .)
-    HASTA           reduce using rule 57 (llamada -> ID LPAREN llamada1 RPAREN SEMICOLON .)
-    SEMICOLON       reduce using rule 57 (llamada -> ID LPAREN llamada1 RPAREN SEMICOLON .)
-    HACER           reduce using rule 57 (llamada -> ID LPAREN llamada1 RPAREN SEMICOLON .)
     ID              reduce using rule 57 (llamada -> ID LPAREN llamada1 RPAREN SEMICOLON .)
     REGRESA         reduce using rule 57 (llamada -> ID LPAREN llamada1 RPAREN SEMICOLON .)
     LEE             reduce using rule 57 (llamada -> ID LPAREN llamada1 RPAREN SEMICOLON .)
@@ -3864,64 +3835,72 @@ state 234
     DISTRIBUCION    reduce using rule 57 (llamada -> ID LPAREN llamada1 RPAREN SEMICOLON .)
     TENDENCIA       reduce using rule 57 (llamada -> ID LPAREN llamada1 RPAREN SEMICOLON .)
     RBRACE          reduce using rule 57 (llamada -> ID LPAREN llamada1 RPAREN SEMICOLON .)
+    MUL             reduce using rule 57 (llamada -> ID LPAREN llamada1 RPAREN SEMICOLON .)
+    DIV             reduce using rule 57 (llamada -> ID LPAREN llamada1 RPAREN SEMICOLON .)
+    ADD             reduce using rule 57 (llamada -> ID LPAREN llamada1 RPAREN SEMICOLON .)
+    SUB             reduce using rule 57 (llamada -> ID LPAREN llamada1 RPAREN SEMICOLON .)
+    SEMICOLON       reduce using rule 57 (llamada -> ID LPAREN llamada1 RPAREN SEMICOLON .)
+    COMMA           reduce using rule 57 (llamada -> ID LPAREN llamada1 RPAREN SEMICOLON .)
+    RPAREN          reduce using rule 57 (llamada -> ID LPAREN llamada1 RPAREN SEMICOLON .)
+    LT              reduce using rule 57 (llamada -> ID LPAREN llamada1 RPAREN SEMICOLON .)
+    GT              reduce using rule 57 (llamada -> ID LPAREN llamada1 RPAREN SEMICOLON .)
+    LE              reduce using rule 57 (llamada -> ID LPAREN llamada1 RPAREN SEMICOLON .)
+    GE              reduce using rule 57 (llamada -> ID LPAREN llamada1 RPAREN SEMICOLON .)
+    NOT_EQUAL       reduce using rule 57 (llamada -> ID LPAREN llamada1 RPAREN SEMICOLON .)
+    EQUAL           reduce using rule 57 (llamada -> ID LPAREN llamada1 RPAREN SEMICOLON .)
+    AND             reduce using rule 57 (llamada -> ID LPAREN llamada1 RPAREN SEMICOLON .)
+    OR              reduce using rule 57 (llamada -> ID LPAREN llamada1 RPAREN SEMICOLON .)
+    ASSIGN          reduce using rule 57 (llamada -> ID LPAREN llamada1 RPAREN SEMICOLON .)
+    RBRACK          reduce using rule 57 (llamada -> ID LPAREN llamada1 RPAREN SEMICOLON .)
+    HASTA           reduce using rule 57 (llamada -> ID LPAREN llamada1 RPAREN SEMICOLON .)
+    HACER           reduce using rule 57 (llamada -> ID LPAREN llamada1 RPAREN SEMICOLON .)
 
 
-state 235
+state 234
 
     (60) llamada2 -> COMMA llamada1 .
 
     RPAREN          reduce using rule 60 (llamada2 -> COMMA llamada1 .)
 
 
+state 235
+
+    (63) lectura -> LEE pnQuadGenSec3 LPAREN variable RPAREN . SEMICOLON pnQuadGenSec4
+
+    SEMICOLON       shift and go to state 263
+
+
 state 236
 
-    (63) lectura -> LEE LPAREN variable RPAREN SEMICOLON .
+    (88) v_exp -> VARIABLES . LBRACK exp RBRACK
 
-    ID              reduce using rule 63 (lectura -> LEE LPAREN variable RPAREN SEMICOLON .)
-    REGRESA         reduce using rule 63 (lectura -> LEE LPAREN variable RPAREN SEMICOLON .)
-    LEE             reduce using rule 63 (lectura -> LEE LPAREN variable RPAREN SEMICOLON .)
-    ESCRIBE         reduce using rule 63 (lectura -> LEE LPAREN variable RPAREN SEMICOLON .)
-    CARGA           reduce using rule 63 (lectura -> LEE LPAREN variable RPAREN SEMICOLON .)
-    SI              reduce using rule 63 (lectura -> LEE LPAREN variable RPAREN SEMICOLON .)
-    MIENTRAS        reduce using rule 63 (lectura -> LEE LPAREN variable RPAREN SEMICOLON .)
-    DESDE           reduce using rule 63 (lectura -> LEE LPAREN variable RPAREN SEMICOLON .)
-    VARIABLES       reduce using rule 63 (lectura -> LEE LPAREN variable RPAREN SEMICOLON .)
-    DISTRIBUCION    reduce using rule 63 (lectura -> LEE LPAREN variable RPAREN SEMICOLON .)
-    TENDENCIA       reduce using rule 63 (lectura -> LEE LPAREN variable RPAREN SEMICOLON .)
-    RBRACE          reduce using rule 63 (lectura -> LEE LPAREN variable RPAREN SEMICOLON .)
+    LBRACK          shift and go to state 264
 
 
 state 237
 
-    (88) v_exp -> VARIABLES . LBRACK exp RBRACK
+    (79) funciones_especiales_void -> fev LPAREN ID COMMA v_exp . RPAREN SEMICOLON
 
-    LBRACK          shift and go to state 262
+    RPAREN          shift and go to state 265
 
 
 state 238
-
-    (79) funciones_especiales_void -> fev LPAREN ID COMMA v_exp . RPAREN SEMICOLON
-
-    RPAREN          shift and go to state 263
-
-
-state 239
 
     (73) decision -> SI LPAREN expresion RPAREN ENTONCES . bloque sino
     (38) bloque -> . LBRACE est RBRACE
 
     LBRACE          shift and go to state 51
 
-    bloque                         shift and go to state 264
+    bloque                         shift and go to state 266
 
-state 240
+state 239
 
     (19) param1 -> COMMA param .
 
     RPAREN          reduce using rule 19 (param1 -> COMMA param .)
 
 
-state 241
+state 240
 
     (13) funcion -> FUNCION tipo_fun ID pn_3_addFunction LPAREN parametros RPAREN pn_5_updateContParams var1 bloque .
 
@@ -3929,7 +3908,7 @@ state 241
     PRINCIPAL       reduce using rule 13 (funcion -> FUNCION tipo_fun ID pn_3_addFunction LPAREN parametros RPAREN pn_5_updateContParams var1 bloque .)
 
 
-state 242
+state 241
 
     (33) dim_dec1 -> LBRACK CTE_INT RBRACK . pn_8_decColumnas
     (132) pn_8_decColumnas -> .
@@ -3937,20 +3916,20 @@ state 242
     COMMA           reduce using rule 132 (pn_8_decColumnas -> .)
     SEMICOLON       reduce using rule 132 (pn_8_decColumnas -> .)
 
-    pn_8_decColumnas               shift and go to state 265
+    pn_8_decColumnas               shift and go to state 267
 
-state 243
+state 242
 
     (70) carga_datos -> CARGA LPAREN ID COMMA CTE_STR COMMA . ca COMMA ca RPAREN SEMICOLON
     (71) ca -> . ID
     (72) ca -> . CTE_INT
 
-    ID              shift and go to state 268
-    CTE_INT         shift and go to state 267
+    ID              shift and go to state 270
+    CTE_INT         shift and go to state 269
 
-    ca                             shift and go to state 266
+    ca                             shift and go to state 268
 
-state 244
+state 243
 
     (112) op_a -> ADD pnQuadGenExp2 .
 
@@ -3966,7 +3945,7 @@ state 244
     VARIANZA        reduce using rule 112 (op_a -> ADD pnQuadGenExp2 .)
 
 
-state 245
+state 244
 
     (110) exp1 -> op_a exp .
 
@@ -3987,7 +3966,7 @@ state 245
     HACER           reduce using rule 110 (exp1 -> op_a exp .)
 
 
-state 246
+state 245
 
     (113) op_a -> SUB pnQuadGenExp2 .
 
@@ -4003,7 +3982,7 @@ state 246
     VARIANZA        reduce using rule 113 (op_a -> SUB pnQuadGenExp2 .)
 
 
-state 247
+state 246
 
     (96) meg -> op_l pnQuadGenExp10 mega_exp . pnQuadGenExp11
     (143) pnQuadGenExp11 -> .
@@ -4011,9 +3990,9 @@ state 247
     ASSIGN          reduce using rule 143 (pnQuadGenExp11 -> .)
     RPAREN          reduce using rule 143 (pnQuadGenExp11 -> .)
 
-    pnQuadGenExp11                 shift and go to state 269
+    pnQuadGenExp11                 shift and go to state 271
 
-state 248
+state 247
 
     (117) op_a1 -> MUL pnQuadGenExp3 .
 
@@ -4029,7 +4008,7 @@ state 248
     VARIANZA        reduce using rule 117 (op_a1 -> MUL pnQuadGenExp3 .)
 
 
-state 249
+state 248
 
     (118) op_a1 -> DIV pnQuadGenExp3 .
 
@@ -4045,7 +4024,7 @@ state 249
     VARIANZA        reduce using rule 118 (op_a1 -> DIV pnQuadGenExp3 .)
 
 
-state 250
+state 249
 
     (115) term -> op_a1 termino .
 
@@ -4068,43 +4047,43 @@ state 250
     HACER           reduce using rule 115 (term -> op_a1 termino .)
 
 
-state 251
+state 250
 
     (82) funciones_especiales -> fe LPAREN ID COMMA . v_exp RPAREN
     (88) v_exp -> . VARIABLES LBRACK exp RBRACK
 
-    VARIABLES       shift and go to state 237
+    VARIABLES       shift and go to state 236
 
-    v_exp                          shift and go to state 270
+    v_exp                          shift and go to state 272
 
-state 252
+state 251
 
     (120) factor -> LPAREN pnQuadGenExp6 exp RPAREN . pnQuadGenExp7
-    (141) pnQuadGenExp7 -> .
+    (139) pnQuadGenExp7 -> .
 
-    MUL             reduce using rule 141 (pnQuadGenExp7 -> .)
-    DIV             reduce using rule 141 (pnQuadGenExp7 -> .)
-    ADD             reduce using rule 141 (pnQuadGenExp7 -> .)
-    SUB             reduce using rule 141 (pnQuadGenExp7 -> .)
-    LT              reduce using rule 141 (pnQuadGenExp7 -> .)
-    GT              reduce using rule 141 (pnQuadGenExp7 -> .)
-    LE              reduce using rule 141 (pnQuadGenExp7 -> .)
-    GE              reduce using rule 141 (pnQuadGenExp7 -> .)
-    NOT_EQUAL       reduce using rule 141 (pnQuadGenExp7 -> .)
-    EQUAL           reduce using rule 141 (pnQuadGenExp7 -> .)
-    AND             reduce using rule 141 (pnQuadGenExp7 -> .)
-    OR              reduce using rule 141 (pnQuadGenExp7 -> .)
-    ASSIGN          reduce using rule 141 (pnQuadGenExp7 -> .)
-    RPAREN          reduce using rule 141 (pnQuadGenExp7 -> .)
-    COMMA           reduce using rule 141 (pnQuadGenExp7 -> .)
-    HASTA           reduce using rule 141 (pnQuadGenExp7 -> .)
-    SEMICOLON       reduce using rule 141 (pnQuadGenExp7 -> .)
-    RBRACK          reduce using rule 141 (pnQuadGenExp7 -> .)
-    HACER           reduce using rule 141 (pnQuadGenExp7 -> .)
+    MUL             reduce using rule 139 (pnQuadGenExp7 -> .)
+    DIV             reduce using rule 139 (pnQuadGenExp7 -> .)
+    ADD             reduce using rule 139 (pnQuadGenExp7 -> .)
+    SUB             reduce using rule 139 (pnQuadGenExp7 -> .)
+    LT              reduce using rule 139 (pnQuadGenExp7 -> .)
+    GT              reduce using rule 139 (pnQuadGenExp7 -> .)
+    LE              reduce using rule 139 (pnQuadGenExp7 -> .)
+    GE              reduce using rule 139 (pnQuadGenExp7 -> .)
+    NOT_EQUAL       reduce using rule 139 (pnQuadGenExp7 -> .)
+    EQUAL           reduce using rule 139 (pnQuadGenExp7 -> .)
+    AND             reduce using rule 139 (pnQuadGenExp7 -> .)
+    OR              reduce using rule 139 (pnQuadGenExp7 -> .)
+    ASSIGN          reduce using rule 139 (pnQuadGenExp7 -> .)
+    RPAREN          reduce using rule 139 (pnQuadGenExp7 -> .)
+    COMMA           reduce using rule 139 (pnQuadGenExp7 -> .)
+    HASTA           reduce using rule 139 (pnQuadGenExp7 -> .)
+    SEMICOLON       reduce using rule 139 (pnQuadGenExp7 -> .)
+    RBRACK          reduce using rule 139 (pnQuadGenExp7 -> .)
+    HACER           reduce using rule 139 (pnQuadGenExp7 -> .)
 
-    pnQuadGenExp7                  shift and go to state 271
+    pnQuadGenExp7                  shift and go to state 273
 
-state 253
+state 252
 
     (76) condicional -> MIENTRAS LPAREN expresion RPAREN HAZ bloque .
 
@@ -4122,16 +4101,16 @@ state 253
     RBRACE          reduce using rule 76 (condicional -> MIENTRAS LPAREN expresion RPAREN HAZ bloque .)
 
 
-state 254
+state 253
 
     (83) funciones_especiales -> CORRELACIONA LPAREN ID COMMA . v_exp COMMA v_exp RPAREN
     (88) v_exp -> . VARIABLES LBRACK exp RBRACK
 
-    VARIABLES       shift and go to state 237
+    VARIABLES       shift and go to state 236
 
-    v_exp                          shift and go to state 272
+    v_exp                          shift and go to state 274
 
-state 255
+state 254
 
     (101) sp -> op_r exp pnQuadGenExp9 .
 
@@ -4141,21 +4120,48 @@ state 255
     RPAREN          reduce using rule 101 (sp -> op_r exp pnQuadGenExp9 .)
 
 
+state 255
+
+    (64) escritura -> ESCRIBE pnQuadGenSec3 LPAREN esc RPAREN SEMICOLON . pnQuadGenSec4
+    (147) pnQuadGenSec4 -> .
+
+    ID              reduce using rule 147 (pnQuadGenSec4 -> .)
+    REGRESA         reduce using rule 147 (pnQuadGenSec4 -> .)
+    LEE             reduce using rule 147 (pnQuadGenSec4 -> .)
+    ESCRIBE         reduce using rule 147 (pnQuadGenSec4 -> .)
+    CARGA           reduce using rule 147 (pnQuadGenSec4 -> .)
+    SI              reduce using rule 147 (pnQuadGenSec4 -> .)
+    MIENTRAS        reduce using rule 147 (pnQuadGenSec4 -> .)
+    DESDE           reduce using rule 147 (pnQuadGenSec4 -> .)
+    VARIABLES       reduce using rule 147 (pnQuadGenSec4 -> .)
+    DISTRIBUCION    reduce using rule 147 (pnQuadGenSec4 -> .)
+    TENDENCIA       reduce using rule 147 (pnQuadGenSec4 -> .)
+    RBRACE          reduce using rule 147 (pnQuadGenSec4 -> .)
+
+    pnQuadGenSec4                  shift and go to state 275
+
 state 256
 
-    (78) funciones_especiales_void -> VARIABLES LPAREN ID COMMA ID COMMA . ID RPAREN SEMICOLON
+    (68) esc2 -> COMMA esc .
 
-    ID              shift and go to state 273
+    RPAREN          reduce using rule 68 (esc2 -> COMMA esc .)
 
 
 state 257
 
-    (77) no_condicional -> DESDE variable ASSIGN exp HASTA exp . HACER bloque
+    (78) funciones_especiales_void -> VARIABLES LPAREN ID COMMA ID COMMA . ID RPAREN SEMICOLON
 
-    HACER           shift and go to state 274
+    ID              shift and go to state 276
 
 
 state 258
+
+    (77) no_condicional -> DESDE variable ASSIGN exp HASTA exp . HACER bloque
+
+    HACER           shift and go to state 277
+
+
+state 259
 
     (53) asig -> exp SEMICOLON pnQuadGenSec2 .
 
@@ -4173,7 +4179,7 @@ state 258
     RBRACE          reduce using rule 53 (asig -> exp SEMICOLON pnQuadGenSec2 .)
 
 
-state 259
+state 260
 
     (37) dim_index1 -> empty .
 
@@ -4198,7 +4204,7 @@ state 259
     HACER           reduce using rule 37 (dim_index1 -> empty .)
 
 
-state 260
+state 261
 
     (35) dim_index -> LBRACK exp RBRACK dim_index1 .
 
@@ -4223,7 +4229,7 @@ state 260
     HACER           reduce using rule 35 (dim_index -> LBRACK exp RBRACK dim_index1 .)
 
 
-state 261
+state 262
 
     (36) dim_index1 -> LBRACK . exp RBRACK
     (109) exp -> . termino pnQuadGenExp4 exp1
@@ -4260,12 +4266,32 @@ state 261
     var_cte                        shift and go to state 110
     llamada                        shift and go to state 117
     termino                        shift and go to state 112
-    exp                            shift and go to state 275
+    exp                            shift and go to state 278
     factor                         shift and go to state 118
     variable                       shift and go to state 124
     fe                             shift and go to state 122
 
-state 262
+state 263
+
+    (63) lectura -> LEE pnQuadGenSec3 LPAREN variable RPAREN SEMICOLON . pnQuadGenSec4
+    (147) pnQuadGenSec4 -> .
+
+    ID              reduce using rule 147 (pnQuadGenSec4 -> .)
+    REGRESA         reduce using rule 147 (pnQuadGenSec4 -> .)
+    LEE             reduce using rule 147 (pnQuadGenSec4 -> .)
+    ESCRIBE         reduce using rule 147 (pnQuadGenSec4 -> .)
+    CARGA           reduce using rule 147 (pnQuadGenSec4 -> .)
+    SI              reduce using rule 147 (pnQuadGenSec4 -> .)
+    MIENTRAS        reduce using rule 147 (pnQuadGenSec4 -> .)
+    DESDE           reduce using rule 147 (pnQuadGenSec4 -> .)
+    VARIABLES       reduce using rule 147 (pnQuadGenSec4 -> .)
+    DISTRIBUCION    reduce using rule 147 (pnQuadGenSec4 -> .)
+    TENDENCIA       reduce using rule 147 (pnQuadGenSec4 -> .)
+    RBRACE          reduce using rule 147 (pnQuadGenSec4 -> .)
+
+    pnQuadGenSec4                  shift and go to state 279
+
+state 264
 
     (88) v_exp -> VARIABLES LBRACK . exp RBRACK
     (109) exp -> . termino pnQuadGenExp4 exp1
@@ -4302,26 +4328,26 @@ state 262
     var_cte                        shift and go to state 110
     llamada                        shift and go to state 117
     termino                        shift and go to state 112
-    exp                            shift and go to state 276
+    exp                            shift and go to state 280
     factor                         shift and go to state 118
     variable                       shift and go to state 124
     fe                             shift and go to state 122
 
-state 263
+state 265
 
     (79) funciones_especiales_void -> fev LPAREN ID COMMA v_exp RPAREN . SEMICOLON
 
-    SEMICOLON       shift and go to state 277
+    SEMICOLON       shift and go to state 281
 
 
-state 264
+state 266
 
     (73) decision -> SI LPAREN expresion RPAREN ENTONCES bloque . sino
     (74) sino -> . SINO bloque
     (75) sino -> . empty
     (124) empty -> .
 
-    SINO            shift and go to state 278
+    SINO            shift and go to state 282
     ID              reduce using rule 124 (empty -> .)
     REGRESA         reduce using rule 124 (empty -> .)
     LEE             reduce using rule 124 (empty -> .)
@@ -4335,10 +4361,10 @@ state 264
     TENDENCIA       reduce using rule 124 (empty -> .)
     RBRACE          reduce using rule 124 (empty -> .)
 
-    sino                           shift and go to state 279
-    empty                          shift and go to state 280
+    sino                           shift and go to state 283
+    empty                          shift and go to state 284
 
-state 265
+state 267
 
     (33) dim_dec1 -> LBRACK CTE_INT RBRACK pn_8_decColumnas .
 
@@ -4346,30 +4372,30 @@ state 265
     SEMICOLON       reduce using rule 33 (dim_dec1 -> LBRACK CTE_INT RBRACK pn_8_decColumnas .)
 
 
-state 266
+state 268
 
     (70) carga_datos -> CARGA LPAREN ID COMMA CTE_STR COMMA ca . COMMA ca RPAREN SEMICOLON
 
-    COMMA           shift and go to state 281
-
-
-state 267
-
-    (72) ca -> CTE_INT .
-
-    COMMA           reduce using rule 72 (ca -> CTE_INT .)
-    RPAREN          reduce using rule 72 (ca -> CTE_INT .)
-
-
-state 268
-
-    (71) ca -> ID .
-
-    COMMA           reduce using rule 71 (ca -> ID .)
-    RPAREN          reduce using rule 71 (ca -> ID .)
+    COMMA           shift and go to state 285
 
 
 state 269
+
+    (72) ca -> CTE_INT .
+
+    RPAREN          reduce using rule 72 (ca -> CTE_INT .)
+    COMMA           reduce using rule 72 (ca -> CTE_INT .)
+
+
+state 270
+
+    (71) ca -> ID .
+
+    RPAREN          reduce using rule 71 (ca -> ID .)
+    COMMA           reduce using rule 71 (ca -> ID .)
+
+
+state 271
 
     (96) meg -> op_l pnQuadGenExp10 mega_exp pnQuadGenExp11 .
 
@@ -4377,14 +4403,14 @@ state 269
     RPAREN          reduce using rule 96 (meg -> op_l pnQuadGenExp10 mega_exp pnQuadGenExp11 .)
 
 
-state 270
+state 272
 
     (82) funciones_especiales -> fe LPAREN ID COMMA v_exp . RPAREN
 
-    RPAREN          shift and go to state 282
+    RPAREN          shift and go to state 286
 
 
-state 271
+state 273
 
     (120) factor -> LPAREN pnQuadGenExp6 exp RPAREN pnQuadGenExp7 .
 
@@ -4392,10 +4418,9 @@ state 271
     DIV             reduce using rule 120 (factor -> LPAREN pnQuadGenExp6 exp RPAREN pnQuadGenExp7 .)
     ADD             reduce using rule 120 (factor -> LPAREN pnQuadGenExp6 exp RPAREN pnQuadGenExp7 .)
     SUB             reduce using rule 120 (factor -> LPAREN pnQuadGenExp6 exp RPAREN pnQuadGenExp7 .)
-    HASTA           reduce using rule 120 (factor -> LPAREN pnQuadGenExp6 exp RPAREN pnQuadGenExp7 .)
     COMMA           reduce using rule 120 (factor -> LPAREN pnQuadGenExp6 exp RPAREN pnQuadGenExp7 .)
     RPAREN          reduce using rule 120 (factor -> LPAREN pnQuadGenExp6 exp RPAREN pnQuadGenExp7 .)
-    RBRACK          reduce using rule 120 (factor -> LPAREN pnQuadGenExp6 exp RPAREN pnQuadGenExp7 .)
+    HASTA           reduce using rule 120 (factor -> LPAREN pnQuadGenExp6 exp RPAREN pnQuadGenExp7 .)
     LT              reduce using rule 120 (factor -> LPAREN pnQuadGenExp6 exp RPAREN pnQuadGenExp7 .)
     GT              reduce using rule 120 (factor -> LPAREN pnQuadGenExp6 exp RPAREN pnQuadGenExp7 .)
     LE              reduce using rule 120 (factor -> LPAREN pnQuadGenExp6 exp RPAREN pnQuadGenExp7 .)
@@ -4405,48 +4430,85 @@ state 271
     AND             reduce using rule 120 (factor -> LPAREN pnQuadGenExp6 exp RPAREN pnQuadGenExp7 .)
     OR              reduce using rule 120 (factor -> LPAREN pnQuadGenExp6 exp RPAREN pnQuadGenExp7 .)
     ASSIGN          reduce using rule 120 (factor -> LPAREN pnQuadGenExp6 exp RPAREN pnQuadGenExp7 .)
-    HACER           reduce using rule 120 (factor -> LPAREN pnQuadGenExp6 exp RPAREN pnQuadGenExp7 .)
     SEMICOLON       reduce using rule 120 (factor -> LPAREN pnQuadGenExp6 exp RPAREN pnQuadGenExp7 .)
-
-
-state 272
-
-    (83) funciones_especiales -> CORRELACIONA LPAREN ID COMMA v_exp . COMMA v_exp RPAREN
-
-    COMMA           shift and go to state 283
-
-
-state 273
-
-    (78) funciones_especiales_void -> VARIABLES LPAREN ID COMMA ID COMMA ID . RPAREN SEMICOLON
-
-    RPAREN          shift and go to state 284
+    RBRACK          reduce using rule 120 (factor -> LPAREN pnQuadGenExp6 exp RPAREN pnQuadGenExp7 .)
+    HACER           reduce using rule 120 (factor -> LPAREN pnQuadGenExp6 exp RPAREN pnQuadGenExp7 .)
 
 
 state 274
+
+    (83) funciones_especiales -> CORRELACIONA LPAREN ID COMMA v_exp . COMMA v_exp RPAREN
+
+    COMMA           shift and go to state 287
+
+
+state 275
+
+    (64) escritura -> ESCRIBE pnQuadGenSec3 LPAREN esc RPAREN SEMICOLON pnQuadGenSec4 .
+
+    ID              reduce using rule 64 (escritura -> ESCRIBE pnQuadGenSec3 LPAREN esc RPAREN SEMICOLON pnQuadGenSec4 .)
+    REGRESA         reduce using rule 64 (escritura -> ESCRIBE pnQuadGenSec3 LPAREN esc RPAREN SEMICOLON pnQuadGenSec4 .)
+    LEE             reduce using rule 64 (escritura -> ESCRIBE pnQuadGenSec3 LPAREN esc RPAREN SEMICOLON pnQuadGenSec4 .)
+    ESCRIBE         reduce using rule 64 (escritura -> ESCRIBE pnQuadGenSec3 LPAREN esc RPAREN SEMICOLON pnQuadGenSec4 .)
+    CARGA           reduce using rule 64 (escritura -> ESCRIBE pnQuadGenSec3 LPAREN esc RPAREN SEMICOLON pnQuadGenSec4 .)
+    SI              reduce using rule 64 (escritura -> ESCRIBE pnQuadGenSec3 LPAREN esc RPAREN SEMICOLON pnQuadGenSec4 .)
+    MIENTRAS        reduce using rule 64 (escritura -> ESCRIBE pnQuadGenSec3 LPAREN esc RPAREN SEMICOLON pnQuadGenSec4 .)
+    DESDE           reduce using rule 64 (escritura -> ESCRIBE pnQuadGenSec3 LPAREN esc RPAREN SEMICOLON pnQuadGenSec4 .)
+    VARIABLES       reduce using rule 64 (escritura -> ESCRIBE pnQuadGenSec3 LPAREN esc RPAREN SEMICOLON pnQuadGenSec4 .)
+    DISTRIBUCION    reduce using rule 64 (escritura -> ESCRIBE pnQuadGenSec3 LPAREN esc RPAREN SEMICOLON pnQuadGenSec4 .)
+    TENDENCIA       reduce using rule 64 (escritura -> ESCRIBE pnQuadGenSec3 LPAREN esc RPAREN SEMICOLON pnQuadGenSec4 .)
+    RBRACE          reduce using rule 64 (escritura -> ESCRIBE pnQuadGenSec3 LPAREN esc RPAREN SEMICOLON pnQuadGenSec4 .)
+
+
+state 276
+
+    (78) funciones_especiales_void -> VARIABLES LPAREN ID COMMA ID COMMA ID . RPAREN SEMICOLON
+
+    RPAREN          shift and go to state 288
+
+
+state 277
 
     (77) no_condicional -> DESDE variable ASSIGN exp HASTA exp HACER . bloque
     (38) bloque -> . LBRACE est RBRACE
 
     LBRACE          shift and go to state 51
 
-    bloque                         shift and go to state 285
+    bloque                         shift and go to state 289
 
-state 275
+state 278
 
     (36) dim_index1 -> LBRACK exp . RBRACK
 
-    RBRACK          shift and go to state 286
+    RBRACK          shift and go to state 290
 
 
-state 276
+state 279
+
+    (63) lectura -> LEE pnQuadGenSec3 LPAREN variable RPAREN SEMICOLON pnQuadGenSec4 .
+
+    ID              reduce using rule 63 (lectura -> LEE pnQuadGenSec3 LPAREN variable RPAREN SEMICOLON pnQuadGenSec4 .)
+    REGRESA         reduce using rule 63 (lectura -> LEE pnQuadGenSec3 LPAREN variable RPAREN SEMICOLON pnQuadGenSec4 .)
+    LEE             reduce using rule 63 (lectura -> LEE pnQuadGenSec3 LPAREN variable RPAREN SEMICOLON pnQuadGenSec4 .)
+    ESCRIBE         reduce using rule 63 (lectura -> LEE pnQuadGenSec3 LPAREN variable RPAREN SEMICOLON pnQuadGenSec4 .)
+    CARGA           reduce using rule 63 (lectura -> LEE pnQuadGenSec3 LPAREN variable RPAREN SEMICOLON pnQuadGenSec4 .)
+    SI              reduce using rule 63 (lectura -> LEE pnQuadGenSec3 LPAREN variable RPAREN SEMICOLON pnQuadGenSec4 .)
+    MIENTRAS        reduce using rule 63 (lectura -> LEE pnQuadGenSec3 LPAREN variable RPAREN SEMICOLON pnQuadGenSec4 .)
+    DESDE           reduce using rule 63 (lectura -> LEE pnQuadGenSec3 LPAREN variable RPAREN SEMICOLON pnQuadGenSec4 .)
+    VARIABLES       reduce using rule 63 (lectura -> LEE pnQuadGenSec3 LPAREN variable RPAREN SEMICOLON pnQuadGenSec4 .)
+    DISTRIBUCION    reduce using rule 63 (lectura -> LEE pnQuadGenSec3 LPAREN variable RPAREN SEMICOLON pnQuadGenSec4 .)
+    TENDENCIA       reduce using rule 63 (lectura -> LEE pnQuadGenSec3 LPAREN variable RPAREN SEMICOLON pnQuadGenSec4 .)
+    RBRACE          reduce using rule 63 (lectura -> LEE pnQuadGenSec3 LPAREN variable RPAREN SEMICOLON pnQuadGenSec4 .)
+
+
+state 280
 
     (88) v_exp -> VARIABLES LBRACK exp . RBRACK
 
-    RBRACK          shift and go to state 287
+    RBRACK          shift and go to state 291
 
 
-state 277
+state 281
 
     (79) funciones_especiales_void -> fev LPAREN ID COMMA v_exp RPAREN SEMICOLON .
 
@@ -4464,16 +4526,16 @@ state 277
     RBRACE          reduce using rule 79 (funciones_especiales_void -> fev LPAREN ID COMMA v_exp RPAREN SEMICOLON .)
 
 
-state 278
+state 282
 
     (74) sino -> SINO . bloque
     (38) bloque -> . LBRACE est RBRACE
 
     LBRACE          shift and go to state 51
 
-    bloque                         shift and go to state 288
+    bloque                         shift and go to state 292
 
-state 279
+state 283
 
     (73) decision -> SI LPAREN expresion RPAREN ENTONCES bloque sino .
 
@@ -4491,7 +4553,7 @@ state 279
     RBRACE          reduce using rule 73 (decision -> SI LPAREN expresion RPAREN ENTONCES bloque sino .)
 
 
-state 280
+state 284
 
     (75) sino -> empty .
 
@@ -4509,18 +4571,18 @@ state 280
     RBRACE          reduce using rule 75 (sino -> empty .)
 
 
-state 281
+state 285
 
     (70) carga_datos -> CARGA LPAREN ID COMMA CTE_STR COMMA ca COMMA . ca RPAREN SEMICOLON
     (71) ca -> . ID
     (72) ca -> . CTE_INT
 
-    ID              shift and go to state 268
-    CTE_INT         shift and go to state 267
+    ID              shift and go to state 270
+    CTE_INT         shift and go to state 269
 
-    ca                             shift and go to state 289
+    ca                             shift and go to state 293
 
-state 282
+state 286
 
     (82) funciones_especiales -> fe LPAREN ID COMMA v_exp RPAREN .
 
@@ -4528,40 +4590,40 @@ state 282
     DIV             reduce using rule 82 (funciones_especiales -> fe LPAREN ID COMMA v_exp RPAREN .)
     ADD             reduce using rule 82 (funciones_especiales -> fe LPAREN ID COMMA v_exp RPAREN .)
     SUB             reduce using rule 82 (funciones_especiales -> fe LPAREN ID COMMA v_exp RPAREN .)
+    COMMA           reduce using rule 82 (funciones_especiales -> fe LPAREN ID COMMA v_exp RPAREN .)
+    RPAREN          reduce using rule 82 (funciones_especiales -> fe LPAREN ID COMMA v_exp RPAREN .)
+    AND             reduce using rule 82 (funciones_especiales -> fe LPAREN ID COMMA v_exp RPAREN .)
+    OR              reduce using rule 82 (funciones_especiales -> fe LPAREN ID COMMA v_exp RPAREN .)
+    ASSIGN          reduce using rule 82 (funciones_especiales -> fe LPAREN ID COMMA v_exp RPAREN .)
     LT              reduce using rule 82 (funciones_especiales -> fe LPAREN ID COMMA v_exp RPAREN .)
     GT              reduce using rule 82 (funciones_especiales -> fe LPAREN ID COMMA v_exp RPAREN .)
     LE              reduce using rule 82 (funciones_especiales -> fe LPAREN ID COMMA v_exp RPAREN .)
     GE              reduce using rule 82 (funciones_especiales -> fe LPAREN ID COMMA v_exp RPAREN .)
     NOT_EQUAL       reduce using rule 82 (funciones_especiales -> fe LPAREN ID COMMA v_exp RPAREN .)
     EQUAL           reduce using rule 82 (funciones_especiales -> fe LPAREN ID COMMA v_exp RPAREN .)
-    AND             reduce using rule 82 (funciones_especiales -> fe LPAREN ID COMMA v_exp RPAREN .)
-    OR              reduce using rule 82 (funciones_especiales -> fe LPAREN ID COMMA v_exp RPAREN .)
-    ASSIGN          reduce using rule 82 (funciones_especiales -> fe LPAREN ID COMMA v_exp RPAREN .)
-    RPAREN          reduce using rule 82 (funciones_especiales -> fe LPAREN ID COMMA v_exp RPAREN .)
     RBRACK          reduce using rule 82 (funciones_especiales -> fe LPAREN ID COMMA v_exp RPAREN .)
-    COMMA           reduce using rule 82 (funciones_especiales -> fe LPAREN ID COMMA v_exp RPAREN .)
-    HASTA           reduce using rule 82 (funciones_especiales -> fe LPAREN ID COMMA v_exp RPAREN .)
     SEMICOLON       reduce using rule 82 (funciones_especiales -> fe LPAREN ID COMMA v_exp RPAREN .)
+    HASTA           reduce using rule 82 (funciones_especiales -> fe LPAREN ID COMMA v_exp RPAREN .)
     HACER           reduce using rule 82 (funciones_especiales -> fe LPAREN ID COMMA v_exp RPAREN .)
 
 
-state 283
+state 287
 
     (83) funciones_especiales -> CORRELACIONA LPAREN ID COMMA v_exp COMMA . v_exp RPAREN
     (88) v_exp -> . VARIABLES LBRACK exp RBRACK
 
-    VARIABLES       shift and go to state 237
+    VARIABLES       shift and go to state 236
 
-    v_exp                          shift and go to state 290
+    v_exp                          shift and go to state 294
 
-state 284
+state 288
 
     (78) funciones_especiales_void -> VARIABLES LPAREN ID COMMA ID COMMA ID RPAREN . SEMICOLON
 
-    SEMICOLON       shift and go to state 291
+    SEMICOLON       shift and go to state 295
 
 
-state 285
+state 289
 
     (77) no_condicional -> DESDE variable ASSIGN exp HASTA exp HACER bloque .
 
@@ -4579,7 +4641,7 @@ state 285
     RBRACE          reduce using rule 77 (no_condicional -> DESDE variable ASSIGN exp HASTA exp HACER bloque .)
 
 
-state 286
+state 290
 
     (36) dim_index1 -> LBRACK exp RBRACK .
 
@@ -4604,15 +4666,15 @@ state 286
     HACER           reduce using rule 36 (dim_index1 -> LBRACK exp RBRACK .)
 
 
-state 287
+state 291
 
     (88) v_exp -> VARIABLES LBRACK exp RBRACK .
 
-    RPAREN          reduce using rule 88 (v_exp -> VARIABLES LBRACK exp RBRACK .)
     COMMA           reduce using rule 88 (v_exp -> VARIABLES LBRACK exp RBRACK .)
+    RPAREN          reduce using rule 88 (v_exp -> VARIABLES LBRACK exp RBRACK .)
 
 
-state 288
+state 292
 
     (74) sino -> SINO bloque .
 
@@ -4630,21 +4692,21 @@ state 288
     RBRACE          reduce using rule 74 (sino -> SINO bloque .)
 
 
-state 289
+state 293
 
     (70) carga_datos -> CARGA LPAREN ID COMMA CTE_STR COMMA ca COMMA ca . RPAREN SEMICOLON
 
-    RPAREN          shift and go to state 292
+    RPAREN          shift and go to state 296
 
 
-state 290
+state 294
 
     (83) funciones_especiales -> CORRELACIONA LPAREN ID COMMA v_exp COMMA v_exp . RPAREN
 
-    RPAREN          shift and go to state 293
+    RPAREN          shift and go to state 297
 
 
-state 291
+state 295
 
     (78) funciones_especiales_void -> VARIABLES LPAREN ID COMMA ID COMMA ID RPAREN SEMICOLON .
 
@@ -4662,14 +4724,14 @@ state 291
     RBRACE          reduce using rule 78 (funciones_especiales_void -> VARIABLES LPAREN ID COMMA ID COMMA ID RPAREN SEMICOLON .)
 
 
-state 292
+state 296
 
     (70) carga_datos -> CARGA LPAREN ID COMMA CTE_STR COMMA ca COMMA ca RPAREN . SEMICOLON
 
-    SEMICOLON       shift and go to state 294
+    SEMICOLON       shift and go to state 298
 
 
-state 293
+state 297
 
     (83) funciones_especiales -> CORRELACIONA LPAREN ID COMMA v_exp COMMA v_exp RPAREN .
 
@@ -4677,24 +4739,24 @@ state 293
     DIV             reduce using rule 83 (funciones_especiales -> CORRELACIONA LPAREN ID COMMA v_exp COMMA v_exp RPAREN .)
     ADD             reduce using rule 83 (funciones_especiales -> CORRELACIONA LPAREN ID COMMA v_exp COMMA v_exp RPAREN .)
     SUB             reduce using rule 83 (funciones_especiales -> CORRELACIONA LPAREN ID COMMA v_exp COMMA v_exp RPAREN .)
+    COMMA           reduce using rule 83 (funciones_especiales -> CORRELACIONA LPAREN ID COMMA v_exp COMMA v_exp RPAREN .)
+    RPAREN          reduce using rule 83 (funciones_especiales -> CORRELACIONA LPAREN ID COMMA v_exp COMMA v_exp RPAREN .)
+    AND             reduce using rule 83 (funciones_especiales -> CORRELACIONA LPAREN ID COMMA v_exp COMMA v_exp RPAREN .)
+    OR              reduce using rule 83 (funciones_especiales -> CORRELACIONA LPAREN ID COMMA v_exp COMMA v_exp RPAREN .)
+    ASSIGN          reduce using rule 83 (funciones_especiales -> CORRELACIONA LPAREN ID COMMA v_exp COMMA v_exp RPAREN .)
     LT              reduce using rule 83 (funciones_especiales -> CORRELACIONA LPAREN ID COMMA v_exp COMMA v_exp RPAREN .)
     GT              reduce using rule 83 (funciones_especiales -> CORRELACIONA LPAREN ID COMMA v_exp COMMA v_exp RPAREN .)
     LE              reduce using rule 83 (funciones_especiales -> CORRELACIONA LPAREN ID COMMA v_exp COMMA v_exp RPAREN .)
     GE              reduce using rule 83 (funciones_especiales -> CORRELACIONA LPAREN ID COMMA v_exp COMMA v_exp RPAREN .)
     NOT_EQUAL       reduce using rule 83 (funciones_especiales -> CORRELACIONA LPAREN ID COMMA v_exp COMMA v_exp RPAREN .)
     EQUAL           reduce using rule 83 (funciones_especiales -> CORRELACIONA LPAREN ID COMMA v_exp COMMA v_exp RPAREN .)
-    AND             reduce using rule 83 (funciones_especiales -> CORRELACIONA LPAREN ID COMMA v_exp COMMA v_exp RPAREN .)
-    OR              reduce using rule 83 (funciones_especiales -> CORRELACIONA LPAREN ID COMMA v_exp COMMA v_exp RPAREN .)
-    ASSIGN          reduce using rule 83 (funciones_especiales -> CORRELACIONA LPAREN ID COMMA v_exp COMMA v_exp RPAREN .)
-    RPAREN          reduce using rule 83 (funciones_especiales -> CORRELACIONA LPAREN ID COMMA v_exp COMMA v_exp RPAREN .)
     RBRACK          reduce using rule 83 (funciones_especiales -> CORRELACIONA LPAREN ID COMMA v_exp COMMA v_exp RPAREN .)
-    COMMA           reduce using rule 83 (funciones_especiales -> CORRELACIONA LPAREN ID COMMA v_exp COMMA v_exp RPAREN .)
-    HASTA           reduce using rule 83 (funciones_especiales -> CORRELACIONA LPAREN ID COMMA v_exp COMMA v_exp RPAREN .)
     SEMICOLON       reduce using rule 83 (funciones_especiales -> CORRELACIONA LPAREN ID COMMA v_exp COMMA v_exp RPAREN .)
+    HASTA           reduce using rule 83 (funciones_especiales -> CORRELACIONA LPAREN ID COMMA v_exp COMMA v_exp RPAREN .)
     HACER           reduce using rule 83 (funciones_especiales -> CORRELACIONA LPAREN ID COMMA v_exp COMMA v_exp RPAREN .)
 
 
-state 294
+state 298
 
     (70) carga_datos -> CARGA LPAREN ID COMMA CTE_STR COMMA ca COMMA ca RPAREN SEMICOLON .
 

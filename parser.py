@@ -10,9 +10,11 @@ from lex import tokens
 from sys import stdin
 from DirFunc import *
 from CuboSemantico import *
+from CuboSemantico_FuncEsp import *
 
 directorioFunciones = DirFunc()
 validaCubo = CuboSemantico()
+validaCuboEsp = CuboSemantico_FuncEsp()
 
 
 ### Pilas para generacion de cuadruplos ####
@@ -66,7 +68,7 @@ precedence = (
 #INICIO
 def p_programa(p):
     'programa : PROGRAMA ID SEMICOLON var1 func1 principal pn_6_end'
-    # print("PROGRAMA")
+    print("PROGRAMA \"", p[2], "\" terminado.")
 
 def p_var1(p):
     '''
@@ -255,10 +257,10 @@ def p_retorno(p):
     'retorno : REGRESA LPAREN exp RPAREN SEMICOLON'
 
 def p_lectura(p):
-    'lectura : LEE LPAREN variable RPAREN SEMICOLON'
+    'lectura : LEE pnQuadGenSec3 LPAREN variable RPAREN SEMICOLON pnQuadGenSec4'
 
 def p_escritura(p):
-    'escritura : ESCRIBE LPAREN esc RPAREN SEMICOLON'
+    'escritura : ESCRIBE pnQuadGenSec3 LPAREN esc RPAREN SEMICOLON pnQuadGenSec4'
 
 def p_esc(p):
     'esc : esc1 esc2'
@@ -589,6 +591,123 @@ def p_pn_8_decColumnas(p):
     numColumnas = p[-2]
 
 ##### Generacion de cuadruplos #######
+
+'''Anadir id a poper y pTipo'''
+def p_pnQuadGenExp1(p):
+    '''
+    pnQuadGenExp1 : 
+    '''
+    global currentFunc
+    global directorioFunciones
+    global pOperandos
+    global pTipos
+    idName = p[-1]
+    print("QuadExp1 : ", p[-1])
+    print("CurrentFunc: " , currentFunc)
+    idType = directorioFunciones.func_searchVarType(currentFunc, idName)
+    if not idType:
+        idType = directorioFunciones.func_searchVarType('global', idName)
+    
+    if not idType:
+        print("Error: Variable ", idName, " no declarada")
+        return
+    
+    pushOperando(idName)
+    pushTipo(idType)
+    print("POperandos : ", pOperandos)
+    print("pTipos : ", pTipos)
+    print("\n")
+
+'''Anadir un + o - al POper'''
+def p_pnQuadGenExp2(p):
+    '''
+    pnQuadGenExp2 : 
+    '''
+
+    global pOper
+
+    if p[-1] not in OPERADORES_SUMARESTA:
+        print("Error: Operador no esperado")
+    else:
+        pushOperador(p[-1])
+        print("POper: ", pOper)
+
+'''Anadir un * o / al POper'''
+def p_pnQuadGenExp3(p):
+    '''
+    pnQuadGenExp3 : 
+    '''
+
+    global pOper
+
+    if p[-1] not in OPERADORES_MULTDIV:
+        print("Error: Operador no esperado")
+    else:
+        pushOperador(p[-1])
+        print("POper: ", pOper)
+
+'''Checa si el top del POper es un + o - para crear el cuadruplo de esa operacion'''
+def p_pnQuadGenExp4(p):
+    '''
+    pnQuadGenExp4 : 
+    '''
+    if topOperador() in OPERADORES_SUMARESTA:
+        quad_rightOperand = popOperandos()
+        quad_rightType = popTipos()
+        quad_leftOperand = popOperandos()
+        quad_leftType = popTipos()
+        quad_operator = popOperadores()
+
+        global validaCubo
+        quad_resultType = validaCubo.getType(quad_leftType, quad_rightType, quad_operator)
+
+        if quad_resultType == 'error':
+            print('Error: Type Mismatch')
+        else:
+            quad_resultIndex = nextAvailTemp(quad_resultType)
+            printQuad(quad_operator, quad_leftOperand, quad_rightOperand, quad_resultIndex)
+            pushOperando(quad_resultIndex)
+            pushTipo(quad_rightType)
+
+
+'''Checa si el top de la pila de operadores es un * o / para crear el cuadruplo  '''
+def p_pnQuadGenExp5(p):
+    '''
+    pnQuadGenExp5 : 
+    '''
+    if topOperador() in OPERADORES_MULTDIV:
+        
+        quad_rightOperand = popOperandos()
+        quad_rightType = popTipos()
+        quad_leftOperand = popOperandos()
+        quad_leftType = popTipos()
+        quad_operator = popOperadores()
+
+        global validaCubo
+        quad_resultType = validaCubo.getType(quad_leftType, quad_rightType, quad_operator)
+
+        if quad_resultType == 'error':
+            print('Error: Type Mismatch')
+        else:
+            quad_resultIndex = nextAvailTemp(quad_resultType)
+            printQuad(quad_operator, quad_leftOperand, quad_rightOperand, quad_resultIndex)
+            pushOperando(quad_resultIndex)
+            pushTipo(quad_rightType)
+
+'''Agrega fondo falso '''
+def p_pnQuadGenExp6(p):
+    '''
+    pnQuadGenExp6 : 
+    '''
+    pushOperador('(')
+
+'''Quita fondo falso '''
+def p_pnQuadGenExp7(p):
+    '''
+    pnQuadGenExp7 : 
+    '''
+    tipo = popOperadores()
+
 '''Meter un operador relacional a la pila de operadores'''
 def p_pnQuadGenExp8(p):
     '''
@@ -623,126 +742,6 @@ def p_pnQuadGenExp9(p):
             printQuad(quad_operator, quad_leftOperand, quad_rightOperand, quad_resultIndex)
             pushOperando(quad_resultIndex)
             pushTipo(quad_rightType)
-
-'''Checa si el top del POper es un + o - para crear el cuadruplo de esa operacion'''
-def p_pnQuadGenExp4(p):
-    '''
-    pnQuadGenExp4 : 
-    '''
-    if topOperador() in OPERADORES_SUMARESTA:
-        quad_rightOperand = popOperandos()
-        quad_rightType = popTipos()
-        quad_leftOperand = popOperandos()
-        quad_leftType = popTipos()
-        quad_operator = popOperadores()
-
-        global validaCubo
-        quad_resultType = validaCubo.getType(quad_leftType, quad_rightType, quad_operator)
-
-        if quad_resultType == 'error':
-            print('Error: Type Mismatch')
-        else:
-            quad_resultIndex = nextAvailTemp(quad_resultType)
-            printQuad(quad_operator, quad_leftOperand, quad_rightOperand, quad_resultIndex)
-            pushOperando(quad_resultIndex)
-            pushTipo(quad_rightType)
-
-'''Anadir un + o - al POper'''
-def p_pnQuadGenExp2(p):
-    '''
-    pnQuadGenExp2 : 
-    '''
-
-    global pOper
-
-    if p[-1] not in OPERADORES_SUMARESTA:
-        print("Error: Operador no esperado")
-    else:
-        pushOperador(p[-1])
-        print("POper: ", pOper)
-
-'''Checa si el top de la pila de operadores es un * o / para crear el cuadruplo  '''
-def p_pnQuadGenExp5(p):
-    '''
-    pnQuadGenExp5 : 
-    '''
-    if topOperador() in OPERADORES_MULTDIV:
-        
-        quad_rightOperand = popOperandos()
-        quad_rightType = popTipos()
-        quad_leftOperand = popOperandos()
-        quad_leftType = popTipos()
-        quad_operator = popOperadores()
-
-        global validaCubo
-        quad_resultType = validaCubo.getType(quad_leftType, quad_rightType, quad_operator)
-
-        if quad_resultType == 'error':
-            print('Error: Type Mismatch')
-        else:
-            quad_resultIndex = nextAvailTemp(quad_resultType)
-            printQuad(quad_operator, quad_leftOperand, quad_rightOperand, quad_resultIndex)
-            pushOperando(quad_resultIndex)
-            pushTipo(quad_rightType)
-    
-
-
-
-'''Anadir un * o / al POper'''
-def p_pnQuadGenExp3(p):
-    '''
-    pnQuadGenExp3 : 
-    '''
-
-    global pOper
-
-    if p[-1] not in OPERADORES_MULTDIV:
-        print("Error: Operador no esperado")
-    else:
-        pushOperador(p[-1])
-        print("POper: ", pOper)
-
-
-'''Anadir id a poper y pTipo'''
-def p_pnQuadGenExp1(p):
-    '''
-    pnQuadGenExp1 : 
-    '''
-    global currentFunc
-    global directorioFunciones
-    global pOperandos
-    global pTipos
-    idName = p[-1]
-    print("QuadExp1 : ", p[-1])
-    print("CurrentFunc: " , currentFunc)
-    idType = directorioFunciones.func_searchVarType(currentFunc, idName)
-    if not idType:
-        idType = directorioFunciones.func_searchVarType('global', idName)
-    
-    if not idType:
-        print("Error: Variable ", idName, " no declarada")
-        return
-    
-    pushOperando(idName)
-    pushTipo(idType)
-    print("POperandos : ", pOperandos)
-    print("pTipos : ", pTipos)
-    print("\n")
-
-'''Agrega fondo falso '''
-def p_pnQuadGenExp6(p):
-    '''
-    pnQuadGenExp6 : 
-    '''
-    pushOperador('(')
-
-'''Quita fondo falso '''
-def p_pnQuadGenExp7(p):
-    '''
-    pnQuadGenExp7 : 
-    '''
-    tipo = popOperadores()
-
 
 '''
 Meter un operador logico a pila de operadores
@@ -823,41 +822,41 @@ def p_pnQuadGenSec2(p):
 
 
 
-# '''
-# Meter escribir o leer a la pila
-# '''
-# def p_pnQuadGenSec3(p):
-#     '''
-#     pnQuadGenSec3 : 
-#     '''
-#     global pOper
-#     if p[-1] not in OP_SECUENCIALES:
-#         print("Error: Operador no esperado")
-#     else:
-#         pushOperador(p[-1])
-#         print("pOper : ", pOper)
+'''
+Meter escribir o leer a la pila
+'''
+def p_pnQuadGenSec3(p):
+    '''
+    pnQuadGenSec3 : 
+    '''
+    global pOper
+    if p[-1] not in OP_SECUENCIALES:
+        print("Error: Operador no esperado")
+    else:
+        pushOperador(p[-1])
+        print("pOper : ", pOper)
 
-# '''Checa si el top de la pila de operadores es lectura o escritura '''
-# def p_pnQuadGenSec4(p):
-#      '''
-#     pnQuadGenSec4 : 
-#     '''
-#     if topOperador() in OP_SECUENCIALES:
-#         quad_rightOperand = popOperandos()
-#         quad_rightType = popTipos()
-#         quad_operator = popOperadores()
+'''Checa si el top de la pila de operadores es lectura o escritura '''
+def p_pnQuadGenSec4(p):
+    '''
+    pnQuadGenSec4 : 
+    '''
+    if topOperador() in OP_SECUENCIALES:
+        quad_rightOperand = popOperandos()
+        quad_rightType = popTipos()
+        quad_operator = popOperadores()
 
-#         global validaCubo
+        global validaCubo
 
-#         quad_resultType = validaCubo.getType(quad_operator, quad_rightType, '')
+        quad_resultType = validaCubo.getType(quad_operator, quad_rightType, '')
 
     
-#         if quad_leftType == 'error':
-#             print("Error: Operacion invalida")
-#         else:
-#             printQuad(quad_operator, quad_rightOperand, '', quad_operator)
-#             pushOperando(quad_rightOperand)
-#             pushTipo(quad_resultType)
+        if quad_resultType == 'error':
+            print("Error: Operacion invalida")
+        else:
+            printQuad(quad_operator, quad_rightOperand, '', quad_operator)
+            pushOperando(quad_rightOperand)
+            pushTipo(quad_resultType)
         
 
 
@@ -887,6 +886,8 @@ var
 int : A, B, C, D, E, F, G;
 {
 z = (A + B) * (C / D);
+lee(z);
+escribe(z);
 
 
 }

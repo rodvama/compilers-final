@@ -79,8 +79,8 @@ Rule 69    esc2 -> empty
 Rule 70    carga_datos -> CARGA LPAREN ID COMMA CTE_STR COMMA ca COMMA ca RPAREN SEMICOLON
 Rule 71    ca -> ID
 Rule 72    ca -> CTE_INT
-Rule 73    decision -> SI LPAREN expresion RPAREN ENTONCES bloque sino
-Rule 74    sino -> SINO bloque
+Rule 73    decision -> SI LPAREN expresion RPAREN pnQuadGenCond1 ENTONCES bloque sino pnQuadGenCond3
+Rule 74    sino -> SINO pnQuadGenCond2 bloque
 Rule 75    sino -> empty
 Rule 76    condicional -> MIENTRAS LPAREN expresion RPAREN HAZ bloque
 Rule 77    no_condicional -> DESDE variable ASSIGN exp HASTA exp HACER bloque
@@ -154,6 +154,9 @@ Rule 144   pnQuadGenSec1 -> <empty>
 Rule 145   pnQuadGenSec2 -> <empty>
 Rule 146   pnQuadGenSec3 -> <empty>
 Rule 147   pnQuadGenSec4 -> <empty>
+Rule 148   pnQuadGenCond1 -> <empty>
+Rule 149   pnQuadGenCond2 -> <empty>
+Rule 150   pnQuadGenCond3 -> <empty>
 
 Terminals, with rules where they appear
 
@@ -267,6 +270,9 @@ op_r                 : 101
 param                : 16 19
 param1               : 18
 parametros           : 13
+pnQuadGenCond1       : 73
+pnQuadGenCond2       : 74
+pnQuadGenCond3       : 73
 pnQuadGenExp1        : 54 89 90
 pnQuadGenExp10       : 96
 pnQuadGenExp11       : 96
@@ -830,7 +836,7 @@ state 51
     (63) lectura -> . LEE pnQuadGenSec3 LPAREN variable RPAREN SEMICOLON pnQuadGenSec4
     (64) escritura -> . ESCRIBE pnQuadGenSec3 LPAREN esc RPAREN SEMICOLON pnQuadGenSec4
     (70) carga_datos -> . CARGA LPAREN ID COMMA CTE_STR COMMA ca COMMA ca RPAREN SEMICOLON
-    (73) decision -> . SI LPAREN expresion RPAREN ENTONCES bloque sino
+    (73) decision -> . SI LPAREN expresion RPAREN pnQuadGenCond1 ENTONCES bloque sino pnQuadGenCond3
     (76) condicional -> . MIENTRAS LPAREN expresion RPAREN HAZ bloque
     (77) no_condicional -> . DESDE variable ASSIGN exp HASTA exp HACER bloque
     (78) funciones_especiales_void -> . VARIABLES LPAREN ID COMMA ID COMMA ID RPAREN SEMICOLON
@@ -1075,7 +1081,7 @@ state 69
     (63) lectura -> . LEE pnQuadGenSec3 LPAREN variable RPAREN SEMICOLON pnQuadGenSec4
     (64) escritura -> . ESCRIBE pnQuadGenSec3 LPAREN esc RPAREN SEMICOLON pnQuadGenSec4
     (70) carga_datos -> . CARGA LPAREN ID COMMA CTE_STR COMMA ca COMMA ca RPAREN SEMICOLON
-    (73) decision -> . SI LPAREN expresion RPAREN ENTONCES bloque sino
+    (73) decision -> . SI LPAREN expresion RPAREN pnQuadGenCond1 ENTONCES bloque sino pnQuadGenCond3
     (76) condicional -> . MIENTRAS LPAREN expresion RPAREN HAZ bloque
     (77) no_condicional -> . DESDE variable ASSIGN exp HASTA exp HACER bloque
     (78) funciones_especiales_void -> . VARIABLES LPAREN ID COMMA ID COMMA ID RPAREN SEMICOLON
@@ -1236,7 +1242,7 @@ state 78
 
 state 79
 
-    (73) decision -> SI . LPAREN expresion RPAREN ENTONCES bloque sino
+    (73) decision -> SI . LPAREN expresion RPAREN pnQuadGenCond1 ENTONCES bloque sino pnQuadGenCond3
 
     LPAREN          shift and go to state 104
 
@@ -1454,8 +1460,8 @@ state 93
     DISTRIBUCION    reduce using rule 38 (bloque -> LBRACE est RBRACE .)
     TENDENCIA       reduce using rule 38 (bloque -> LBRACE est RBRACE .)
     RBRACE          reduce using rule 38 (bloque -> LBRACE est RBRACE .)
-    $end            reduce using rule 38 (bloque -> LBRACE est RBRACE .)
     SINO            reduce using rule 38 (bloque -> LBRACE est RBRACE .)
+    $end            reduce using rule 38 (bloque -> LBRACE est RBRACE .)
 
 
 state 94
@@ -1612,7 +1618,7 @@ state 103
 
 state 104
 
-    (73) decision -> SI LPAREN . expresion RPAREN ENTONCES bloque sino
+    (73) decision -> SI LPAREN . expresion RPAREN pnQuadGenCond1 ENTONCES bloque sino pnQuadGenCond3
     (92) expresion -> . mega_exp expresion1
     (95) mega_exp -> . super_exp meg
     (100) super_exp -> . exp sp
@@ -2404,7 +2410,7 @@ state 144
 
 state 145
 
-    (73) decision -> SI LPAREN expresion . RPAREN ENTONCES bloque sino
+    (73) decision -> SI LPAREN expresion . RPAREN pnQuadGenCond1 ENTONCES bloque sino pnQuadGenCond3
 
     RPAREN          shift and go to state 194
 
@@ -3142,10 +3148,12 @@ state 193
 
 state 194
 
-    (73) decision -> SI LPAREN expresion RPAREN . ENTONCES bloque sino
+    (73) decision -> SI LPAREN expresion RPAREN . pnQuadGenCond1 ENTONCES bloque sino pnQuadGenCond3
+    (148) pnQuadGenCond1 -> .
 
-    ENTONCES        shift and go to state 238
+    ENTONCES        reduce using rule 148 (pnQuadGenCond1 -> .)
 
+    pnQuadGenCond1                 shift and go to state 238
 
 state 195
 
@@ -3886,12 +3894,10 @@ state 237
 
 state 238
 
-    (73) decision -> SI LPAREN expresion RPAREN ENTONCES . bloque sino
-    (38) bloque -> . LBRACE est RBRACE
+    (73) decision -> SI LPAREN expresion RPAREN pnQuadGenCond1 . ENTONCES bloque sino pnQuadGenCond3
 
-    LBRACE          shift and go to state 51
+    ENTONCES        shift and go to state 266
 
-    bloque                         shift and go to state 266
 
 state 239
 
@@ -4342,27 +4348,12 @@ state 265
 
 state 266
 
-    (73) decision -> SI LPAREN expresion RPAREN ENTONCES bloque . sino
-    (74) sino -> . SINO bloque
-    (75) sino -> . empty
-    (124) empty -> .
+    (73) decision -> SI LPAREN expresion RPAREN pnQuadGenCond1 ENTONCES . bloque sino pnQuadGenCond3
+    (38) bloque -> . LBRACE est RBRACE
 
-    SINO            shift and go to state 282
-    ID              reduce using rule 124 (empty -> .)
-    REGRESA         reduce using rule 124 (empty -> .)
-    LEE             reduce using rule 124 (empty -> .)
-    ESCRIBE         reduce using rule 124 (empty -> .)
-    CARGA           reduce using rule 124 (empty -> .)
-    SI              reduce using rule 124 (empty -> .)
-    MIENTRAS        reduce using rule 124 (empty -> .)
-    DESDE           reduce using rule 124 (empty -> .)
-    VARIABLES       reduce using rule 124 (empty -> .)
-    DISTRIBUCION    reduce using rule 124 (empty -> .)
-    TENDENCIA       reduce using rule 124 (empty -> .)
-    RBRACE          reduce using rule 124 (empty -> .)
+    LBRACE          shift and go to state 51
 
-    sino                           shift and go to state 283
-    empty                          shift and go to state 284
+    bloque                         shift and go to state 282
 
 state 267
 
@@ -4376,23 +4367,23 @@ state 268
 
     (70) carga_datos -> CARGA LPAREN ID COMMA CTE_STR COMMA ca . COMMA ca RPAREN SEMICOLON
 
-    COMMA           shift and go to state 285
+    COMMA           shift and go to state 283
 
 
 state 269
 
     (72) ca -> CTE_INT .
 
-    RPAREN          reduce using rule 72 (ca -> CTE_INT .)
     COMMA           reduce using rule 72 (ca -> CTE_INT .)
+    RPAREN          reduce using rule 72 (ca -> CTE_INT .)
 
 
 state 270
 
     (71) ca -> ID .
 
-    RPAREN          reduce using rule 71 (ca -> ID .)
     COMMA           reduce using rule 71 (ca -> ID .)
+    RPAREN          reduce using rule 71 (ca -> ID .)
 
 
 state 271
@@ -4407,7 +4398,7 @@ state 272
 
     (82) funciones_especiales -> fe LPAREN ID COMMA v_exp . RPAREN
 
-    RPAREN          shift and go to state 286
+    RPAREN          shift and go to state 284
 
 
 state 273
@@ -4439,7 +4430,7 @@ state 274
 
     (83) funciones_especiales -> CORRELACIONA LPAREN ID COMMA v_exp . COMMA v_exp RPAREN
 
-    COMMA           shift and go to state 287
+    COMMA           shift and go to state 285
 
 
 state 275
@@ -4464,7 +4455,7 @@ state 276
 
     (78) funciones_especiales_void -> VARIABLES LPAREN ID COMMA ID COMMA ID . RPAREN SEMICOLON
 
-    RPAREN          shift and go to state 288
+    RPAREN          shift and go to state 286
 
 
 state 277
@@ -4474,13 +4465,13 @@ state 277
 
     LBRACE          shift and go to state 51
 
-    bloque                         shift and go to state 289
+    bloque                         shift and go to state 287
 
 state 278
 
     (36) dim_index1 -> LBRACK exp . RBRACK
 
-    RBRACK          shift and go to state 290
+    RBRACK          shift and go to state 288
 
 
 state 279
@@ -4505,7 +4496,7 @@ state 280
 
     (88) v_exp -> VARIABLES LBRACK exp . RBRACK
 
-    RBRACK          shift and go to state 291
+    RBRACK          shift and go to state 289
 
 
 state 281
@@ -4528,50 +4519,29 @@ state 281
 
 state 282
 
-    (74) sino -> SINO . bloque
-    (38) bloque -> . LBRACE est RBRACE
+    (73) decision -> SI LPAREN expresion RPAREN pnQuadGenCond1 ENTONCES bloque . sino pnQuadGenCond3
+    (74) sino -> . SINO pnQuadGenCond2 bloque
+    (75) sino -> . empty
+    (124) empty -> .
 
-    LBRACE          shift and go to state 51
+    SINO            shift and go to state 290
+    ID              reduce using rule 124 (empty -> .)
+    REGRESA         reduce using rule 124 (empty -> .)
+    LEE             reduce using rule 124 (empty -> .)
+    ESCRIBE         reduce using rule 124 (empty -> .)
+    CARGA           reduce using rule 124 (empty -> .)
+    SI              reduce using rule 124 (empty -> .)
+    MIENTRAS        reduce using rule 124 (empty -> .)
+    DESDE           reduce using rule 124 (empty -> .)
+    VARIABLES       reduce using rule 124 (empty -> .)
+    DISTRIBUCION    reduce using rule 124 (empty -> .)
+    TENDENCIA       reduce using rule 124 (empty -> .)
+    RBRACE          reduce using rule 124 (empty -> .)
 
-    bloque                         shift and go to state 292
+    sino                           shift and go to state 291
+    empty                          shift and go to state 292
 
 state 283
-
-    (73) decision -> SI LPAREN expresion RPAREN ENTONCES bloque sino .
-
-    ID              reduce using rule 73 (decision -> SI LPAREN expresion RPAREN ENTONCES bloque sino .)
-    REGRESA         reduce using rule 73 (decision -> SI LPAREN expresion RPAREN ENTONCES bloque sino .)
-    LEE             reduce using rule 73 (decision -> SI LPAREN expresion RPAREN ENTONCES bloque sino .)
-    ESCRIBE         reduce using rule 73 (decision -> SI LPAREN expresion RPAREN ENTONCES bloque sino .)
-    CARGA           reduce using rule 73 (decision -> SI LPAREN expresion RPAREN ENTONCES bloque sino .)
-    SI              reduce using rule 73 (decision -> SI LPAREN expresion RPAREN ENTONCES bloque sino .)
-    MIENTRAS        reduce using rule 73 (decision -> SI LPAREN expresion RPAREN ENTONCES bloque sino .)
-    DESDE           reduce using rule 73 (decision -> SI LPAREN expresion RPAREN ENTONCES bloque sino .)
-    VARIABLES       reduce using rule 73 (decision -> SI LPAREN expresion RPAREN ENTONCES bloque sino .)
-    DISTRIBUCION    reduce using rule 73 (decision -> SI LPAREN expresion RPAREN ENTONCES bloque sino .)
-    TENDENCIA       reduce using rule 73 (decision -> SI LPAREN expresion RPAREN ENTONCES bloque sino .)
-    RBRACE          reduce using rule 73 (decision -> SI LPAREN expresion RPAREN ENTONCES bloque sino .)
-
-
-state 284
-
-    (75) sino -> empty .
-
-    ID              reduce using rule 75 (sino -> empty .)
-    REGRESA         reduce using rule 75 (sino -> empty .)
-    LEE             reduce using rule 75 (sino -> empty .)
-    ESCRIBE         reduce using rule 75 (sino -> empty .)
-    CARGA           reduce using rule 75 (sino -> empty .)
-    SI              reduce using rule 75 (sino -> empty .)
-    MIENTRAS        reduce using rule 75 (sino -> empty .)
-    DESDE           reduce using rule 75 (sino -> empty .)
-    VARIABLES       reduce using rule 75 (sino -> empty .)
-    DISTRIBUCION    reduce using rule 75 (sino -> empty .)
-    TENDENCIA       reduce using rule 75 (sino -> empty .)
-    RBRACE          reduce using rule 75 (sino -> empty .)
-
-
-state 285
 
     (70) carga_datos -> CARGA LPAREN ID COMMA CTE_STR COMMA ca COMMA . ca RPAREN SEMICOLON
     (71) ca -> . ID
@@ -4582,7 +4552,7 @@ state 285
 
     ca                             shift and go to state 293
 
-state 286
+state 284
 
     (82) funciones_especiales -> fe LPAREN ID COMMA v_exp RPAREN .
 
@@ -4607,7 +4577,7 @@ state 286
     HACER           reduce using rule 82 (funciones_especiales -> fe LPAREN ID COMMA v_exp RPAREN .)
 
 
-state 287
+state 285
 
     (83) funciones_especiales -> CORRELACIONA LPAREN ID COMMA v_exp COMMA . v_exp RPAREN
     (88) v_exp -> . VARIABLES LBRACK exp RBRACK
@@ -4616,14 +4586,14 @@ state 287
 
     v_exp                          shift and go to state 294
 
-state 288
+state 286
 
     (78) funciones_especiales_void -> VARIABLES LPAREN ID COMMA ID COMMA ID RPAREN . SEMICOLON
 
     SEMICOLON       shift and go to state 295
 
 
-state 289
+state 287
 
     (77) no_condicional -> DESDE variable ASSIGN exp HASTA exp HACER bloque .
 
@@ -4641,7 +4611,7 @@ state 289
     RBRACE          reduce using rule 77 (no_condicional -> DESDE variable ASSIGN exp HASTA exp HACER bloque .)
 
 
-state 290
+state 288
 
     (36) dim_index1 -> LBRACK exp RBRACK .
 
@@ -4666,7 +4636,7 @@ state 290
     HACER           reduce using rule 36 (dim_index1 -> LBRACK exp RBRACK .)
 
 
-state 291
+state 289
 
     (88) v_exp -> VARIABLES LBRACK exp RBRACK .
 
@@ -4674,36 +4644,65 @@ state 291
     RPAREN          reduce using rule 88 (v_exp -> VARIABLES LBRACK exp RBRACK .)
 
 
+state 290
+
+    (74) sino -> SINO . pnQuadGenCond2 bloque
+    (149) pnQuadGenCond2 -> .
+
+    LBRACE          reduce using rule 149 (pnQuadGenCond2 -> .)
+
+    pnQuadGenCond2                 shift and go to state 296
+
+state 291
+
+    (73) decision -> SI LPAREN expresion RPAREN pnQuadGenCond1 ENTONCES bloque sino . pnQuadGenCond3
+    (150) pnQuadGenCond3 -> .
+
+    ID              reduce using rule 150 (pnQuadGenCond3 -> .)
+    REGRESA         reduce using rule 150 (pnQuadGenCond3 -> .)
+    LEE             reduce using rule 150 (pnQuadGenCond3 -> .)
+    ESCRIBE         reduce using rule 150 (pnQuadGenCond3 -> .)
+    CARGA           reduce using rule 150 (pnQuadGenCond3 -> .)
+    SI              reduce using rule 150 (pnQuadGenCond3 -> .)
+    MIENTRAS        reduce using rule 150 (pnQuadGenCond3 -> .)
+    DESDE           reduce using rule 150 (pnQuadGenCond3 -> .)
+    VARIABLES       reduce using rule 150 (pnQuadGenCond3 -> .)
+    DISTRIBUCION    reduce using rule 150 (pnQuadGenCond3 -> .)
+    TENDENCIA       reduce using rule 150 (pnQuadGenCond3 -> .)
+    RBRACE          reduce using rule 150 (pnQuadGenCond3 -> .)
+
+    pnQuadGenCond3                 shift and go to state 297
+
 state 292
 
-    (74) sino -> SINO bloque .
+    (75) sino -> empty .
 
-    ID              reduce using rule 74 (sino -> SINO bloque .)
-    REGRESA         reduce using rule 74 (sino -> SINO bloque .)
-    LEE             reduce using rule 74 (sino -> SINO bloque .)
-    ESCRIBE         reduce using rule 74 (sino -> SINO bloque .)
-    CARGA           reduce using rule 74 (sino -> SINO bloque .)
-    SI              reduce using rule 74 (sino -> SINO bloque .)
-    MIENTRAS        reduce using rule 74 (sino -> SINO bloque .)
-    DESDE           reduce using rule 74 (sino -> SINO bloque .)
-    VARIABLES       reduce using rule 74 (sino -> SINO bloque .)
-    DISTRIBUCION    reduce using rule 74 (sino -> SINO bloque .)
-    TENDENCIA       reduce using rule 74 (sino -> SINO bloque .)
-    RBRACE          reduce using rule 74 (sino -> SINO bloque .)
+    ID              reduce using rule 75 (sino -> empty .)
+    REGRESA         reduce using rule 75 (sino -> empty .)
+    LEE             reduce using rule 75 (sino -> empty .)
+    ESCRIBE         reduce using rule 75 (sino -> empty .)
+    CARGA           reduce using rule 75 (sino -> empty .)
+    SI              reduce using rule 75 (sino -> empty .)
+    MIENTRAS        reduce using rule 75 (sino -> empty .)
+    DESDE           reduce using rule 75 (sino -> empty .)
+    VARIABLES       reduce using rule 75 (sino -> empty .)
+    DISTRIBUCION    reduce using rule 75 (sino -> empty .)
+    TENDENCIA       reduce using rule 75 (sino -> empty .)
+    RBRACE          reduce using rule 75 (sino -> empty .)
 
 
 state 293
 
     (70) carga_datos -> CARGA LPAREN ID COMMA CTE_STR COMMA ca COMMA ca . RPAREN SEMICOLON
 
-    RPAREN          shift and go to state 296
+    RPAREN          shift and go to state 298
 
 
 state 294
 
     (83) funciones_especiales -> CORRELACIONA LPAREN ID COMMA v_exp COMMA v_exp . RPAREN
 
-    RPAREN          shift and go to state 297
+    RPAREN          shift and go to state 299
 
 
 state 295
@@ -4726,12 +4725,39 @@ state 295
 
 state 296
 
-    (70) carga_datos -> CARGA LPAREN ID COMMA CTE_STR COMMA ca COMMA ca RPAREN . SEMICOLON
+    (74) sino -> SINO pnQuadGenCond2 . bloque
+    (38) bloque -> . LBRACE est RBRACE
 
-    SEMICOLON       shift and go to state 298
+    LBRACE          shift and go to state 51
 
+    bloque                         shift and go to state 300
 
 state 297
+
+    (73) decision -> SI LPAREN expresion RPAREN pnQuadGenCond1 ENTONCES bloque sino pnQuadGenCond3 .
+
+    ID              reduce using rule 73 (decision -> SI LPAREN expresion RPAREN pnQuadGenCond1 ENTONCES bloque sino pnQuadGenCond3 .)
+    REGRESA         reduce using rule 73 (decision -> SI LPAREN expresion RPAREN pnQuadGenCond1 ENTONCES bloque sino pnQuadGenCond3 .)
+    LEE             reduce using rule 73 (decision -> SI LPAREN expresion RPAREN pnQuadGenCond1 ENTONCES bloque sino pnQuadGenCond3 .)
+    ESCRIBE         reduce using rule 73 (decision -> SI LPAREN expresion RPAREN pnQuadGenCond1 ENTONCES bloque sino pnQuadGenCond3 .)
+    CARGA           reduce using rule 73 (decision -> SI LPAREN expresion RPAREN pnQuadGenCond1 ENTONCES bloque sino pnQuadGenCond3 .)
+    SI              reduce using rule 73 (decision -> SI LPAREN expresion RPAREN pnQuadGenCond1 ENTONCES bloque sino pnQuadGenCond3 .)
+    MIENTRAS        reduce using rule 73 (decision -> SI LPAREN expresion RPAREN pnQuadGenCond1 ENTONCES bloque sino pnQuadGenCond3 .)
+    DESDE           reduce using rule 73 (decision -> SI LPAREN expresion RPAREN pnQuadGenCond1 ENTONCES bloque sino pnQuadGenCond3 .)
+    VARIABLES       reduce using rule 73 (decision -> SI LPAREN expresion RPAREN pnQuadGenCond1 ENTONCES bloque sino pnQuadGenCond3 .)
+    DISTRIBUCION    reduce using rule 73 (decision -> SI LPAREN expresion RPAREN pnQuadGenCond1 ENTONCES bloque sino pnQuadGenCond3 .)
+    TENDENCIA       reduce using rule 73 (decision -> SI LPAREN expresion RPAREN pnQuadGenCond1 ENTONCES bloque sino pnQuadGenCond3 .)
+    RBRACE          reduce using rule 73 (decision -> SI LPAREN expresion RPAREN pnQuadGenCond1 ENTONCES bloque sino pnQuadGenCond3 .)
+
+
+state 298
+
+    (70) carga_datos -> CARGA LPAREN ID COMMA CTE_STR COMMA ca COMMA ca RPAREN . SEMICOLON
+
+    SEMICOLON       shift and go to state 301
+
+
+state 299
 
     (83) funciones_especiales -> CORRELACIONA LPAREN ID COMMA v_exp COMMA v_exp RPAREN .
 
@@ -4756,7 +4782,25 @@ state 297
     HACER           reduce using rule 83 (funciones_especiales -> CORRELACIONA LPAREN ID COMMA v_exp COMMA v_exp RPAREN .)
 
 
-state 298
+state 300
+
+    (74) sino -> SINO pnQuadGenCond2 bloque .
+
+    ID              reduce using rule 74 (sino -> SINO pnQuadGenCond2 bloque .)
+    REGRESA         reduce using rule 74 (sino -> SINO pnQuadGenCond2 bloque .)
+    LEE             reduce using rule 74 (sino -> SINO pnQuadGenCond2 bloque .)
+    ESCRIBE         reduce using rule 74 (sino -> SINO pnQuadGenCond2 bloque .)
+    CARGA           reduce using rule 74 (sino -> SINO pnQuadGenCond2 bloque .)
+    SI              reduce using rule 74 (sino -> SINO pnQuadGenCond2 bloque .)
+    MIENTRAS        reduce using rule 74 (sino -> SINO pnQuadGenCond2 bloque .)
+    DESDE           reduce using rule 74 (sino -> SINO pnQuadGenCond2 bloque .)
+    VARIABLES       reduce using rule 74 (sino -> SINO pnQuadGenCond2 bloque .)
+    DISTRIBUCION    reduce using rule 74 (sino -> SINO pnQuadGenCond2 bloque .)
+    TENDENCIA       reduce using rule 74 (sino -> SINO pnQuadGenCond2 bloque .)
+    RBRACE          reduce using rule 74 (sino -> SINO pnQuadGenCond2 bloque .)
+
+
+state 301
 
     (70) carga_datos -> CARGA LPAREN ID COMMA CTE_STR COMMA ca COMMA ca RPAREN SEMICOLON .
 

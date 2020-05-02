@@ -21,6 +21,10 @@ validaCuboEsp = CuboSemantico_FuncEsp()
 pOperandos = [] #Pila de operandos pendientes (PilaO)
 pOper = [] #Pila de operadores pendientes (POper)
 pTipos = [] #Pila de tipos
+pSaltos = [] #Pila de saltos para condiciones y ciclos
+
+#Arreglo donde se almacenaran todos los cuadruplos que se vayan generando
+cuadruplos = []
 
 
 ##Constantes
@@ -44,11 +48,13 @@ avail = 0
 #Declaracion de espacio de memoria por tipo de memoria
 index_intTemporales = BATCH_SIZE
 index_floatTemporales = index_intTemporales + BATCH_SIZE
+index_boolTemporales = index_floatTemporales + BATCH_SIZE
 
 
 #Declaracion de inicio de index de memoria para temporales
 cont_IntTemp = 1
 cont_FloatTemp = index_intTemporales
+cont_BoolTemp = index_floatTemporales
 
 
 
@@ -285,20 +291,20 @@ def p_ca(pa):
        | CTE_INT
     '''
 
+#Condicionales y Ciclos
+def p_decision(p): #IF
+    'decision : SI LPAREN expresion RPAREN pnQuadGenCond1 ENTONCES bloque sino pnQuadGenCond3'
 
-def p_decision(p):
-    'decision : SI LPAREN expresion RPAREN ENTONCES bloque sino'
-
-def p_sino(p):
+def p_sino(p): #ELSE
     '''
-    sino : SINO bloque
+    sino : SINO pnQuadGenCond2 bloque
          | empty
     '''
 
-def p_condicional(p):
+def p_condicional(p): #While
     'condicional : MIENTRAS LPAREN expresion RPAREN HAZ bloque'
 
-def p_no_condicional(p):
+def p_no_condicional(p): #For
     'no_condicional : DESDE variable ASSIGN exp HASTA exp HACER bloque'
 
 
@@ -331,7 +337,7 @@ def p_v_exp(p):
 
 
 
-def p_var_cte(p):
+def p_var_cte(p):#Se modificaran los PN
     '''
     var_cte : CTE_INT pnQuadGenExp1
             | CTE_FLOAT pnQuadGenExp1
@@ -480,14 +486,40 @@ def topTipo():
         return 'empty'
     return pTipos[last]
 
-################ Funciones de impresion #####################
+#Regresa el ultimo elemento de la pila de Saltos
+def popSaltos():
+    global pSaltos
+    return pSaltos.pop()
+
+#Agrega el nuevo salto a la pila de Saltos.
+def pushSaltos(salto):
+    global pSaltos
+    pSaltos.append(salto)
+
+#Obtiene el indice del siguiente cuadruplo del arreglo de cuadruplos
+def nextQuad():
+    global cuadruplos
+    return len(cuadruplos)
+
+    
+
+################ Funciones de impresion y Errores #####################
 def printQuad(operator, leftOperand, rightOperand, result):
     print("Quad: ('{}','{}','{}','{}')".format(operator, leftOperand, rightOperand, result))
+
+def errorTypeMismatch():
+    print('Error: Type Mismatch')
+
+#Funcion para mostrar un mensaje de error cuando se llena los maximos posibles valores temporales
+def errorOutOfBounds(tipoMemoria,tipoDato):
+    print("Error: Memoria llena; demasiadas {} de tipo {}.".format(tipoMemoria,tipoDato))
+    sys.exit()
 
 ################ Funciones de manejo de memoria##############
 def nextAvailTemp(tipo):
     global cont_IntTemp
     global cont_FloatTemp
+    global cont_BoolTemp
     global avail
     
     if tipo == 'int':
@@ -495,14 +527,21 @@ def nextAvailTemp(tipo):
             avail = cont_IntTemp
             cont_IntTemp += 1
         else:
-            print("Error: Out of bounds Int")
+            errorOutOfBounds('temporales','Enteras')
     elif tipo == 'float':
         
         if cont_FloatTemp < index_floatTemporales:
             avail = cont_FloatTemp
             cont_FloatTemp += 1
         else:
-            print("Error: out of bounds Float")
+            errorOutOfBounds('temporales','Flotantes')
+
+    elif tipo == 'bool':
+        if cont_BoolTemp < index_boolTemporales:
+            avail = cont_BoolTemp
+            cont_BoolTemp = cont_BoolTemp + 1
+        else:
+           errorOutOfBounds('temporales','Boleanas')
     else:
         avail = -1
         print("Error: Tipo de variable no existente")
@@ -560,6 +599,7 @@ def p_pn_4_params(p):
     directorioFunciones.func_addVar(currentFunc, varName, currentType, 0, 0)
     currentContParams += 1
 
+#Modifica la cantidad de parametros de una funcion en el directorio de funciones
 def p_pn_5_updateContParams(p):
     '''
     pn_5_updateContParams :  
@@ -859,7 +899,43 @@ def p_pnQuadGenSec4(p):
             pushTipo(quad_resultType)
         
 
+# GENERACION DE CODIGO PARA ESTATUTOS NO LINEALES (CONDICIONALES)
+def p_pnQuadGenCond1(p): #IF
+    '''
+    pnQuadGenCond1 :
+    '''
+    global cuadruplos
+    exp_type = popTipos()
 
+    if(exp_type != 'error'):
+        result = popOperandos()
+        printQuad('GOTOF', result,'', '')
+        pushSaltos(nextQuad() - 1)
+
+    else:
+        errorTypeMismatch
+
+    
+
+def p_pnQuadGenCond2(p): #IF
+    '''
+    pnQuadGenCond2 :
+    '''
+    global cuadruplos
+    end = popSaltos()
+    # tempQuad = (cuadruplos[end][0], cuadruplos[end][1], cuadruplos[end][2], nextQuad())
+    # cuadruplos[end] = tempQuad
+
+def p_pnQuadGenCond3(p): #IF
+    '''
+    pnQuadGenCond3 :
+    '''
+    global cuadruplos
+    printQuad('GOTO', '', '', '')
+    false = popSaltos
+    pushSaltos(nextQuad() - 1)
+    # tempQuad = (cuadruplos[false][0], cuadruplos[false][1], cuadruplos[false][2], nextQuad())
+    # cuadruplos[false] = tempQuad
 
 # parser = yacc.yacc()
 
@@ -880,6 +956,8 @@ def main():
 #Test it out
 data =''' 
 programa COVID19;
+var
+int : x , y;
 
 funcion int sumar (int z)
 var
@@ -894,6 +972,12 @@ escribe(z);
 
 principal()
 {
+si (x == y) entonces {
+    
+}
+sino {
+    
+}
 
 }
 '''

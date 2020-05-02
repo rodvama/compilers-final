@@ -28,6 +28,7 @@ cuadruplos = []
 
 
 ##Constantes
+CONTEXT_GLOBAL = 'global'
 OPERADORES_SUMARESTA = ['+', '-']
 OPERADORES_MULTDIV = ['*', '/']
 OPERADORES_REL = ['>', '<', '<=', '>=', '==', '!=']
@@ -37,13 +38,14 @@ OP_SECUENCIALES = ['lee', 'escribe']
 BATCH_SIZE = 100 #Tamano del espacio de memoria
 
 ##Funciones globales
-currentFunc = "global"
+currentFunc = CONTEXT_GLOBAL
 currentType = "void"
 varName = ""
 currentContParams = 0
 numRenglones = 0
 numColumnas = 0
 avail = 0
+constanteNegativa = False
 
 #Declaracion de espacio de memoria por tipo de memoria
 index_intTemporales = BATCH_SIZE
@@ -91,7 +93,7 @@ def p_func1(p):
     # print("FUNC'")
 
 def p_principal(p):
-    'principal : PRINCIPAL LPAREN RPAREN bloque'
+    'principal : PRINCIPAL pn_9_setCurrentFuncGl LPAREN RPAREN bloque'
     # print("PRINCIPAL")
 
 #DECLARACION DE VARIABLES
@@ -274,7 +276,6 @@ def p_esc(p):
 def p_esc1(p):
     '''
     esc1 : exp
-         | CTE_STR
     '''
 def p_esc2(p):
     '''
@@ -339,9 +340,10 @@ def p_v_exp(p):
 
 def p_var_cte(p):#Se modificaran los PN
     '''
-    var_cte : CTE_INT pnQuadGenExp1
-            | CTE_FLOAT pnQuadGenExp1
-            | CTE_CH 
+    var_cte : CTE_INT pnQuadGenCteInt
+            | CTE_FLOAT pnQuadGenCteFloat
+            | CTE_CH pnQuadGenCteChar
+            | CTE_STR pnQuadGenCteStr
     '''
 
 #EXPRESIONES
@@ -505,7 +507,7 @@ def nextQuad():
 
 ################ Funciones de impresion y Errores #####################
 def printQuad(operator, leftOperand, rightOperand, result):
-    print("Quad: ('{}','{}','{}','{}')".format(operator, leftOperand, rightOperand, result))
+    print(">> Quad: ('{}','{}','{}','{}')".format(operator, leftOperand, rightOperand, result))
 
 def errorTypeMismatch():
     print('Error: Type Mismatch')
@@ -550,6 +552,9 @@ def nextAvailTemp(tipo):
 
 
 ################ PUNTOS NEURALGICOS ###################
+
+
+##########DIRECTORIO DE FUNCIONES Y TABLA DE VARIABLESpnQuadGenExp1#############
 def p_pn_1_setCurrentType(p):
     '''
     pn_1_setCurrentType :
@@ -630,7 +635,47 @@ def p_pn_8_decColumnas(p):
     global numColumnas
     numColumnas = p[-2]
 
+def p_pn_9_setCurrentFuncGl(p):
+    '''
+    pn_9_setCurrentFuncGl :
+    '''
+    global currentFunc
+    currentFunc = CONTEXT_GLOBAL
+
+
 ##### Generacion de cuadruplos #######
+
+###### CONSTANTES ###########
+def p_pnQuadGenCteInt(p):
+    '''
+    pnQuadGenCteInt :
+    '''
+    pushOperando(p[-1])
+    pushTipo('int')
+
+def p_pnQuadGenCteFloat(p):
+    '''
+    pnQuadGenCteFloat :
+    '''
+    pushOperando(p[-1])
+    pushTipo('float')
+
+def p_pnQuadGenCteChar(p):
+    '''
+    pnQuadGenCteChar :
+    '''
+    pushOperando(p[-1])
+    pushTipo('char')
+
+def p_pnQuadGenCteStr(p):
+    '''
+    pnQuadGenCteStr :
+    '''
+    pushOperando(p[-1])
+    pushTipo('string')
+
+
+###### EXPRESIONES #########
 
 '''Anadir id a poper y pTipo'''
 def p_pnQuadGenExp1(p):
@@ -646,7 +691,7 @@ def p_pnQuadGenExp1(p):
     print("CurrentFunc: " , currentFunc)
     idType = directorioFunciones.func_searchVarType(currentFunc, idName)
     if not idType:
-        idType = directorioFunciones.func_searchVarType('global', idName)
+        idType = directorioFunciones.func_searchVarType(CONTEXT_GLOBAL, idName)
     
     if not idType:
         print("Error: Variable ", idName, " no declarada")
@@ -852,7 +897,7 @@ def p_pnQuadGenSec2(p):
 
         quad_resultType = validaCubo.getType(quad_leftType, quad_rightType, quad_operator)
 
-        if directorioFunciones.var_exist(currentFunc, quad_leftOperand) or directorioFunciones.var_exist('global', quad_leftOperand):
+        if directorioFunciones.var_exist(currentFunc, quad_leftOperand) or directorioFunciones.var_exist(CONTEXT_GLOBAL, quad_leftOperand):
             if quad_leftType == 'error':
                 print("Error: Operacion invalida")
             else:
@@ -973,7 +1018,7 @@ escribe(z);
 principal()
 {
 si (x == y) entonces {
-    
+    y = 3;
 }
 sino {
     
@@ -986,4 +1031,4 @@ parser = yacc.yacc()
 result = parser.parse(data)
 
 print(result)
-# print(directorioFunciones.func_search("global"))
+# print(directorioFunciones.func_search(CONTEXT_GLOBAL))

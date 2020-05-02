@@ -1,7 +1,8 @@
 # Jose Arturo Villalobos A00818214
 # Rodrigo Valencia
 # Diseno de compiladores
-# Directorio de Funciones
+# Parser
+#Ultima modificacion: 2 Mayo 2020
 import ply.yacc as yacc
 import os
 import codecs

@@ -47,6 +47,8 @@ numRenglones = 0
 numColumnas = 0
 avail = 0
 constanteNegativa = False
+forBool = False
+varFor = ''
 
 #Declaracion de espacio de memoria por tipo de memoria
 index_intTemporales = BATCH_SIZE
@@ -78,6 +80,9 @@ precedence = (
 def p_programa(p):
     'programa : PROGRAMA ID SEMICOLON var1 func1 principal pn_6_end'
     print("PROGRAMA \"", p[2], "\" terminado.")
+    printQuadList()
+    
+    
 
 def p_var1(p):
     '''
@@ -295,19 +300,20 @@ def p_ca(pa):
 
 #Condicionales y Ciclos
 def p_decision(p): #IF
-    'decision : SI LPAREN expresion RPAREN pnQuadGenCond1 ENTONCES bloque sino pnQuadGenCond3'
+    'decision : SI LPAREN expresion RPAREN pnQuadGenCond1 ENTONCES bloque sino pnQuadGenCond2'
 
 def p_sino(p): #ELSE
     '''
-    sino : SINO pnQuadGenCond2 bloque
+    sino : SINO pnQuadGenCond3 bloque
          | empty
     '''
 
+
 def p_condicional(p): #While
-    'condicional : MIENTRAS LPAREN expresion RPAREN HAZ bloque'
+    'condicional : MIENTRAS pnQuadGenCiclos1 LPAREN expresion RPAREN pnQuadGenCiclos2 HAZ bloque pnQuadGenCiclos3'
 
 def p_no_condicional(p): #For
-    'no_condicional : DESDE variable ASSIGN exp HASTA exp HACER bloque'
+    'no_condicional : DESDE pnQuadGenCiclos4 variable ASSIGN pnQuadGenSec1 exp pnQuadGenCiclos5 HASTA pnQuadGenCiclos6 exp pnQuadGenCiclos7 HACER bloque pnQuadGenCiclos8'
 
 
 def p_funciones_especiales_void(p):
@@ -492,11 +498,13 @@ def topTipo():
 #Regresa el ultimo elemento de la pila de Saltos
 def popSaltos():
     global pSaltos
+
     return pSaltos.pop()
 
 #Agrega el nuevo salto a la pila de Saltos.
 def pushSaltos(salto):
     global pSaltos
+    print("PUSH SALTO: ", salto)
     pSaltos.append(salto)
 
 #Obtiene el indice del siguiente cuadruplo del arreglo de cuadruplos
@@ -504,14 +512,41 @@ def nextQuad():
     global cuadruplos
     return len(cuadruplos)
 
+#Regresa el ultimo cuadruplo
+def popQuad():
+    global cuadruplos
+    return cuadruplos.pop()
+
+#Agrega un nuevo cuadruplo al arreglo de cuadruplos
+def pushQuad(quad):
+    global cuadruplos
+    cuadruplos.append(quad)
+
     
 
 ################ Funciones de impresion y Errores #####################
+
+#Impresion de cuadruplo agregado
 def printQuad(operator, leftOperand, rightOperand, result):
+    tempQuad = (operator, leftOperand, rightOperand, result)
+    pushQuad(tempQuad)
     print(">> Quad: ('{}','{}','{}','{}')".format(operator, leftOperand, rightOperand, result))
+    print("Contador = ", nextQuad() - 1)
+    print("\n")
+
+#Impresion de lista de cuadruplos
+def printQuadList():
+    print("-------Cuadruplos al momento: ")
+
+    count = 0
+    for quad in cuadruplos:
+        print("{}.\t{},\t{},\t{},\t{}".format(count,quad[0],quad[1],quad[2],quad[3]))
+        count = count + 1
+
 
 def errorTypeMismatch():
     print('Error: Type Mismatch')
+    sys.exit()
 
 #Funcion para mostrar un mensaje de error cuando se llena los maximos posibles valores temporales
 def errorOutOfBounds(tipoMemoria,tipoDato):
@@ -687,17 +722,23 @@ def p_pnQuadGenExp1(p):
     global directorioFunciones
     global pOperandos
     global pTipos
+    global forBool
+    global varFor
+
     idName = p[-1]
-    print("QuadExp1 : ", p[-1])
+    print("ID : ", p[-1])
     print("CurrentFunc: " , currentFunc)
     idType = directorioFunciones.func_searchVarType(currentFunc, idName)
-    if not idType:
+    if not idType: #Si no la encuentra en el contexto actual, cambia de contexto a Tipos
         idType = directorioFunciones.func_searchVarType(CONTEXT_GLOBAL, idName)
     
     if not idType:
         print("Error: Variable ", idName, " no declarada")
         return
     
+    if forBool:
+        varFor = idName
+
     pushOperando(idName)
     pushTipo(idType)
     print("POperandos : ", pOperandos)
@@ -748,12 +789,12 @@ def p_pnQuadGenExp4(p):
         quad_resultType = validaCubo.getType(quad_leftType, quad_rightType, quad_operator)
 
         if quad_resultType == 'error':
-            print('Error: Type Mismatch')
+            errorTypeMismatch()
         else:
             quad_resultIndex = nextAvailTemp(quad_resultType)
             printQuad(quad_operator, quad_leftOperand, quad_rightOperand, quad_resultIndex)
             pushOperando(quad_resultIndex)
-            pushTipo(quad_rightType)
+            pushTipo(quad_resultType)
 
 
 '''Checa si el top de la pila de operadores es un * o / para crear el cuadruplo  '''
@@ -778,7 +819,7 @@ def p_pnQuadGenExp5(p):
             quad_resultIndex = nextAvailTemp(quad_resultType)
             printQuad(quad_operator, quad_leftOperand, quad_rightOperand, quad_resultIndex)
             pushOperando(quad_resultIndex)
-            pushTipo(quad_rightType)
+            pushTipo(quad_resultType)
 
 '''Agrega fondo falso '''
 def p_pnQuadGenExp6(p):
@@ -827,7 +868,7 @@ def p_pnQuadGenExp9(p):
             quad_resultIndex = nextAvailTemp(quad_resultType)
             printQuad(quad_operator, quad_leftOperand, quad_rightOperand, quad_resultIndex)
             pushOperando(quad_resultIndex)
-            pushTipo(quad_rightType)
+            pushTipo(quad_resultType)
 
 '''
 Meter un operador logico a pila de operadores
@@ -864,7 +905,7 @@ def p_pnQuadGenExp11(p):
             quad_resultIndex = nextAvailTemp(quad_resultType)
             printQuad(quad_operator, quad_leftOperand, quad_rightOperand, quad_resultIndex)
             pushOperando(quad_resultIndex)
-            pushTipo(quad_rightType)
+            pushTipo(quad_resultType)
 
 
 '''
@@ -946,42 +987,178 @@ def p_pnQuadGenSec4(p):
         
 
 # GENERACION DE CODIGO PARA ESTATUTOS NO LINEALES (CONDICIONALES)
+
+#Genera el cuadruplo GOTOF en la condicion SI (if) depues de recibir el booleano generado por la expresion
 def p_pnQuadGenCond1(p): #IF
     '''
     pnQuadGenCond1 :
     '''
     global cuadruplos
     exp_type = popTipos()
-
+    
     if(exp_type != 'error'):
         result = popOperandos()
         printQuad('GOTOF', result,'', '')
+        print("cond1: ", nextQuad())
         pushSaltos(nextQuad() - 1)
 
     else:
         errorTypeMismatch
 
     
-
+#Rellena el cuadruplo para saber cuando terminar la condicion
 def p_pnQuadGenCond2(p): #IF
     '''
     pnQuadGenCond2 :
     '''
     global cuadruplos
+    
     end = popSaltos()
-    # tempQuad = (cuadruplos[end][0], cuadruplos[end][1], cuadruplos[end][2], nextQuad())
-    # cuadruplos[end] = tempQuad
+    
+    tempQuad = (cuadruplos[end][0], cuadruplos[end][1], cuadruplos[end][2], nextQuad())
+    cuadruplos[end] = tempQuad
 
+#Genera el cuadruplo GOTO para SINO (else) y completa el cuadruplo
 def p_pnQuadGenCond3(p): #IF
     '''
     pnQuadGenCond3 :
     '''
     global cuadruplos
     printQuad('GOTO', '', '', '')
-    false = popSaltos
+    falso = popSaltos()
+    print("cond3: ", nextQuad())
     pushSaltos(nextQuad() - 1)
-    # tempQuad = (cuadruplos[false][0], cuadruplos[false][1], cuadruplos[false][2], nextQuad())
-    # cuadruplos[false] = tempQuad
+    tempQuad = (cuadruplos[falso][0], cuadruplos[falso][1], cuadruplos[falso][2], nextQuad())
+    cuadruplos[falso] = tempQuad
+
+
+#Mete el siguiente cuadruplo a pSaltos. Que representa la ubicacion a donde regresara al final del ciclo para volver a evaluar la condicion
+def p_pnQuadGenCiclos1(p):
+    '''
+    pnQuadGenCiclos1 :  
+    '''
+    
+    pushSaltos(nextQuad())
+
+
+def p_pnQuadGenCiclos2(p):
+    '''
+    pnQuadGenCiclos2 : 
+    '''
+    exp_type = popTipos()
+    if exp_type != 'error':
+        result = popOperandos()
+        printQuad('GOTOF', result, '', '')
+        pushSaltos(nextQuad() - 1)
+    else:
+        errorTypeMismatch()
+
+
+#Genera el cuadruplo GOTO para regresar al inicio del ciclo y volver evaluar la nueva condicion. Aqui tambien se rellena el GOTOF anterior
+def p_pnQuadGenCiclos3(p):
+    '''
+    pnQuadGenCiclos3 : 
+    '''
+    end = popSaltos()
+    retorno = popSaltos()
+    printQuad('GOTO', '', '', retorno) #Genetare quad: GOTO
+
+    tempQuad = (cuadruplos[end][0], cuadruplos[end][1], cuadruplos[end][2], nextQuad())
+    cuadruplos[end] = tempQuad #FILL (end, cont)
+
+#Activa la variable bool de ForBool para indicar que esta entrando a un For
+def p_pnQuadGenCiclos4(p):
+    '''
+    pnQuadGenCiclos4 : 
+    '''
+    global forBool
+    forBool = True
+    
+
+def p_pnQuadGenCiclos5(p):
+    '''
+    pnQuadGenCiclos5 : 
+    '''
+    if topOperador() in OP_ASIG:
+        quad_rightOperand = popOperandos()
+        quad_rightType = popTipos()
+        quad_leftOperand = popOperandos()
+        quad_leftType = popTipos()
+        quad_operator = popOperadores()
+
+        global validaCubo
+        global directorioFunciones
+
+        quad_resultType = validaCubo.getType(quad_leftType, quad_rightType, quad_operator)
+
+        if directorioFunciones.var_exist(currentFunc, quad_leftOperand) or directorioFunciones.var_exist(CONTEXT_GLOBAL, quad_leftOperand):
+            if quad_leftType == 'error':
+                print("Error: Operacion invalida")
+            else:
+                printQuad(quad_operator, quad_rightOperand, '', quad_leftOperand)
+        else:
+            print("Error")
+    
+def p_pnQuadGenCiclos6(p):
+    '''
+    pnQuadGenCiclos6 :
+    '''
+    pushOperando(varFor)
+
+    idType = directorioFunciones.func_searchVarType(currentFunc, varFor)
+    if not idType: #Si no la encuentra en el contexto actual, cambia de contexto a Tipos
+        idType = directorioFunciones.func_searchVarType(CONTEXT_GLOBAL, varFor)
+    
+    if not idType:
+        print("Error: Variable ", idName, " no declarada")
+        return
+
+    pushTipo(idType)
+    pushOperador('<=')
+    pushSaltos(nextQuad())
+    
+
+def p_pnQuadGenCiclos7(p):
+    '''
+    pnQuadGenCiclos7 :
+    '''
+    if topOperador() in OPERADORES_REL:
+        quad_rightOperand = popOperandos()
+        quad_rightType = popTipos()
+        quad_leftOperand = popOperandos()
+        quad_leftType = popTipos()
+        quad_operator = popOperadores()
+        
+        global validaCubo
+        quad_resultType = validaCubo.getType(quad_leftType, quad_rightType, quad_operator)
+        
+        if quad_resultType == 'error':
+            print('Error: Type Mismatch')
+        else:
+            quad_resultIndex = nextAvailTemp(quad_resultType)
+            printQuad(quad_operator, quad_leftOperand, quad_rightOperand, quad_resultIndex)
+            pushOperando(quad_resultIndex)
+            pushTipo(quad_resultType)
+            
+        exp_type = popTipos()
+        if (exp_type != 'bool' or exp_type == 'error'):
+            errorTypeMismatch()
+        else:
+            result = popOperandos()
+            printQuad('GOTOF', result, '', '')
+            pushSaltos(nextQuad() - 1)
+
+def p_pnQuadGenCiclos8(p):
+    '''
+    pnQuadGenCiclos8 :
+    '''
+    end = popSaltos()
+    retorno = popSaltos()
+    printQuad('GOTO', '', '', retorno) #Genetare quad: GOTO
+
+    tempQuad = (cuadruplos[end][0], cuadruplos[end][1], cuadruplos[end][2], nextQuad())
+    cuadruplos[end] = tempQuad #FILL (end, cont) 
+
 
 # parser = yacc.yacc()
 
@@ -1003,30 +1180,19 @@ def main():
 data =''' 
 programa COVID19;
 var
-int : x , y;
-
-funcion int sumar (int z)
-var
-int : A, B, C, D, E, F, G;
-{
-z = (A + B) * (C / D);
-lee(z);
-escribe(z);
-
-
-}
+int : A, B, C, D;
 
 principal()
 {
-si (x == y) entonces {
-    y = 3;
-}
-sino {
-    
-}
+
+desde A = 0 hasta 9 hacer {
 
 }
+B = C + D;
+}
 '''
+tempQuad = ('0', '0', '0', '0')
+pushQuad(tempQuad)
 
 parser = yacc.yacc()
 result = parser.parse(data)

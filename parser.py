@@ -27,6 +27,12 @@ pSaltos = [] #Pila de saltos para condiciones y ciclos
 #Arreglo donde se almacenaran todos los cuadruplos que se vayan generando
 cuadruplos = []
 
+#Diccionarios de constantes
+d_ints = {}
+d_floats = {}
+d_strs = {}
+d_ch = {}
+d_df = {}
 
 ##Constantes
 CONTEXT_GLOBAL = 'global'
@@ -38,7 +44,7 @@ OP_ASIG = ['=']
 OP_SECUENCIALES = ['lee', 'escribe']
 BATCH_SIZE = 100 #Tamano del espacio de memoria
 
-##Funciones globales
+##Variables globales
 currentFunc = CONTEXT_GLOBAL
 currentType = "void"
 varName = ""
@@ -49,18 +55,96 @@ avail = 0
 constanteNegativa = False
 forBool = False
 varFor = ''
+negativo = False
 
+'''
+Espacios de memoria:
++++++++++++++++++++++++
++globales enteras     + batch_size
++---------------------+
++globales flotantes   + batch_size
++---------------------+
++globales strings     + batch_size
++---------------------+
++globales char       + batch_size
++---------------------+
++globales dataframes  + batch_size
++++++++++++++++++++++++
++locales enteras      + batch_size
++---------------------+
++locales flotantes    + batch_size
++---------------------+
++locales strings      + batch_size
++---------------------+
++locales char         + batch_size
++---------------------+
++locales dataframes   + batch_size
++++++++++++++++++++++++
++temp enteras         + batch_size
++---------------------+
++temp flotantes       + batch_size
++---------------------+
++temp strings         + batch_size
++---------------------+
++temp char            + batch_size
++---------------------+
++temp dataframes      + batch_size
++---------------------+
++temp booleanas       + batch_size
++++++++++++++++++++++++
++constantes enteras   + batch_size
++---------------------+
++constantes flotantes + batch_size
++---------------------+
++constantes strings   + batch_size
++---------------------+
++constantes char      + batch_size
++---------------------+
++constantes dataframe    + batch_size
++++++++++++++++++++++++
+'''
 #Declaracion de espacio de memoria por tipo de memoria
-index_intTemporales = BATCH_SIZE
+index_intGlobales = BATCH_SIZE
+index_floatGlobales = index_intGlobales + BATCH_SIZE
+index_stringsGlobales = index_floatGlobales + BATCH_SIZE
+index_charGlobales = index_stringsGlobales + BATCH_SIZE
+index_dfGlobales = index_charGlobales + BATCH_SIZE
+
+index_intLocales = index_dfGlobales + BATCH_SIZE
+index_floatLocales = index_intLocales + BATCH_SIZE
+index_stringsLocales = index_floatLocales + BATCH_SIZE
+index_charLocales = index_stringsLocales + BATCH_SIZE
+index_dfLocales = index_charLocales + BATCH_SIZE
+
+index_intTemporales = index_dfLocales + BATCH_SIZE
 index_floatTemporales = index_intTemporales + BATCH_SIZE
-index_boolTemporales = index_floatTemporales + BATCH_SIZE
+index_stringsTemporales = index_floatTemporales + BATCH_SIZE
+index_charTemporales = index_stringsTemporales + BATCH_SIZE
+index_dfTemporales = index_charTemporales + BATCH_SIZE
+index_boolTemporales = index_dfTemporales + BATCH_SIZE
+
+index_intConstantes = index_boolTemporales + BATCH_SIZE
+index_floatConstantes = index_intConstantes + BATCH_SIZE
+index_stringConstantes = index_floatConstantes + BATCH_SIZE
+index_charConstantes = index_stringConstantes + BATCH_SIZE
+index_dfConstantes = index_charConstantes + BATCH_SIZE
 
 
 #Declaracion de inicio de index de memoria para temporales
-cont_IntTemp = 1
+cont_IntTemp = index_dfLocales
 cont_FloatTemp = index_intTemporales
-cont_BoolTemp = index_floatTemporales
+cont_StringTemp = index_floatTemporales
+cont_CharTemp = index_stringsTemporales
+cont_dfTemp = index_charTemporales
+cont_BoolTemp = index_dfTemporales
 
+
+#Declaracion de inicio de los inde de memoria para constantes 
+cont_IntConst = index_boolTemporales
+cont_FloatConst = index_intConstantes
+cont_StringConst = index_floatConstantes
+cont_CharConst = index_stringConstantes
+cont_dfConst = index_charConstantes
 
 
 #Se define la precedencia
@@ -347,11 +431,26 @@ def p_v_exp(p):
 
 def p_var_cte(p):#Se modificaran los PN
     '''
-    var_cte : CTE_INT pnQuadGenCteInt
-            | CTE_FLOAT pnQuadGenCteFloat
-            | CTE_CH pnQuadGenCteChar
+    var_cte : CTE_CH pnQuadGenCteChar
             | CTE_STR pnQuadGenCteStr
+            | SUB pnNeg var_num
+            | var_num
     '''
+    
+    if p[1] == '-':
+        p[0] = -1 * p[3]
+    else:
+        p[0] = p[1]
+    
+    global negativo
+    negativo = False
+
+def p_var_num(p): 
+    '''
+    var_num : CTE_INT pnQuadGenCteInt
+            | CTE_FLOAT pnQuadGenCteFloat
+    '''
+    p[0] = p[1]
 
 #EXPRESIONES
 
@@ -522,6 +621,66 @@ def pushQuad(quad):
     global cuadruplos
     cuadruplos.append(quad)
 
+def pushConstante(constante):
+    global d_ints
+    global d_floats
+    global d_strs
+    global d_ch
+    global d_df
+    
+    global cont_IntConst
+    global cont_FloatConst
+    global cont_StringConst
+    global cont_CharConst
+    global cont_dfConst
+
+    if type(constante) == int:
+        if constante not in d_ints:
+            if cont_IntConst < index_intConstantes:
+                d_ints[constante] = cont_IntConst
+                cont_IntConst = cont_IntConst + 1
+                printQuad('addConstante', 'int', constante, d_ints[constante])
+            else:
+                print(cont_IntConst, index_intConstantes)
+                errorOutOfBounds('Constantes', 'Enteras')
+        pushOperando(d_ints[constante])
+        pushTipo('int')
+    
+    elif type(constante) == float:
+        if constante not in d_floats:
+            if cont_FloatConst < index_floatConstantes:
+                d_floats[constante] = cont_FloatConst
+                cont_FloatConst = cont_FloatConst + 1
+                printQuad('addConstante', 'float', constante, d_floats[constante])
+            else:
+                errorOutOfBounds('Constantes', 'Flotantes')
+        pushOperando(d_floats[constante])
+        pushTipo('float')
+    
+    elif type(constante) == str:
+        if constante not in d_strs:
+            if cont_StringConst < index_stringConstantes:
+                d_strs[constante] = cont_StringsConst
+                cont_StringsConst = cont_StringsConst + 1
+                printQuad('addConstante', 'string', constante, d_strs[constante])
+            else:
+                errorOutOfBounds('Constantes', 'Strings')
+        pushOperando(d_strs[constante])
+        pushTipo('string')
+    
+    elif type(constante) == chr:
+        if constante not in d_ch:
+            if cont_CharConst < index_charConstantes:
+                d_chars[constante] = cont_CharConst
+                cont_CharConst = cont_CharConst + 1
+                printQuad('addConstante', 'char', constante, d_chars[constante])
+            else:
+                errorOutOfBounds('Constantes', 'Chars')
+        pushOperando(d_chars[constante])
+        pushTipo('char')
+    else:
+        sys.exit("Error: Tipo de Variable desconocida")
+
     
 
 ################ Funciones de impresion y Errores #####################
@@ -550,7 +709,7 @@ def errorTypeMismatch():
 
 #Funcion para mostrar un mensaje de error cuando se llena los maximos posibles valores temporales
 def errorOutOfBounds(tipoMemoria,tipoDato):
-    print("Error: Memoria llena; demasiadas {} de tipo {}.".format(tipoMemoria,tipoDato))
+    print("Error: Memoria llena; Muchas {} de tipo {}.".format(tipoMemoria,tipoDato))
     sys.exit()
 
 ################ Funciones de manejo de memoria##############
@@ -682,33 +841,42 @@ def p_pn_9_setCurrentFuncGl(p):
 ##### Generacion de cuadruplos #######
 
 ###### CONSTANTES ###########
+def p_pnNeg(p):
+    '''
+    pnNeg :
+    '''
+    global negativo
+    negativo = True
+
 def p_pnQuadGenCteInt(p):
     '''
     pnQuadGenCteInt :
     '''
-    pushOperando(p[-1])
-    pushTipo('int')
+    if negativo:
+        pushConstante(-1 * p[-1])
+    else:
+        pushConstante(p[-1])
 
 def p_pnQuadGenCteFloat(p):
     '''
     pnQuadGenCteFloat :
     '''
-    pushOperando(p[-1])
-    pushTipo('float')
+    if negativo:
+        pushConstante(-1 * p[-1])
+    else:
+        pushConstante(p[-1])
 
 def p_pnQuadGenCteChar(p):
     '''
     pnQuadGenCteChar :
     '''
-    pushOperando(p[-1])
-    pushTipo('char')
+    pushConstante(p[-1])
 
 def p_pnQuadGenCteStr(p):
     '''
     pnQuadGenCteStr :
     '''
-    pushOperando(p[-1])
-    pushTipo('string')
+    pushConstante(p[-1])
 
 
 ###### EXPRESIONES #########
@@ -1185,10 +1353,8 @@ int : A, B, C, D;
 principal()
 {
 
-desde A = 0 hasta 9 hacer {
+A = -5.6 +  C;
 
-}
-B = C + D;
 }
 '''
 tempQuad = ('0', '0', '0', '0')

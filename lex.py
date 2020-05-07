@@ -120,14 +120,14 @@ def t_ID(t):
     t.type = keywords.get(t.value, 'ID')
     return t
 
-def t_CTE_INT(t):
-    r'\d+'
-    t.value = int(t.value)
-    return t
-
 def t_CTE_FLOAT(t):
     r'\d+\.\d+'
     t.value = float(t.value)
+    return t
+
+def t_CTE_INT(t):
+    r'\d+'
+    t.value = int(t.value)
     return t
 
 
@@ -160,15 +160,15 @@ def t_error(t):
 lexer = lex.lex()
 
 
-# # Test it out
-# data =''' 
-# "hola fds"
+# Test it out
+data =''' 
+2.4
 
-# '''
+'''
 
 
-# lexer.input(data)
-# while True:
-#     tok = lexer.token()
-#     if not tok : break
-#     print(tok)
+lexer.input(data)
+while True:
+    tok = lexer.token()
+    if not tok : break
+    print(tok)

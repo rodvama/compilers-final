@@ -1,38 +1,45 @@
 # Jose Arturo Villalobos A00818214
 # Rodrigo Valencia
 # Diseno de compiladores
-# Tabla de variables
+
+############################## Tabla de Variables ##############################
+'''
+La Tabla de Variables del Lenguaje COVID es reprsentado por un Diccionario.
+Los atributos semanticos que contiene la tabla de variables son:
+- nombre: nombre de la variable que se va a guardar
+- tipo : tipo de la variable que se va a guardar
+- renglones : Numero de renglones si es un arreglo
+- columnas : Numero de columnas si es un arreglo
+- memoria : Posicion de memoria
+
+El formato sera: 
+tabla_variables = {nombre: nombre, tipo, renglones, columnas}
+'''
 
 class TablaVars:
     
+    '''
+    Constructor para inicializar el diccionario tabla_variables
+    '''
     def __init__(self):
-        '''
-        Tabla de Variables
-        diccionario = {nombre: nombre, tipo, renglones, columnas}
-        nombre: nombre de la variable a guardar
-        tipo : tipo de la variable a guardar
-        renglones : Numero de renglones si es un arreglo
-        columnas : Numero de columnas si es un arreglo
-        '''
-        self.diccionario = {} #Inicializa la tabla de variables
+        self.tabla_variables = {} 
         
     
     '''
-    Funcion para ver si la variable ya ha sido creada
+    Funcion que verifica si una variable ya existe
     '''
     def var_exist(self, nombre):
-        return nombre in self.diccionario.keys()
+        return nombre in self.tabla_variables.keys()
 
     '''
-    Funcion para agregar una variable
+    Funcion para agregar una nueva variable a la tabla
     '''
     def var_add(self, nombre, tipo, renglones, columnas):
-        #Verifica que el nombre de la variable no exista
         if self.var_exist(nombre):
             print("Error : Variable ", str(nombre), " duplicada")
             return False
         else:
-            self.diccionario[nombre] = {
+            self.tabla_variables[nombre] = {
                 'nombre' : nombre,
                 'tipo': tipo,
                 'renglones': renglones,
@@ -41,48 +48,48 @@ class TablaVars:
             return True
 
     '''
-    Funcion que busca una variable en el diccionario y regresa su nombre y sus datos
+    Funcion que regresa todos los datos de una variable (si existe)
     '''
     def var_search(self, nombre):
         if self.var_exist(nombre):
-            return self.diccionario[nombre]
+            return self.tabla_variables[nombre]
         else:
             return None
 
     '''
-    Funcion que regresa el tipo de una variable del diccionario
+    Funcion que regresa el el valor del atributo "Tipo" de la variable dada
     '''
     def var_searchType(self, nombre):
         if self.var_exist(nombre):
-            return self.diccionario[nombre]['tipo']
+            return self.tabla_variables[nombre]['tipo']
         else:
             return None
 
     
     # '''
-    # Funcion para actualizar renglones y columnas de una variable que es arreglo y ya esta creada
+    # Funcion para actualizar los atributos de Renglones y Columnas de una variable, para indicar que dicha variable es un arreglo o matriz.
     # '''
     # def var_upadateDims(self, nombre, renglones, columnas):
 
     #     if self.var_exist(nombre):
     #         if columnas < 0: #Se actualizan solo renglones
-    #             self.diccionario[nombre]['renglones'] = renglones
+    #             self.tabla_variables[nombre]['renglones'] = renglones
     #         else:
-    #             self.diccionario[nombre]['columnas'] = columnas
-    #             self.diccionario[nombre]['renglones']= renglones #?
+    #             self.tabla_variables[nombre]['columnas'] = columnas
+    #             self.tabla_variables[nombre]['renglones']= renglones #?
             
     #         print("Dimensiones actualizadas de la variable: ", nombre)
-    #         print("Renglones: ", self.diccionario[nombre]['renglones'], "Columnas: ", self.diccionario[nombre]['columnas'])
+    #         print("Renglones: ", self.tabla_variables[nombre]['renglones'], "Columnas: ", self.tabla_variables[nombre]['columnas'])
 
     #     else:
     #         print("Error. No es posible actializar las dimensaiones de una variable que no existe: ", nombre)
 
     
     # '''
-    # Funcion que busca y regresa la posicion de memoria de una variables
+    # Funcion que regresa la posicion de memoria de la variable dada
     # '''
     # def var_searchMemPos(self, nombre):
     #     if self.var_exist(nombre):
-    #         return self.diccionario[nombre]['posMem']
+    #         return self.tabla_variables[nombre]['posMem']
     #     else:
     #         return None

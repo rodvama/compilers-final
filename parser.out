@@ -85,8 +85,8 @@ Rule 75    condicional -> MIENTRAS pnQuadGenCiclos1 LPAREN expresion RPAREN pnQu
 Rule 76    no_condicional -> DESDE pnQuadGenCiclos4 variable ASSIGN pnQuadGenSec1 exp pnQuadGenCiclos5 HASTA pnQuadGenCiclos6 exp pnQuadGenCiclos7 HACER bloque pnQuadGenCiclos8
 Rule 77    funciones_especiales_void -> VARIABLES LPAREN ID COMMA ID COMMA ID RPAREN SEMICOLON
 Rule 78    funciones_especiales_void -> fev LPAREN ID COMMA v_exp RPAREN SEMICOLON
-Rule 79    fev -> DISTRIBUCION
-Rule 80    fev -> TENDENCIA
+Rule 79    fev -> PLOTHIST
+Rule 80    fev -> PLOTLINE
 Rule 81    funciones_especiales -> fe LPAREN ID COMMA v_exp RPAREN
 Rule 82    funciones_especiales -> CORRELACIONA LPAREN ID COMMA v_exp COMMA v_exp RPAREN
 Rule 83    fe -> MEDIA
@@ -190,7 +190,6 @@ CTE_INT              : 32 33 71 92
 CTE_STR              : 69 89
 DATAFRAME            : 24
 DESDE                : 76
-DISTRIBUCION         : 79
 DIV                  : 120
 ENTONCES             : 72
 EQUAL                : 110
@@ -217,6 +216,8 @@ MODA                 : 85
 MUL                  : 119
 NOT_EQUAL            : 109
 OR                   : 101
+PLOTHIST             : 79
+PLOTLINE             : 80
 PRINCIPAL            : 6
 PROGRAMA             : 1
 RBRACE               : 38
@@ -228,7 +229,6 @@ SI                   : 72
 SINO                 : 73
 STRING               : 25
 SUB                  : 90 115
-TENDENCIA            : 80
 TWO_DOTS             : 8
 VAR                  : 7
 VARIABLES            : 77 87
@@ -923,21 +923,21 @@ state 55
     (77) funciones_especiales_void -> . VARIABLES LPAREN ID COMMA ID COMMA ID RPAREN SEMICOLON
     (78) funciones_especiales_void -> . fev LPAREN ID COMMA v_exp RPAREN SEMICOLON
     (54) variable -> . ID pnQuadGenExp1 di
-    (79) fev -> . DISTRIBUCION
-    (80) fev -> . TENDENCIA
+    (79) fev -> . PLOTHIST
+    (80) fev -> . PLOTLINE
 
     RBRACE          reduce using rule 126 (empty -> .)
-    ID              shift and go to state 82
+    ID              shift and go to state 81
     REGRESA         shift and go to state 68
-    LEE             shift and go to state 84
+    LEE             shift and go to state 83
     ESCRIBE         shift and go to state 71
-    CARGA           shift and go to state 65
+    CARGA           shift and go to state 66
     SI              shift and go to state 88
-    MIENTRAS        shift and go to state 66
-    DESDE           shift and go to state 79
+    MIENTRAS        shift and go to state 67
+    DESDE           shift and go to state 78
     VARIABLES       shift and go to state 75
-    DISTRIBUCION    shift and go to state 77
-    TENDENCIA       shift and go to state 67
+    PLOTHIST        shift and go to state 85
+    PLOTLINE        shift and go to state 65
 
     fev                            shift and go to state 86
     est                            shift and go to state 69
@@ -946,11 +946,11 @@ state 55
     retorno                        shift and go to state 73
     empty                          shift and go to state 74
     condicional                    shift and go to state 76
-    estatutos                      shift and go to state 78
-    funciones_especiales_void      shift and go to state 80
-    variable                       shift and go to state 81
-    no_condicional                 shift and go to state 83
-    asignacion                     shift and go to state 85
+    estatutos                      shift and go to state 77
+    funciones_especiales_void      shift and go to state 79
+    variable                       shift and go to state 80
+    no_condicional                 shift and go to state 82
+    asignacion                     shift and go to state 84
     lectura                        shift and go to state 87
     carga_datos                    shift and go to state 89
     escritura                      shift and go to state 90
@@ -1026,12 +1026,19 @@ state 64
 
 state 65
 
+    (80) fev -> PLOTLINE .
+
+    LPAREN          reduce using rule 80 (fev -> PLOTLINE .)
+
+
+state 66
+
     (69) carga_datos -> CARGA . LPAREN ID COMMA CTE_STR COMMA ca COMMA ca RPAREN SEMICOLON
 
     LPAREN          shift and go to state 95
 
 
-state 66
+state 67
 
     (75) condicional -> MIENTRAS . pnQuadGenCiclos1 LPAREN expresion RPAREN pnQuadGenCiclos2 HAZ bloque pnQuadGenCiclos3
     (159) pnQuadGenCiclos1 -> .
@@ -1039,13 +1046,6 @@ state 66
     LPAREN          reduce using rule 159 (pnQuadGenCiclos1 -> .)
 
     pnQuadGenCiclos1               shift and go to state 96
-
-state 67
-
-    (80) fev -> TENDENCIA .
-
-    LPAREN          reduce using rule 80 (fev -> TENDENCIA .)
-
 
 state 68
 
@@ -1074,8 +1074,8 @@ state 70
     MIENTRAS        reduce using rule 47 (estatutos -> decision .)
     DESDE           reduce using rule 47 (estatutos -> decision .)
     VARIABLES       reduce using rule 47 (estatutos -> decision .)
-    DISTRIBUCION    reduce using rule 47 (estatutos -> decision .)
-    TENDENCIA       reduce using rule 47 (estatutos -> decision .)
+    PLOTHIST        reduce using rule 47 (estatutos -> decision .)
+    PLOTLINE        reduce using rule 47 (estatutos -> decision .)
     RBRACE          reduce using rule 47 (estatutos -> decision .)
 
 
@@ -1101,8 +1101,8 @@ state 72
     MIENTRAS        reduce using rule 42 (estatutos -> llamada .)
     DESDE           reduce using rule 42 (estatutos -> llamada .)
     VARIABLES       reduce using rule 42 (estatutos -> llamada .)
-    DISTRIBUCION    reduce using rule 42 (estatutos -> llamada .)
-    TENDENCIA       reduce using rule 42 (estatutos -> llamada .)
+    PLOTHIST        reduce using rule 42 (estatutos -> llamada .)
+    PLOTLINE        reduce using rule 42 (estatutos -> llamada .)
     RBRACE          reduce using rule 42 (estatutos -> llamada .)
 
 
@@ -1119,8 +1119,8 @@ state 73
     MIENTRAS        reduce using rule 43 (estatutos -> retorno .)
     DESDE           reduce using rule 43 (estatutos -> retorno .)
     VARIABLES       reduce using rule 43 (estatutos -> retorno .)
-    DISTRIBUCION    reduce using rule 43 (estatutos -> retorno .)
-    TENDENCIA       reduce using rule 43 (estatutos -> retorno .)
+    PLOTHIST        reduce using rule 43 (estatutos -> retorno .)
+    PLOTLINE        reduce using rule 43 (estatutos -> retorno .)
     RBRACE          reduce using rule 43 (estatutos -> retorno .)
 
 
@@ -1151,19 +1151,12 @@ state 76
     MIENTRAS        reduce using rule 48 (estatutos -> condicional .)
     DESDE           reduce using rule 48 (estatutos -> condicional .)
     VARIABLES       reduce using rule 48 (estatutos -> condicional .)
-    DISTRIBUCION    reduce using rule 48 (estatutos -> condicional .)
-    TENDENCIA       reduce using rule 48 (estatutos -> condicional .)
+    PLOTHIST        reduce using rule 48 (estatutos -> condicional .)
+    PLOTLINE        reduce using rule 48 (estatutos -> condicional .)
     RBRACE          reduce using rule 48 (estatutos -> condicional .)
 
 
 state 77
-
-    (79) fev -> DISTRIBUCION .
-
-    LPAREN          reduce using rule 79 (fev -> DISTRIBUCION .)
-
-
-state 78
 
     (39) est -> estatutos . est
     (39) est -> . estatutos est
@@ -1191,21 +1184,21 @@ state 78
     (77) funciones_especiales_void -> . VARIABLES LPAREN ID COMMA ID COMMA ID RPAREN SEMICOLON
     (78) funciones_especiales_void -> . fev LPAREN ID COMMA v_exp RPAREN SEMICOLON
     (54) variable -> . ID pnQuadGenExp1 di
-    (79) fev -> . DISTRIBUCION
-    (80) fev -> . TENDENCIA
+    (79) fev -> . PLOTHIST
+    (80) fev -> . PLOTLINE
 
     RBRACE          reduce using rule 126 (empty -> .)
-    ID              shift and go to state 82
+    ID              shift and go to state 81
     REGRESA         shift and go to state 68
-    LEE             shift and go to state 84
+    LEE             shift and go to state 83
     ESCRIBE         shift and go to state 71
-    CARGA           shift and go to state 65
+    CARGA           shift and go to state 66
     SI              shift and go to state 88
-    MIENTRAS        shift and go to state 66
-    DESDE           shift and go to state 79
+    MIENTRAS        shift and go to state 67
+    DESDE           shift and go to state 78
     VARIABLES       shift and go to state 75
-    DISTRIBUCION    shift and go to state 77
-    TENDENCIA       shift and go to state 67
+    PLOTHIST        shift and go to state 85
+    PLOTLINE        shift and go to state 65
 
     fev                            shift and go to state 86
     est                            shift and go to state 101
@@ -1214,16 +1207,16 @@ state 78
     retorno                        shift and go to state 73
     empty                          shift and go to state 74
     condicional                    shift and go to state 76
-    estatutos                      shift and go to state 78
-    funciones_especiales_void      shift and go to state 80
-    variable                       shift and go to state 81
-    no_condicional                 shift and go to state 83
-    asignacion                     shift and go to state 85
+    estatutos                      shift and go to state 77
+    funciones_especiales_void      shift and go to state 79
+    variable                       shift and go to state 80
+    no_condicional                 shift and go to state 82
+    asignacion                     shift and go to state 84
     lectura                        shift and go to state 87
     carga_datos                    shift and go to state 89
     escritura                      shift and go to state 90
 
-state 79
+state 78
 
     (76) no_condicional -> DESDE . pnQuadGenCiclos4 variable ASSIGN pnQuadGenSec1 exp pnQuadGenCiclos5 HASTA pnQuadGenCiclos6 exp pnQuadGenCiclos7 HACER bloque pnQuadGenCiclos8
     (162) pnQuadGenCiclos4 -> .
@@ -1232,7 +1225,7 @@ state 79
 
     pnQuadGenCiclos4               shift and go to state 102
 
-state 80
+state 79
 
     (50) estatutos -> funciones_especiales_void .
 
@@ -1245,19 +1238,19 @@ state 80
     MIENTRAS        reduce using rule 50 (estatutos -> funciones_especiales_void .)
     DESDE           reduce using rule 50 (estatutos -> funciones_especiales_void .)
     VARIABLES       reduce using rule 50 (estatutos -> funciones_especiales_void .)
-    DISTRIBUCION    reduce using rule 50 (estatutos -> funciones_especiales_void .)
-    TENDENCIA       reduce using rule 50 (estatutos -> funciones_especiales_void .)
+    PLOTHIST        reduce using rule 50 (estatutos -> funciones_especiales_void .)
+    PLOTLINE        reduce using rule 50 (estatutos -> funciones_especiales_void .)
     RBRACE          reduce using rule 50 (estatutos -> funciones_especiales_void .)
 
 
-state 81
+state 80
 
     (51) asignacion -> variable . ASSIGN pnQuadGenSec1 asig
 
     ASSIGN          shift and go to state 103
 
 
-state 82
+state 81
 
     (57) llamada -> ID . LPAREN llamada1 RPAREN SEMICOLON
     (54) variable -> ID . pnQuadGenExp1 di
@@ -1274,7 +1267,7 @@ state 82
 
     pnQuadGenExp1                  shift and go to state 104
 
-state 83
+state 82
 
     (49) estatutos -> no_condicional .
 
@@ -1287,12 +1280,12 @@ state 83
     MIENTRAS        reduce using rule 49 (estatutos -> no_condicional .)
     DESDE           reduce using rule 49 (estatutos -> no_condicional .)
     VARIABLES       reduce using rule 49 (estatutos -> no_condicional .)
-    DISTRIBUCION    reduce using rule 49 (estatutos -> no_condicional .)
-    TENDENCIA       reduce using rule 49 (estatutos -> no_condicional .)
+    PLOTHIST        reduce using rule 49 (estatutos -> no_condicional .)
+    PLOTLINE        reduce using rule 49 (estatutos -> no_condicional .)
     RBRACE          reduce using rule 49 (estatutos -> no_condicional .)
 
 
-state 84
+state 83
 
     (63) lectura -> LEE . pnQuadGenSec3 LPAREN variable RPAREN SEMICOLON pnQuadGenSec4
     (154) pnQuadGenSec3 -> .
@@ -1301,7 +1294,7 @@ state 84
 
     pnQuadGenSec3                  shift and go to state 106
 
-state 85
+state 84
 
     (41) estatutos -> asignacion .
 
@@ -1314,9 +1307,16 @@ state 85
     MIENTRAS        reduce using rule 41 (estatutos -> asignacion .)
     DESDE           reduce using rule 41 (estatutos -> asignacion .)
     VARIABLES       reduce using rule 41 (estatutos -> asignacion .)
-    DISTRIBUCION    reduce using rule 41 (estatutos -> asignacion .)
-    TENDENCIA       reduce using rule 41 (estatutos -> asignacion .)
+    PLOTHIST        reduce using rule 41 (estatutos -> asignacion .)
+    PLOTLINE        reduce using rule 41 (estatutos -> asignacion .)
     RBRACE          reduce using rule 41 (estatutos -> asignacion .)
+
+
+state 85
+
+    (79) fev -> PLOTHIST .
+
+    LPAREN          reduce using rule 79 (fev -> PLOTHIST .)
 
 
 state 86
@@ -1339,8 +1339,8 @@ state 87
     MIENTRAS        reduce using rule 44 (estatutos -> lectura .)
     DESDE           reduce using rule 44 (estatutos -> lectura .)
     VARIABLES       reduce using rule 44 (estatutos -> lectura .)
-    DISTRIBUCION    reduce using rule 44 (estatutos -> lectura .)
-    TENDENCIA       reduce using rule 44 (estatutos -> lectura .)
+    PLOTHIST        reduce using rule 44 (estatutos -> lectura .)
+    PLOTLINE        reduce using rule 44 (estatutos -> lectura .)
     RBRACE          reduce using rule 44 (estatutos -> lectura .)
 
 
@@ -1364,8 +1364,8 @@ state 89
     MIENTRAS        reduce using rule 46 (estatutos -> carga_datos .)
     DESDE           reduce using rule 46 (estatutos -> carga_datos .)
     VARIABLES       reduce using rule 46 (estatutos -> carga_datos .)
-    DISTRIBUCION    reduce using rule 46 (estatutos -> carga_datos .)
-    TENDENCIA       reduce using rule 46 (estatutos -> carga_datos .)
+    PLOTHIST        reduce using rule 46 (estatutos -> carga_datos .)
+    PLOTLINE        reduce using rule 46 (estatutos -> carga_datos .)
     RBRACE          reduce using rule 46 (estatutos -> carga_datos .)
 
 
@@ -1382,8 +1382,8 @@ state 90
     MIENTRAS        reduce using rule 45 (estatutos -> escritura .)
     DESDE           reduce using rule 45 (estatutos -> escritura .)
     VARIABLES       reduce using rule 45 (estatutos -> escritura .)
-    DISTRIBUCION    reduce using rule 45 (estatutos -> escritura .)
-    TENDENCIA       reduce using rule 45 (estatutos -> escritura .)
+    PLOTHIST        reduce using rule 45 (estatutos -> escritura .)
+    PLOTLINE        reduce using rule 45 (estatutos -> escritura .)
     RBRACE          reduce using rule 45 (estatutos -> escritura .)
 
 
@@ -1504,8 +1504,8 @@ state 98
     MIENTRAS        reduce using rule 38 (bloque -> LBRACE est RBRACE .)
     DESDE           reduce using rule 38 (bloque -> LBRACE est RBRACE .)
     VARIABLES       reduce using rule 38 (bloque -> LBRACE est RBRACE .)
-    DISTRIBUCION    reduce using rule 38 (bloque -> LBRACE est RBRACE .)
-    TENDENCIA       reduce using rule 38 (bloque -> LBRACE est RBRACE .)
+    PLOTHIST        reduce using rule 38 (bloque -> LBRACE est RBRACE .)
+    PLOTLINE        reduce using rule 38 (bloque -> LBRACE est RBRACE .)
     RBRACE          reduce using rule 38 (bloque -> LBRACE est RBRACE .)
     FUNCION         reduce using rule 38 (bloque -> LBRACE est RBRACE .)
     PRINCIPAL       reduce using rule 38 (bloque -> LBRACE est RBRACE .)
@@ -2327,7 +2327,7 @@ state 141
     (85) fe -> . MODA
     (86) fe -> . VARIANZA
 
-    ID              shift and go to state 82
+    ID              shift and go to state 81
     LPAREN          shift and go to state 130
     CTE_CH          shift and go to state 134
     CTE_STR         shift and go to state 128
@@ -2396,9 +2396,9 @@ state 143
     EQUAL           reduce using rule 54 (variable -> ID pnQuadGenExp1 di .)
     AND             reduce using rule 54 (variable -> ID pnQuadGenExp1 di .)
     OR              reduce using rule 54 (variable -> ID pnQuadGenExp1 di .)
+    HACER           reduce using rule 54 (variable -> ID pnQuadGenExp1 di .)
     HASTA           reduce using rule 54 (variable -> ID pnQuadGenExp1 di .)
     SEMICOLON       reduce using rule 54 (variable -> ID pnQuadGenExp1 di .)
-    HACER           reduce using rule 54 (variable -> ID pnQuadGenExp1 di .)
 
 
 state 144
@@ -2954,8 +2954,8 @@ state 178
     MIENTRAS        reduce using rule 51 (asignacion -> variable ASSIGN pnQuadGenSec1 asig .)
     DESDE           reduce using rule 51 (asignacion -> variable ASSIGN pnQuadGenSec1 asig .)
     VARIABLES       reduce using rule 51 (asignacion -> variable ASSIGN pnQuadGenSec1 asig .)
-    DISTRIBUCION    reduce using rule 51 (asignacion -> variable ASSIGN pnQuadGenSec1 asig .)
-    TENDENCIA       reduce using rule 51 (asignacion -> variable ASSIGN pnQuadGenSec1 asig .)
+    PLOTHIST        reduce using rule 51 (asignacion -> variable ASSIGN pnQuadGenSec1 asig .)
+    PLOTLINE        reduce using rule 51 (asignacion -> variable ASSIGN pnQuadGenSec1 asig .)
     RBRACE          reduce using rule 51 (asignacion -> variable ASSIGN pnQuadGenSec1 asig .)
 
 
@@ -2973,8 +2973,8 @@ state 179
     MIENTRAS        reduce using rule 52 (asig -> llamada .)
     DESDE           reduce using rule 52 (asig -> llamada .)
     VARIABLES       reduce using rule 52 (asig -> llamada .)
-    DISTRIBUCION    reduce using rule 52 (asig -> llamada .)
-    TENDENCIA       reduce using rule 52 (asig -> llamada .)
+    PLOTHIST        reduce using rule 52 (asig -> llamada .)
+    PLOTLINE        reduce using rule 52 (asig -> llamada .)
     RBRACE          reduce using rule 52 (asig -> llamada .)
     MUL             reduce using rule 124 (factor -> llamada .)
     DIV             reduce using rule 124 (factor -> llamada .)
@@ -3787,8 +3787,8 @@ state 225
     MIENTRAS        reduce using rule 62 (retorno -> REGRESA LPAREN exp RPAREN SEMICOLON .)
     DESDE           reduce using rule 62 (retorno -> REGRESA LPAREN exp RPAREN SEMICOLON .)
     VARIABLES       reduce using rule 62 (retorno -> REGRESA LPAREN exp RPAREN SEMICOLON .)
-    DISTRIBUCION    reduce using rule 62 (retorno -> REGRESA LPAREN exp RPAREN SEMICOLON .)
-    TENDENCIA       reduce using rule 62 (retorno -> REGRESA LPAREN exp RPAREN SEMICOLON .)
+    PLOTHIST        reduce using rule 62 (retorno -> REGRESA LPAREN exp RPAREN SEMICOLON .)
+    PLOTLINE        reduce using rule 62 (retorno -> REGRESA LPAREN exp RPAREN SEMICOLON .)
     RBRACE          reduce using rule 62 (retorno -> REGRESA LPAREN exp RPAREN SEMICOLON .)
 
 
@@ -3934,8 +3934,8 @@ state 232
     MIENTRAS        reduce using rule 153 (pnQuadGenSec2 -> .)
     DESDE           reduce using rule 153 (pnQuadGenSec2 -> .)
     VARIABLES       reduce using rule 153 (pnQuadGenSec2 -> .)
-    DISTRIBUCION    reduce using rule 153 (pnQuadGenSec2 -> .)
-    TENDENCIA       reduce using rule 153 (pnQuadGenSec2 -> .)
+    PLOTHIST        reduce using rule 153 (pnQuadGenSec2 -> .)
+    PLOTLINE        reduce using rule 153 (pnQuadGenSec2 -> .)
     RBRACE          reduce using rule 153 (pnQuadGenSec2 -> .)
 
     pnQuadGenSec2                  shift and go to state 265
@@ -3990,9 +3990,6 @@ state 234
     ASSIGN          reduce using rule 57 (llamada -> ID LPAREN llamada1 RPAREN SEMICOLON .)
     RPAREN          reduce using rule 57 (llamada -> ID LPAREN llamada1 RPAREN SEMICOLON .)
     HASTA           reduce using rule 57 (llamada -> ID LPAREN llamada1 RPAREN SEMICOLON .)
-    COMMA           reduce using rule 57 (llamada -> ID LPAREN llamada1 RPAREN SEMICOLON .)
-    SEMICOLON       reduce using rule 57 (llamada -> ID LPAREN llamada1 RPAREN SEMICOLON .)
-    RBRACK          reduce using rule 57 (llamada -> ID LPAREN llamada1 RPAREN SEMICOLON .)
     HACER           reduce using rule 57 (llamada -> ID LPAREN llamada1 RPAREN SEMICOLON .)
     ID              reduce using rule 57 (llamada -> ID LPAREN llamada1 RPAREN SEMICOLON .)
     REGRESA         reduce using rule 57 (llamada -> ID LPAREN llamada1 RPAREN SEMICOLON .)
@@ -4003,9 +4000,12 @@ state 234
     MIENTRAS        reduce using rule 57 (llamada -> ID LPAREN llamada1 RPAREN SEMICOLON .)
     DESDE           reduce using rule 57 (llamada -> ID LPAREN llamada1 RPAREN SEMICOLON .)
     VARIABLES       reduce using rule 57 (llamada -> ID LPAREN llamada1 RPAREN SEMICOLON .)
-    DISTRIBUCION    reduce using rule 57 (llamada -> ID LPAREN llamada1 RPAREN SEMICOLON .)
-    TENDENCIA       reduce using rule 57 (llamada -> ID LPAREN llamada1 RPAREN SEMICOLON .)
+    PLOTHIST        reduce using rule 57 (llamada -> ID LPAREN llamada1 RPAREN SEMICOLON .)
+    PLOTLINE        reduce using rule 57 (llamada -> ID LPAREN llamada1 RPAREN SEMICOLON .)
     RBRACE          reduce using rule 57 (llamada -> ID LPAREN llamada1 RPAREN SEMICOLON .)
+    COMMA           reduce using rule 57 (llamada -> ID LPAREN llamada1 RPAREN SEMICOLON .)
+    SEMICOLON       reduce using rule 57 (llamada -> ID LPAREN llamada1 RPAREN SEMICOLON .)
+    RBRACK          reduce using rule 57 (llamada -> ID LPAREN llamada1 RPAREN SEMICOLON .)
 
 
 state 235
@@ -4423,8 +4423,8 @@ state 261
     MIENTRAS        reduce using rule 155 (pnQuadGenSec4 -> .)
     DESDE           reduce using rule 155 (pnQuadGenSec4 -> .)
     VARIABLES       reduce using rule 155 (pnQuadGenSec4 -> .)
-    DISTRIBUCION    reduce using rule 155 (pnQuadGenSec4 -> .)
-    TENDENCIA       reduce using rule 155 (pnQuadGenSec4 -> .)
+    PLOTHIST        reduce using rule 155 (pnQuadGenSec4 -> .)
+    PLOTLINE        reduce using rule 155 (pnQuadGenSec4 -> .)
     RBRACE          reduce using rule 155 (pnQuadGenSec4 -> .)
 
     pnQuadGenSec4                  shift and go to state 282
@@ -4465,8 +4465,8 @@ state 265
     MIENTRAS        reduce using rule 53 (asig -> exp SEMICOLON pnQuadGenSec2 .)
     DESDE           reduce using rule 53 (asig -> exp SEMICOLON pnQuadGenSec2 .)
     VARIABLES       reduce using rule 53 (asig -> exp SEMICOLON pnQuadGenSec2 .)
-    DISTRIBUCION    reduce using rule 53 (asig -> exp SEMICOLON pnQuadGenSec2 .)
-    TENDENCIA       reduce using rule 53 (asig -> exp SEMICOLON pnQuadGenSec2 .)
+    PLOTHIST        reduce using rule 53 (asig -> exp SEMICOLON pnQuadGenSec2 .)
+    PLOTLINE        reduce using rule 53 (asig -> exp SEMICOLON pnQuadGenSec2 .)
     RBRACE          reduce using rule 53 (asig -> exp SEMICOLON pnQuadGenSec2 .)
 
 
@@ -4582,8 +4582,8 @@ state 269
     MIENTRAS        reduce using rule 155 (pnQuadGenSec4 -> .)
     DESDE           reduce using rule 155 (pnQuadGenSec4 -> .)
     VARIABLES       reduce using rule 155 (pnQuadGenSec4 -> .)
-    DISTRIBUCION    reduce using rule 155 (pnQuadGenSec4 -> .)
-    TENDENCIA       reduce using rule 155 (pnQuadGenSec4 -> .)
+    PLOTHIST        reduce using rule 155 (pnQuadGenSec4 -> .)
+    PLOTLINE        reduce using rule 155 (pnQuadGenSec4 -> .)
     RBRACE          reduce using rule 155 (pnQuadGenSec4 -> .)
 
     pnQuadGenSec4                  shift and go to state 286
@@ -4683,16 +4683,16 @@ state 276
 
     (71) ca -> CTE_INT .
 
-    RPAREN          reduce using rule 71 (ca -> CTE_INT .)
     COMMA           reduce using rule 71 (ca -> CTE_INT .)
+    RPAREN          reduce using rule 71 (ca -> CTE_INT .)
 
 
 state 277
 
     (70) ca -> ID .
 
-    RPAREN          reduce using rule 70 (ca -> ID .)
     COMMA           reduce using rule 70 (ca -> ID .)
+    RPAREN          reduce using rule 70 (ca -> ID .)
 
 
 state 278
@@ -4756,8 +4756,8 @@ state 282
     MIENTRAS        reduce using rule 64 (escritura -> ESCRIBE pnQuadGenSec3 LPAREN esc RPAREN SEMICOLON pnQuadGenSec4 .)
     DESDE           reduce using rule 64 (escritura -> ESCRIBE pnQuadGenSec3 LPAREN esc RPAREN SEMICOLON pnQuadGenSec4 .)
     VARIABLES       reduce using rule 64 (escritura -> ESCRIBE pnQuadGenSec3 LPAREN esc RPAREN SEMICOLON pnQuadGenSec4 .)
-    DISTRIBUCION    reduce using rule 64 (escritura -> ESCRIBE pnQuadGenSec3 LPAREN esc RPAREN SEMICOLON pnQuadGenSec4 .)
-    TENDENCIA       reduce using rule 64 (escritura -> ESCRIBE pnQuadGenSec3 LPAREN esc RPAREN SEMICOLON pnQuadGenSec4 .)
+    PLOTHIST        reduce using rule 64 (escritura -> ESCRIBE pnQuadGenSec3 LPAREN esc RPAREN SEMICOLON pnQuadGenSec4 .)
+    PLOTLINE        reduce using rule 64 (escritura -> ESCRIBE pnQuadGenSec3 LPAREN esc RPAREN SEMICOLON pnQuadGenSec4 .)
     RBRACE          reduce using rule 64 (escritura -> ESCRIBE pnQuadGenSec3 LPAREN esc RPAREN SEMICOLON pnQuadGenSec4 .)
 
 
@@ -4795,8 +4795,8 @@ state 286
     MIENTRAS        reduce using rule 63 (lectura -> LEE pnQuadGenSec3 LPAREN variable RPAREN SEMICOLON pnQuadGenSec4 .)
     DESDE           reduce using rule 63 (lectura -> LEE pnQuadGenSec3 LPAREN variable RPAREN SEMICOLON pnQuadGenSec4 .)
     VARIABLES       reduce using rule 63 (lectura -> LEE pnQuadGenSec3 LPAREN variable RPAREN SEMICOLON pnQuadGenSec4 .)
-    DISTRIBUCION    reduce using rule 63 (lectura -> LEE pnQuadGenSec3 LPAREN variable RPAREN SEMICOLON pnQuadGenSec4 .)
-    TENDENCIA       reduce using rule 63 (lectura -> LEE pnQuadGenSec3 LPAREN variable RPAREN SEMICOLON pnQuadGenSec4 .)
+    PLOTHIST        reduce using rule 63 (lectura -> LEE pnQuadGenSec3 LPAREN variable RPAREN SEMICOLON pnQuadGenSec4 .)
+    PLOTLINE        reduce using rule 63 (lectura -> LEE pnQuadGenSec3 LPAREN variable RPAREN SEMICOLON pnQuadGenSec4 .)
     RBRACE          reduce using rule 63 (lectura -> LEE pnQuadGenSec3 LPAREN variable RPAREN SEMICOLON pnQuadGenSec4 .)
 
 
@@ -4820,8 +4820,8 @@ state 288
     MIENTRAS        reduce using rule 78 (funciones_especiales_void -> fev LPAREN ID COMMA v_exp RPAREN SEMICOLON .)
     DESDE           reduce using rule 78 (funciones_especiales_void -> fev LPAREN ID COMMA v_exp RPAREN SEMICOLON .)
     VARIABLES       reduce using rule 78 (funciones_especiales_void -> fev LPAREN ID COMMA v_exp RPAREN SEMICOLON .)
-    DISTRIBUCION    reduce using rule 78 (funciones_especiales_void -> fev LPAREN ID COMMA v_exp RPAREN SEMICOLON .)
-    TENDENCIA       reduce using rule 78 (funciones_especiales_void -> fev LPAREN ID COMMA v_exp RPAREN SEMICOLON .)
+    PLOTHIST        reduce using rule 78 (funciones_especiales_void -> fev LPAREN ID COMMA v_exp RPAREN SEMICOLON .)
+    PLOTLINE        reduce using rule 78 (funciones_especiales_void -> fev LPAREN ID COMMA v_exp RPAREN SEMICOLON .)
     RBRACE          reduce using rule 78 (funciones_especiales_void -> fev LPAREN ID COMMA v_exp RPAREN SEMICOLON .)
 
 
@@ -4850,8 +4850,8 @@ state 290
     MIENTRAS        reduce using rule 126 (empty -> .)
     DESDE           reduce using rule 126 (empty -> .)
     VARIABLES       reduce using rule 126 (empty -> .)
-    DISTRIBUCION    reduce using rule 126 (empty -> .)
-    TENDENCIA       reduce using rule 126 (empty -> .)
+    PLOTHIST        reduce using rule 126 (empty -> .)
+    PLOTLINE        reduce using rule 126 (empty -> .)
     RBRACE          reduce using rule 126 (empty -> .)
 
     sino                           shift and go to state 300
@@ -4882,8 +4882,8 @@ state 292
     MIENTRAS        reduce using rule 161 (pnQuadGenCiclos3 -> .)
     DESDE           reduce using rule 161 (pnQuadGenCiclos3 -> .)
     VARIABLES       reduce using rule 161 (pnQuadGenCiclos3 -> .)
-    DISTRIBUCION    reduce using rule 161 (pnQuadGenCiclos3 -> .)
-    TENDENCIA       reduce using rule 161 (pnQuadGenCiclos3 -> .)
+    PLOTHIST        reduce using rule 161 (pnQuadGenCiclos3 -> .)
+    PLOTLINE        reduce using rule 161 (pnQuadGenCiclos3 -> .)
     RBRACE          reduce using rule 161 (pnQuadGenCiclos3 -> .)
 
     pnQuadGenCiclos3               shift and go to state 303
@@ -4917,8 +4917,8 @@ state 294
     ASSIGN          reduce using rule 81 (funciones_especiales -> fe LPAREN ID COMMA v_exp RPAREN .)
     RPAREN          reduce using rule 81 (funciones_especiales -> fe LPAREN ID COMMA v_exp RPAREN .)
     HASTA           reduce using rule 81 (funciones_especiales -> fe LPAREN ID COMMA v_exp RPAREN .)
-    COMMA           reduce using rule 81 (funciones_especiales -> fe LPAREN ID COMMA v_exp RPAREN .)
     SEMICOLON       reduce using rule 81 (funciones_especiales -> fe LPAREN ID COMMA v_exp RPAREN .)
+    COMMA           reduce using rule 81 (funciones_especiales -> fe LPAREN ID COMMA v_exp RPAREN .)
     HACER           reduce using rule 81 (funciones_especiales -> fe LPAREN ID COMMA v_exp RPAREN .)
 
 
@@ -5005,8 +5005,8 @@ state 300
     MIENTRAS        reduce using rule 157 (pnQuadGenCond2 -> .)
     DESDE           reduce using rule 157 (pnQuadGenCond2 -> .)
     VARIABLES       reduce using rule 157 (pnQuadGenCond2 -> .)
-    DISTRIBUCION    reduce using rule 157 (pnQuadGenCond2 -> .)
-    TENDENCIA       reduce using rule 157 (pnQuadGenCond2 -> .)
+    PLOTHIST        reduce using rule 157 (pnQuadGenCond2 -> .)
+    PLOTLINE        reduce using rule 157 (pnQuadGenCond2 -> .)
     RBRACE          reduce using rule 157 (pnQuadGenCond2 -> .)
 
     pnQuadGenCond2                 shift and go to state 308
@@ -5024,8 +5024,8 @@ state 301
     MIENTRAS        reduce using rule 74 (sino -> empty .)
     DESDE           reduce using rule 74 (sino -> empty .)
     VARIABLES       reduce using rule 74 (sino -> empty .)
-    DISTRIBUCION    reduce using rule 74 (sino -> empty .)
-    TENDENCIA       reduce using rule 74 (sino -> empty .)
+    PLOTHIST        reduce using rule 74 (sino -> empty .)
+    PLOTLINE        reduce using rule 74 (sino -> empty .)
     RBRACE          reduce using rule 74 (sino -> empty .)
 
 
@@ -5049,8 +5049,8 @@ state 303
     MIENTRAS        reduce using rule 75 (condicional -> MIENTRAS pnQuadGenCiclos1 LPAREN expresion RPAREN pnQuadGenCiclos2 HAZ bloque pnQuadGenCiclos3 .)
     DESDE           reduce using rule 75 (condicional -> MIENTRAS pnQuadGenCiclos1 LPAREN expresion RPAREN pnQuadGenCiclos2 HAZ bloque pnQuadGenCiclos3 .)
     VARIABLES       reduce using rule 75 (condicional -> MIENTRAS pnQuadGenCiclos1 LPAREN expresion RPAREN pnQuadGenCiclos2 HAZ bloque pnQuadGenCiclos3 .)
-    DISTRIBUCION    reduce using rule 75 (condicional -> MIENTRAS pnQuadGenCiclos1 LPAREN expresion RPAREN pnQuadGenCiclos2 HAZ bloque pnQuadGenCiclos3 .)
-    TENDENCIA       reduce using rule 75 (condicional -> MIENTRAS pnQuadGenCiclos1 LPAREN expresion RPAREN pnQuadGenCiclos2 HAZ bloque pnQuadGenCiclos3 .)
+    PLOTHIST        reduce using rule 75 (condicional -> MIENTRAS pnQuadGenCiclos1 LPAREN expresion RPAREN pnQuadGenCiclos2 HAZ bloque pnQuadGenCiclos3 .)
+    PLOTLINE        reduce using rule 75 (condicional -> MIENTRAS pnQuadGenCiclos1 LPAREN expresion RPAREN pnQuadGenCiclos2 HAZ bloque pnQuadGenCiclos3 .)
     RBRACE          reduce using rule 75 (condicional -> MIENTRAS pnQuadGenCiclos1 LPAREN expresion RPAREN pnQuadGenCiclos2 HAZ bloque pnQuadGenCiclos3 .)
 
 
@@ -5074,8 +5074,8 @@ state 305
     MIENTRAS        reduce using rule 77 (funciones_especiales_void -> VARIABLES LPAREN ID COMMA ID COMMA ID RPAREN SEMICOLON .)
     DESDE           reduce using rule 77 (funciones_especiales_void -> VARIABLES LPAREN ID COMMA ID COMMA ID RPAREN SEMICOLON .)
     VARIABLES       reduce using rule 77 (funciones_especiales_void -> VARIABLES LPAREN ID COMMA ID COMMA ID RPAREN SEMICOLON .)
-    DISTRIBUCION    reduce using rule 77 (funciones_especiales_void -> VARIABLES LPAREN ID COMMA ID COMMA ID RPAREN SEMICOLON .)
-    TENDENCIA       reduce using rule 77 (funciones_especiales_void -> VARIABLES LPAREN ID COMMA ID COMMA ID RPAREN SEMICOLON .)
+    PLOTHIST        reduce using rule 77 (funciones_especiales_void -> VARIABLES LPAREN ID COMMA ID COMMA ID RPAREN SEMICOLON .)
+    PLOTLINE        reduce using rule 77 (funciones_especiales_void -> VARIABLES LPAREN ID COMMA ID COMMA ID RPAREN SEMICOLON .)
     RBRACE          reduce using rule 77 (funciones_especiales_void -> VARIABLES LPAREN ID COMMA ID COMMA ID RPAREN SEMICOLON .)
 
 
@@ -5149,8 +5149,8 @@ state 308
     MIENTRAS        reduce using rule 72 (decision -> SI LPAREN expresion RPAREN pnQuadGenCond1 ENTONCES bloque sino pnQuadGenCond2 .)
     DESDE           reduce using rule 72 (decision -> SI LPAREN expresion RPAREN pnQuadGenCond1 ENTONCES bloque sino pnQuadGenCond2 .)
     VARIABLES       reduce using rule 72 (decision -> SI LPAREN expresion RPAREN pnQuadGenCond1 ENTONCES bloque sino pnQuadGenCond2 .)
-    DISTRIBUCION    reduce using rule 72 (decision -> SI LPAREN expresion RPAREN pnQuadGenCond1 ENTONCES bloque sino pnQuadGenCond2 .)
-    TENDENCIA       reduce using rule 72 (decision -> SI LPAREN expresion RPAREN pnQuadGenCond1 ENTONCES bloque sino pnQuadGenCond2 .)
+    PLOTHIST        reduce using rule 72 (decision -> SI LPAREN expresion RPAREN pnQuadGenCond1 ENTONCES bloque sino pnQuadGenCond2 .)
+    PLOTLINE        reduce using rule 72 (decision -> SI LPAREN expresion RPAREN pnQuadGenCond1 ENTONCES bloque sino pnQuadGenCond2 .)
     RBRACE          reduce using rule 72 (decision -> SI LPAREN expresion RPAREN pnQuadGenCond1 ENTONCES bloque sino pnQuadGenCond2 .)
 
 
@@ -5181,8 +5181,8 @@ state 310
     ASSIGN          reduce using rule 82 (funciones_especiales -> CORRELACIONA LPAREN ID COMMA v_exp COMMA v_exp RPAREN .)
     RPAREN          reduce using rule 82 (funciones_especiales -> CORRELACIONA LPAREN ID COMMA v_exp COMMA v_exp RPAREN .)
     HASTA           reduce using rule 82 (funciones_especiales -> CORRELACIONA LPAREN ID COMMA v_exp COMMA v_exp RPAREN .)
-    COMMA           reduce using rule 82 (funciones_especiales -> CORRELACIONA LPAREN ID COMMA v_exp COMMA v_exp RPAREN .)
     SEMICOLON       reduce using rule 82 (funciones_especiales -> CORRELACIONA LPAREN ID COMMA v_exp COMMA v_exp RPAREN .)
+    COMMA           reduce using rule 82 (funciones_especiales -> CORRELACIONA LPAREN ID COMMA v_exp COMMA v_exp RPAREN .)
     HACER           reduce using rule 82 (funciones_especiales -> CORRELACIONA LPAREN ID COMMA v_exp COMMA v_exp RPAREN .)
 
 
@@ -5208,8 +5208,8 @@ state 312
     MIENTRAS        reduce using rule 73 (sino -> SINO pnQuadGenCond3 bloque .)
     DESDE           reduce using rule 73 (sino -> SINO pnQuadGenCond3 bloque .)
     VARIABLES       reduce using rule 73 (sino -> SINO pnQuadGenCond3 bloque .)
-    DISTRIBUCION    reduce using rule 73 (sino -> SINO pnQuadGenCond3 bloque .)
-    TENDENCIA       reduce using rule 73 (sino -> SINO pnQuadGenCond3 bloque .)
+    PLOTHIST        reduce using rule 73 (sino -> SINO pnQuadGenCond3 bloque .)
+    PLOTLINE        reduce using rule 73 (sino -> SINO pnQuadGenCond3 bloque .)
     RBRACE          reduce using rule 73 (sino -> SINO pnQuadGenCond3 bloque .)
 
 
@@ -5226,8 +5226,8 @@ state 313
     MIENTRAS        reduce using rule 69 (carga_datos -> CARGA LPAREN ID COMMA CTE_STR COMMA ca COMMA ca RPAREN SEMICOLON .)
     DESDE           reduce using rule 69 (carga_datos -> CARGA LPAREN ID COMMA CTE_STR COMMA ca COMMA ca RPAREN SEMICOLON .)
     VARIABLES       reduce using rule 69 (carga_datos -> CARGA LPAREN ID COMMA CTE_STR COMMA ca COMMA ca RPAREN SEMICOLON .)
-    DISTRIBUCION    reduce using rule 69 (carga_datos -> CARGA LPAREN ID COMMA CTE_STR COMMA ca COMMA ca RPAREN SEMICOLON .)
-    TENDENCIA       reduce using rule 69 (carga_datos -> CARGA LPAREN ID COMMA CTE_STR COMMA ca COMMA ca RPAREN SEMICOLON .)
+    PLOTHIST        reduce using rule 69 (carga_datos -> CARGA LPAREN ID COMMA CTE_STR COMMA ca COMMA ca RPAREN SEMICOLON .)
+    PLOTLINE        reduce using rule 69 (carga_datos -> CARGA LPAREN ID COMMA CTE_STR COMMA ca COMMA ca RPAREN SEMICOLON .)
     RBRACE          reduce using rule 69 (carga_datos -> CARGA LPAREN ID COMMA CTE_STR COMMA ca COMMA ca RPAREN SEMICOLON .)
 
 
@@ -5261,8 +5261,8 @@ state 316
     MIENTRAS        reduce using rule 166 (pnQuadGenCiclos8 -> .)
     DESDE           reduce using rule 166 (pnQuadGenCiclos8 -> .)
     VARIABLES       reduce using rule 166 (pnQuadGenCiclos8 -> .)
-    DISTRIBUCION    reduce using rule 166 (pnQuadGenCiclos8 -> .)
-    TENDENCIA       reduce using rule 166 (pnQuadGenCiclos8 -> .)
+    PLOTHIST        reduce using rule 166 (pnQuadGenCiclos8 -> .)
+    PLOTLINE        reduce using rule 166 (pnQuadGenCiclos8 -> .)
     RBRACE          reduce using rule 166 (pnQuadGenCiclos8 -> .)
 
     pnQuadGenCiclos8               shift and go to state 317
@@ -5280,7 +5280,7 @@ state 317
     MIENTRAS        reduce using rule 76 (no_condicional -> DESDE pnQuadGenCiclos4 variable ASSIGN pnQuadGenSec1 exp pnQuadGenCiclos5 HASTA pnQuadGenCiclos6 exp pnQuadGenCiclos7 HACER bloque pnQuadGenCiclos8 .)
     DESDE           reduce using rule 76 (no_condicional -> DESDE pnQuadGenCiclos4 variable ASSIGN pnQuadGenSec1 exp pnQuadGenCiclos5 HASTA pnQuadGenCiclos6 exp pnQuadGenCiclos7 HACER bloque pnQuadGenCiclos8 .)
     VARIABLES       reduce using rule 76 (no_condicional -> DESDE pnQuadGenCiclos4 variable ASSIGN pnQuadGenSec1 exp pnQuadGenCiclos5 HASTA pnQuadGenCiclos6 exp pnQuadGenCiclos7 HACER bloque pnQuadGenCiclos8 .)
-    DISTRIBUCION    reduce using rule 76 (no_condicional -> DESDE pnQuadGenCiclos4 variable ASSIGN pnQuadGenSec1 exp pnQuadGenCiclos5 HASTA pnQuadGenCiclos6 exp pnQuadGenCiclos7 HACER bloque pnQuadGenCiclos8 .)
-    TENDENCIA       reduce using rule 76 (no_condicional -> DESDE pnQuadGenCiclos4 variable ASSIGN pnQuadGenSec1 exp pnQuadGenCiclos5 HASTA pnQuadGenCiclos6 exp pnQuadGenCiclos7 HACER bloque pnQuadGenCiclos8 .)
+    PLOTHIST        reduce using rule 76 (no_condicional -> DESDE pnQuadGenCiclos4 variable ASSIGN pnQuadGenSec1 exp pnQuadGenCiclos5 HASTA pnQuadGenCiclos6 exp pnQuadGenCiclos7 HACER bloque pnQuadGenCiclos8 .)
+    PLOTLINE        reduce using rule 76 (no_condicional -> DESDE pnQuadGenCiclos4 variable ASSIGN pnQuadGenSec1 exp pnQuadGenCiclos5 HASTA pnQuadGenCiclos6 exp pnQuadGenCiclos7 HACER bloque pnQuadGenCiclos8 .)
     RBRACE          reduce using rule 76 (no_condicional -> DESDE pnQuadGenCiclos4 variable ASSIGN pnQuadGenSec1 exp pnQuadGenCiclos5 HASTA pnQuadGenCiclos6 exp pnQuadGenCiclos7 HACER bloque pnQuadGenCiclos8 .)
 

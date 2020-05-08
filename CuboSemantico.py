@@ -1,29 +1,38 @@
 # Jose Arturo Villalobos A00818214
 # Rodrigo Valencia
 # Diseno de compiladores
-# Cubo Semantico
 #Creacion: 25 de Abril 2020
-#Ultima modificacion: 27 Abril 2020
+#Ultima modificacion: 8 de Mayo 2020
 
+############################### CUBO SEMANTICO #####################################
+
+'''
+Para representar el cubo semantico vamos a utilizar un Diccionario que contiene todas las combinaciones posibles entre dos operandos, utilizando todos los tipos que existen en el lenguaje COVID. 
+        
+Los tipos de datos que contiene COVID son:
+    - Int
+    - Float
+    - Char
+    - String
+    - Dataframe
+
+Tambien incluye los resultados cuando se utilizan los estatutos de lectura (lee) y escritura (escribe). 
+
+La estructura que va a manejar el cubo semantico es la siguiente:
+        
+    (operando1, operando2, operador) : tipo de operando resultante
+
+    Error: Type Mismatch
+        
+'''
 class CuboSemantico:
+
+    ''' 
+    Conctructor
+    '''
     def __init__(self):
-        '''
-        Diccionario que establece todas las posibles combinaciones que puede haber entre dos operandos para todos los tipos de datos que va a manejar el lenguaje COVID.
-        
-        Los tipos de datos que contiene COVID son:
-            - Int
-            - Float
-            - Char
-            - String
-            - Dataframe
 
-        (operando1, operando2, operador) : tipo de operando resultante
-
-        Error: Type Mismatch
-        
-        '''
-
-        self.diccionario = {
+        self.CuboSem = {
             #Int 
             ('int' , 'int' , '+' ) : 'int',
             ('int' , 'int' , '-' ) : 'int',
@@ -43,7 +52,7 @@ class CuboSemantico:
             ('int' , 'float' , '-' ) : 'float',
             ('int' , 'float' , '*' ) : 'float',
             ('int' , 'float' , '/' ) : 'float',
-            ('int' , 'float' , '=' ) : 'int', #Se redondea
+            ('int' , 'float' , '=' ) : 'int', 
             ('int' , 'float' , '==' ) : 'bool',
             ('int' , 'float' , '<' ) : 'bool',
             ('int' , 'float' , '>' ) : 'bool',
@@ -379,30 +388,25 @@ class CuboSemantico:
             ('dataframe' , 'dataframe' , '|' ) : 'error',
             ('dataframe' , 'dataframe' , '&' ) : 'error',
 
+            #Lectura
             ('lee', 'int', '') : 'char',
             ('lee', 'float', '') : 'char',
             ('lee', 'char', '') : 'char',
             ('lee', 'string', '') : 'char',
             ('lee', 'dataframe', '') : 'char',
 
+            #Escritura
             ('escribe', 'int', '') : 'char',
             ('escribe', 'float', '') : 'char',
             ('escribe', 'char', '') : 'char',
             ('escribe', 'string', '') : 'char',
             ('escribe', 'dataframe', '') : 'char'
-
-            
         }
 
     '''
-    Funcion para obtener el tipo resultado de la operacion entre dos operandos
+    Funcion para obtener el TIPO DE RESULTADO de la operacion con el operador entre dos operandos
     '''
     def getType(self, operando1, operando2, operador):
-
-        # if 'error' not in self.diccionario[operando1, operando2, operador]:
-        #     return self.diccionario[operando1, operando2, operador]
-        # else:
-        #     raise TypeError(f"Type Mismatch: No puede aplicarse el operador '{operador}' a los tipos '{operando1}' y '{operando2}' ")
-        return self.diccionario[operando1, operando2, operador]
+        return self.CuboSem[operando1, operando2, operador]
 
     

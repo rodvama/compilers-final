@@ -4,83 +4,76 @@
 # Directorio de Funciones
 
 import sys
-
-#Importa la Tabla de Variables
 from TablaVars import *
 
+'''
+El Directorio de Funciones sera representado por un Diccionario, el cual incluira los atributos semanticos de: 
+- nombre : nombre de la funcion 
+- tipo : tipo de la funcion 
+- cantParametros : Cantidad de parametros 
+- variables : link hacia la tabla de variables
+- cantQuads : cantidad actual de cuadruplos
+'''
+
 class DirFunc:
+    '''
+    Constructor que inicializa el diccionario directorio_funciones con sus atributos, empezando con la seccion de globales.
+    '''
     def __init__(self):
-        '''
-        Diccionario de directorio de Funciones
-        diccionario = {nombre: nombre, tipo, cantParametros, variables}
-        nombre : nombre de la funcion que se va a guardar
-        tipo : tipo de la funcion que se va a guardar
-        cantParametros : Cantidad de parametros para la funcion definida
-        variables : objeto de tipo Jubilo_TablaVars para guardar las variables
-        '''
-        #Inicializacion del diccionario
-        self.diccionario = {'global': {'nombre' : 'globals', 'tipo' : 'void', 'cantParametros' : 0, 'variables': TablaVars()}}
-        print("Funcion creada : Globals de tipo void")
+        self.directorio_funciones = {'global': {'nombre' : 'global', 'tipo' : 'void', 'cantParametros' : 0, 'variables': TablaVars()}}
+        print("Funcion creada exitosamente: Global de tipo void")
 
 
     '''
-    Funcion para saber si ya existe una funcion en el diccionario
+    Funcion que checa si ya existe una funcion en el directorio_funciones
     '''
-    def func_exist(self, nombre):
-        return nombre in self.diccionario.keys()
+    def func_existe(self, nombre):
+        return nombre in self.directorio_funciones.keys()
 
     '''
-    Funcion para agregar una funcion al diccionario
+    Funcion para agregar una funcion nueva al diccionario de directorio_funciones
     '''
     def func_add(self, nombre, tipo, cantParametros):
-        if self.func_exist(nombre):
-            #Error Multiple declaration
-            print ("Error: Funcion ", str(nombre), " ya existe", "\n")
+        if self.func_existe(nombre):
+            print ("Error: Declaracion multiple de funcion: ", str(nombre), "\n")
         else:
-            self.diccionario[nombre] = {
+            self.directorio_funciones[nombre] = {
                 'nombre': nombre,
                 'tipo': tipo,
                 'cantParametros': cantParametros,
                 'variables': TablaVars()
             }
-            print ("Funcion creada en el diccionario: ", nombre, " de tipo: ", tipo, "\n")
+            print ("NUEVA Funcion creada en el Directorio de Funciones: ", nombre, " de tipo: ", tipo, "\n")
 
     '''
-    Funcion que busca y regresa una funcion y sus datos
+    Funcion que regresa todos los datos de la funcion dada. Si no existe no regresa nada.
     '''
     def func_search(self, nombre):
-        if self.func_exist(nombre):
-            return self.diccionario[nombre]
+        if self.func_existe(nombre):
+            return self.directorio_funciones[nombre]
         else:
             return None
 
     '''
-    Funcion que intenta agregar una variable a la funcion nombre
+    Funcion que agrega una variable a la tabla de variables linkeada a la funcion dada.
     '''
     def func_addVar(self, nombre, nombreVar, tipoVar, renglonesVar, columnasVar):
-        '''
-        Dentro de mi diccionario de funciones, ir a la funcion nombre
-        En su atributo variables e intentar agregar la nueva variable.
-        Si regresa verdadero se pudo crear, si regresa falso ya existia esa variable.
-        '''
-        if self.diccionario[nombre]['variables'].var_add(nombreVar, tipoVar, renglonesVar, columnasVar):
-            print ("Variable: ", nombreVar, " creada en la funcion ", nombre)
+
+        if self.directorio_funciones[nombre]['variables'].var_add(nombreVar, tipoVar, renglonesVar, columnasVar):
+            print ("Variable: ", nombreVar, " creada exitosamente, dentro de la funcion:  ", nombre)
         else:
-            print ("Error: No se pudo crear la variable: ", nombreVar, " en la funcion: ", nombre)
-        
-        print (self.diccionario[nombre]['variables'].diccionario)
-        print("\n")
+            print ("Error: No es posible crear la variable: ", nombreVar, " dentro de  la funcion: ", nombre)
     
     
     # '''
     # Funcion que llama a la funcion en TablaVars para actualizar renglones y columnas de una variable
     # '''
     # def func_updateDim(self, nombre, nombreVar, renglones, columnas):
-    #     if self.diccionario[nombre]['variables'].var_exist(nombreVar):
+    #     if self.directorio_funciones[nombre]['variables'].var_exist(nombreVar):
     #         if columnas > 0: #Se manda columnas > 0 cuando se van a actualizar columnas
-    #             return self.diccionario[nombre]['variables'].var_upadateDims(nombreVar, renglones, columnas)
+    #             return self.directorio_funciones[nombre]['variables'].var_upadateDims(nombreVar, renglones, columnas)
     #         else: #Se manda columnas -1 cuando se actualizan rengloens
-    #             return self.diccionario[nombre]['variables'].var_upadateDims(nombreVar, renglones, -1)
+    #             return self.directorio_funciones[nombre]['variables'].var_upadateDims(nombreVar, renglones, -1)
     #     else:
     #         print("Warning: Variable ", nombreVar, "no existe en este contexto ", nombre)
     #         return None
@@ -90,34 +83,40 @@ class DirFunc:
     Funcion que regresa el string del tipo de una variable previamente creada en las funciones
     '''
     def func_searchVarType(self, nombre, nombreVar):
-        if self.diccionario[nombre]['variables'].var_exist(nombreVar):
-            return self.diccionario[nombre]['variables'].var_searchType(nombreVar)
+        if self.directorio_funciones[nombre]['variables'].var_exist(nombreVar):
+            return self.directorio_funciones[nombre]['variables'].var_searchType(nombreVar)
         else:
-            print("Advertencia: Variable: ", nombreVar ," no existe en este contexto: ", nombre)
+            print("Error: Variable: ", nombreVar ," no existe en este contexto: ", nombre)
             return None
     
     '''
     Funcion que regresa si existe una variable en la tabla de variables de la funcion dada
     '''
     def var_exist(self, nombre, nombreVar):
-        if self.diccionario[nombre]['variables'].var_exist(nombreVar):
+        if self.directorio_funciones[nombre]['variables'].var_exist(nombreVar):
             return True
         else:
             return False
 
     '''
-    Funcion para actualizar el numero de parametros de una funcion previamente creada
+    Funcion para cambiar la cantidad de parametros de una funcion dada.
     '''
-    def func_UpdateParams(self, nombre, cantParametros):
-        #Si ya existe la funcion actualizar su cantidad  de parametros directamente
-        if self.func_exist(nombre):
-            self.diccionario[nombre]['cantParametros'] = cantParametros
-
-        #Si no existe desplegar error
+    def func_UpdateParametros(self, nombre, cantParametros):
+        if self.func_existe(nombre):
+            self.directorio_funciones[nombre]['cantParametros'] = cantParametros
         else:
-            print("Error: Imposible actualizar parametros de una funcion no existente: ", nombre)
+            print("Error: NO existe la funcion: ", nombre)
 
-        #print("Funcion creada: ", nombre, " de tipo: ", self.diccionario[nombre]['tipo'], " con cantParametros: ", cantParametros)
+    
+    '''
+    Funcion que imprime el directorio de funciones actual
+    '''
+    def func_print(self):
+        print (self.directorio_funciones[nombre]['variables'].tabla_variables)
+        print("\n")
 
+    '''
+    Funcion que borra el directorio de funciones
+    '''
     def func_deleteDic(self):
-        self.diccionario.clear()
+        self.directorio_funciones.clear()

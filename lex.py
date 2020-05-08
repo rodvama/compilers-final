@@ -76,8 +76,8 @@ keywords = {
     'hacer' : 'HACER',
     #FUNCIONES ESPECIALES
     'Variables' : 'VARIABLES',
-    'Distribucion' : 'DISTRIBUCION',
-    'Tendencia' : 'TENDENCIA',
+    'plothist' : 'PLOTHIST',
+    'plotline' : 'PLOTLINE',
     'Media' : 'MEDIA',
     'Mediana' : 'MEDIANA',
     'Moda' : 'MODA',

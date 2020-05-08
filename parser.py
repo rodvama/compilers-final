@@ -13,9 +13,10 @@ from DirFunc import *
 from CuboSemantico import *
 from CuboSemantico_FuncEsp import *
 
+#Objetos
 directorioFunciones = DirFunc()
-validaCubo = CuboSemantico()
-validaCuboEsp = CuboSemantico_FuncEsp()
+cuboSem = CuboSemantico()
+cuboSemEsp = CuboSemantico_FuncEsp()
 
 
 ### Pilas para generacion de cuadruplos ####
@@ -35,17 +36,17 @@ d_ch = {}
 d_df = {}
 
 ##Constantes
-CONTEXT_GLOBAL = 'global'
-OPERADORES_SUMARESTA = ['+', '-']
-OPERADORES_MULTDIV = ['*', '/']
-OPERADORES_REL = ['>', '<', '<=', '>=', '==', '!=']
-OPERADORES_LOGICOS = ['&', '|']
+GBL = 'global'
+OP_SUMARESTA = ['+', '-']
+OP_MULTDIV = ['*', '/']
+OP_REL = ['>', '<', '<=', '>=', '==', '!=']
+OP_LOGICOS = ['&', '|']
 OP_ASIG = ['=']
 OP_SECUENCIALES = ['lee', 'escribe']
-BATCH_SIZE = 100 #Tamano del espacio de memoria
+ESPACIO_MEMORIA = 100 #Tamano del espacio de memoria
 
 ##Variables globales
-currentFunc = CONTEXT_GLOBAL
+currentFunc = GBL
 currentType = "void"
 varName = ""
 currentContParams = 0
@@ -104,47 +105,47 @@ Espacios de memoria:
 +++++++++++++++++++++++
 '''
 #Declaracion de espacio de memoria por tipo de memoria
-index_intGlobales = BATCH_SIZE
-index_floatGlobales = index_intGlobales + BATCH_SIZE
-index_stringsGlobales = index_floatGlobales + BATCH_SIZE
-index_charGlobales = index_stringsGlobales + BATCH_SIZE
-index_dfGlobales = index_charGlobales + BATCH_SIZE
+limite_intGlobales = ESPACIO_MEMORIA
+limite_floatGlobales = limite_intGlobales + ESPACIO_MEMORIA
+limite_stringsGlobales = limite_floatGlobales + ESPACIO_MEMORIA
+limite_charGlobales = limite_stringsGlobales + ESPACIO_MEMORIA
+limite_dfGlobales = limite_charGlobales + ESPACIO_MEMORIA
 
-index_intLocales = index_dfGlobales + BATCH_SIZE
-index_floatLocales = index_intLocales + BATCH_SIZE
-index_stringsLocales = index_floatLocales + BATCH_SIZE
-index_charLocales = index_stringsLocales + BATCH_SIZE
-index_dfLocales = index_charLocales + BATCH_SIZE
+limite_intLocales = limite_dfGlobales + ESPACIO_MEMORIA
+limite_floatLocales = limite_intLocales + ESPACIO_MEMORIA
+limite_stringsLocales = limite_floatLocales + ESPACIO_MEMORIA
+limite_charLocales = limite_stringsLocales + ESPACIO_MEMORIA
+limite_dfLocales = limite_charLocales + ESPACIO_MEMORIA
 
-index_intTemporales = index_dfLocales + BATCH_SIZE
-index_floatTemporales = index_intTemporales + BATCH_SIZE
-index_stringsTemporales = index_floatTemporales + BATCH_SIZE
-index_charTemporales = index_stringsTemporales + BATCH_SIZE
-index_dfTemporales = index_charTemporales + BATCH_SIZE
-index_boolTemporales = index_dfTemporales + BATCH_SIZE
+limite_intTemporales = limite_dfLocales + ESPACIO_MEMORIA
+limite_floatTemporales = limite_intTemporales + ESPACIO_MEMORIA
+limite_stringsTemporales = limite_floatTemporales + ESPACIO_MEMORIA
+limite_charTemporales = limite_stringsTemporales + ESPACIO_MEMORIA
+limite_dfTemporales = limite_charTemporales + ESPACIO_MEMORIA
+limite_boolTemporales = limite_dfTemporales + ESPACIO_MEMORIA
 
-index_intConstantes = index_boolTemporales + BATCH_SIZE
-index_floatConstantes = index_intConstantes + BATCH_SIZE
-index_stringConstantes = index_floatConstantes + BATCH_SIZE
-index_charConstantes = index_stringConstantes + BATCH_SIZE
-index_dfConstantes = index_charConstantes + BATCH_SIZE
+limite_intConstantes = limite_boolTemporales + ESPACIO_MEMORIA
+limite_floatConstantes = limite_intConstantes + ESPACIO_MEMORIA
+limite_stringConstantes = limite_floatConstantes + ESPACIO_MEMORIA
+limite_charConstantes = limite_stringConstantes + ESPACIO_MEMORIA
+limite_dfConstantes = limite_charConstantes + ESPACIO_MEMORIA
 
 
 #Declaracion de inicio de index de memoria para temporales
-cont_IntTemp = index_dfLocales
-cont_FloatTemp = index_intTemporales
-cont_StringTemp = index_floatTemporales
-cont_CharTemp = index_stringsTemporales
-cont_dfTemp = index_charTemporales
-cont_BoolTemp = index_dfTemporales
+cont_IntTemporales = limite_dfLocales
+cont_FloatTemporales = limite_intTemporales
+cont_StringTemporales = limite_floatTemporales
+cont_CharTemporales = limite_stringsTemporales
+cont_dfTemporales = limite_charTemporales
+cont_BoolTemporales = limite_dfTemporales
 
 
 #Declaracion de inicio de los inde de memoria para constantes 
-cont_IntConst = index_boolTemporales
-cont_FloatConst = index_intConstantes
-cont_StringConst = index_floatConstantes
-cont_CharConst = index_stringConstantes
-cont_dfConst = index_charConstantes
+cont_IntConstantes = limite_boolTemporales
+cont_FloatConstantes = limite_intConstantes
+cont_StringConstantes = limite_floatConstantes
+cont_CharConstantes = limite_stringConstantes
+cont_dfConstantes = limite_charConstantes
 
 
 #Se define la precedencia
@@ -407,8 +408,8 @@ def p_funciones_especiales_void(p):
     '''
 def p_fev(p):
     '''
-    fev : DISTRIBUCION
-        | TENDENCIA
+    fev : PLOTHIST
+        | PLOTLINE
     '''
 
 def p_funciones_especiales(p):
@@ -628,29 +629,29 @@ def pushConstante(constante):
     global d_ch
     global d_df
     
-    global cont_IntConst
-    global cont_FloatConst
-    global cont_StringConst
-    global cont_CharConst
-    global cont_dfConst
+    global cont_IntConstantes
+    global cont_FloatConstantes
+    global cont_StringConstantes
+    global cont_CharConstantes
+    global cont_dfConstantes
 
     if type(constante) == int:
         if constante not in d_ints:
-            if cont_IntConst < index_intConstantes:
-                d_ints[constante] = cont_IntConst
-                cont_IntConst = cont_IntConst + 1
+            if cont_IntConstantes < limite_intConstantes:
+                d_ints[constante] = cont_IntConstantes
+                cont_IntConstantes = cont_IntConstantes + 1
                 printQuad('addConstante', 'int', constante, d_ints[constante])
             else:
-                print(cont_IntConst, index_intConstantes)
+                print(cont_IntConstantes, limite_intConstantes)
                 errorOutOfBounds('Constantes', 'Enteras')
         pushOperando(d_ints[constante])
         pushTipo('int')
     
     elif type(constante) == float:
         if constante not in d_floats:
-            if cont_FloatConst < index_floatConstantes:
-                d_floats[constante] = cont_FloatConst
-                cont_FloatConst = cont_FloatConst + 1
+            if cont_FloatConstantes < limite_floatConstantes:
+                d_floats[constante] = cont_FloatConstantes
+                cont_FloatConstantes = cont_FloatConstantes + 1
                 printQuad('addConstante', 'float', constante, d_floats[constante])
             else:
                 errorOutOfBounds('Constantes', 'Flotantes')
@@ -659,7 +660,7 @@ def pushConstante(constante):
     
     elif type(constante) == str:
         if constante not in d_strs:
-            if cont_StringConst < index_stringConstantes:
+            if cont_StringConstantes < limite_stringConstantes:
                 d_strs[constante] = cont_StringsConst
                 cont_StringsConst = cont_StringsConst + 1
                 printQuad('addConstante', 'string', constante, d_strs[constante])
@@ -670,9 +671,9 @@ def pushConstante(constante):
     
     elif type(constante) == chr:
         if constante not in d_ch:
-            if cont_CharConst < index_charConstantes:
-                d_chars[constante] = cont_CharConst
-                cont_CharConst = cont_CharConst + 1
+            if cont_CharConstantes < limite_charConstantes:
+                d_chars[constante] = cont_CharConstantes
+                cont_CharConstantes = cont_CharConstantes + 1
                 printQuad('addConstante', 'char', constante, d_chars[constante])
             else:
                 errorOutOfBounds('Constantes', 'Chars')
@@ -714,29 +715,29 @@ def errorOutOfBounds(tipoMemoria,tipoDato):
 
 ################ Funciones de manejo de memoria##############
 def nextAvailTemp(tipo):
-    global cont_IntTemp
-    global cont_FloatTemp
-    global cont_BoolTemp
+    global cont_IntTemporales
+    global cont_FloatTemporales
+    global cont_BoolTemporales
     global avail
     
     if tipo == 'int':
-        if cont_IntTemp < index_intTemporales:
-            avail = cont_IntTemp
-            cont_IntTemp += 1
+        if cont_IntTemporales < limite_intTemporales:
+            avail = cont_IntTemporales
+            cont_IntTemporales += 1
         else:
             errorOutOfBounds('temporales','Enteras')
     elif tipo == 'float':
         
-        if cont_FloatTemp < index_floatTemporales:
-            avail = cont_FloatTemp
-            cont_FloatTemp += 1
+        if cont_FloatTemporales < limite_floatTemporales:
+            avail = cont_FloatTemporales
+            cont_FloatTemporales += 1
         else:
             errorOutOfBounds('temporales','Flotantes')
 
     elif tipo == 'bool':
-        if cont_BoolTemp < index_boolTemporales:
-            avail = cont_BoolTemp
-            cont_BoolTemp = cont_BoolTemp + 1
+        if cont_BoolTemporales < limite_boolTemporales:
+            avail = cont_BoolTemporales
+            cont_BoolTemporales = cont_BoolTemporales + 1
         else:
            errorOutOfBounds('temporales','Boleanas')
     else:
@@ -807,7 +808,7 @@ def p_pn_5_updateContParams(p):
     global currentFunc
     global currentContParams
 
-    directorioFunciones.func_UpdateParams(currentFunc, currentContParams)
+    directorioFunciones.func_UpdateParametros(currentFunc, currentContParams)
 
 def p_pn_6_end(p):
     '''
@@ -835,7 +836,7 @@ def p_pn_9_setCurrentFuncGl(p):
     pn_9_setCurrentFuncGl :
     '''
     global currentFunc
-    currentFunc = CONTEXT_GLOBAL
+    currentFunc = GBL
 
 
 ##### Generacion de cuadruplos #######
@@ -898,7 +899,7 @@ def p_pnQuadGenExp1(p):
     print("CurrentFunc: " , currentFunc)
     idType = directorioFunciones.func_searchVarType(currentFunc, idName)
     if not idType: #Si no la encuentra en el contexto actual, cambia de contexto a Tipos
-        idType = directorioFunciones.func_searchVarType(CONTEXT_GLOBAL, idName)
+        idType = directorioFunciones.func_searchVarType(GBL, idName)
     
     if not idType:
         print("Error: Variable ", idName, " no declarada")
@@ -921,7 +922,7 @@ def p_pnQuadGenExp2(p):
 
     global pOper
 
-    if p[-1] not in OPERADORES_SUMARESTA:
+    if p[-1] not in OP_SUMARESTA:
         print("Error: Operador no esperado")
     else:
         pushOperador(p[-1])
@@ -935,7 +936,7 @@ def p_pnQuadGenExp3(p):
 
     global pOper
 
-    if p[-1] not in OPERADORES_MULTDIV:
+    if p[-1] not in OP_MULTDIV:
         print("Error: Operador no esperado")
     else:
         pushOperador(p[-1])
@@ -946,15 +947,15 @@ def p_pnQuadGenExp4(p):
     '''
     pnQuadGenExp4 : 
     '''
-    if topOperador() in OPERADORES_SUMARESTA:
+    if topOperador() in OP_SUMARESTA:
         quad_rightOperand = popOperandos()
         quad_rightType = popTipos()
         quad_leftOperand = popOperandos()
         quad_leftType = popTipos()
         quad_operator = popOperadores()
 
-        global validaCubo
-        quad_resultType = validaCubo.getType(quad_leftType, quad_rightType, quad_operator)
+        global cuboSem
+        quad_resultType = cuboSem.getType(quad_leftType, quad_rightType, quad_operator)
 
         if quad_resultType == 'error':
             errorTypeMismatch()
@@ -970,7 +971,7 @@ def p_pnQuadGenExp5(p):
     '''
     pnQuadGenExp5 : 
     '''
-    if topOperador() in OPERADORES_MULTDIV:
+    if topOperador() in OP_MULTDIV:
         
         quad_rightOperand = popOperandos()
         quad_rightType = popTipos()
@@ -978,8 +979,8 @@ def p_pnQuadGenExp5(p):
         quad_leftType = popTipos()
         quad_operator = popOperadores()
 
-        global validaCubo
-        quad_resultType = validaCubo.getType(quad_leftType, quad_rightType, quad_operator)
+        global cuboSem
+        quad_resultType = cuboSem.getType(quad_leftType, quad_rightType, quad_operator)
 
         if quad_resultType == 'error':
             print('Error: Type Mismatch')
@@ -1009,7 +1010,7 @@ def p_pnQuadGenExp8(p):
     pnQuadGenExp8 : 
     '''
     global popOperadores
-    if p[-1] not in OPERADORES_REL:
+    if p[-1] not in OP_REL:
         print("Error: Operador no esperado")
     else:
         pushOperador(p[-1])
@@ -1020,15 +1021,15 @@ def p_pnQuadGenExp9(p):
     '''
     pnQuadGenExp9 : 
     '''
-    if topOperador() in OPERADORES_REL:
+    if topOperador() in OP_REL:
         quad_rightOperand = popOperandos()
         quad_rightType = popTipos()
         quad_leftOperand = popOperandos()
         quad_leftType = popTipos()
         quad_operator = popOperadores()
 
-        global validaCubo
-        quad_resultType = validaCubo.getType(quad_leftType, quad_rightType, quad_operator)
+        global cuboSem
+        quad_resultType = cuboSem.getType(quad_leftType, quad_rightType, quad_operator)
 
         if quad_resultType == 'error':
             print('Error: Type Mismatch')
@@ -1046,7 +1047,7 @@ def p_pnQuadGenExp10(p):
     pnQuadGenExp10 : 
     '''
     global pOper
-    if p[-1] not in OPERADORES_LOGICOS:
+    if p[-1] not in OP_LOGICOS:
         print("Error: Operador no esperado")
     else:
         pushOperador(p[-1])
@@ -1057,15 +1058,15 @@ def p_pnQuadGenExp11(p):
     '''
     pnQuadGenExp11 : 
     '''
-    if topOperador() in OPERADORES_LOGICOS:
+    if topOperador() in OP_LOGICOS:
         quad_rightOperand = popOperandos()
         quad_rightType = popTipos()
         quad_leftOperand = popOperandos()
         quad_leftType = popTipos()
         quad_operator = popOperadores()
 
-        global validaCubo
-        quad_resultType = validaCubo.getType(quad_leftType, quad_rightType, quad_operator)
+        global cuboSem
+        quad_resultType = cuboSem.getType(quad_leftType, quad_rightType, quad_operator)
 
         if quad_resultType == 'error':
             print('Error: Type Mismatch')
@@ -1102,12 +1103,12 @@ def p_pnQuadGenSec2(p):
         quad_leftType = popTipos()
         quad_operator = popOperadores()
 
-        global validaCubo
+        global cuboSem
         global directorioFunciones
 
-        quad_resultType = validaCubo.getType(quad_leftType, quad_rightType, quad_operator)
+        quad_resultType = cuboSem.getType(quad_leftType, quad_rightType, quad_operator)
 
-        if directorioFunciones.var_exist(currentFunc, quad_leftOperand) or directorioFunciones.var_exist(CONTEXT_GLOBAL, quad_leftOperand):
+        if directorioFunciones.var_exist(currentFunc, quad_leftOperand) or directorioFunciones.var_exist(GBL, quad_leftOperand):
             if quad_leftType == 'error':
                 print("Error: Operacion invalida")
             else:
@@ -1141,9 +1142,9 @@ def p_pnQuadGenSec4(p):
         quad_rightType = popTipos()
         quad_operator = popOperadores()
 
-        global validaCubo
+        global cuboSem
 
-        quad_resultType = validaCubo.getType(quad_operator, quad_rightType, '')
+        quad_resultType = cuboSem.getType(quad_operator, quad_rightType, '')
 
     
         if quad_resultType == 'error':
@@ -1254,12 +1255,12 @@ def p_pnQuadGenCiclos5(p):
         quad_leftType = popTipos()
         quad_operator = popOperadores()
 
-        global validaCubo
+        global cuboSem
         global directorioFunciones
 
-        quad_resultType = validaCubo.getType(quad_leftType, quad_rightType, quad_operator)
+        quad_resultType = cuboSem.getType(quad_leftType, quad_rightType, quad_operator)
 
-        if directorioFunciones.var_exist(currentFunc, quad_leftOperand) or directorioFunciones.var_exist(CONTEXT_GLOBAL, quad_leftOperand):
+        if directorioFunciones.var_exist(currentFunc, quad_leftOperand) or directorioFunciones.var_exist(GBL, quad_leftOperand):
             if quad_leftType == 'error':
                 print("Error: Operacion invalida")
             else:
@@ -1275,7 +1276,7 @@ def p_pnQuadGenCiclos6(p):
 
     idType = directorioFunciones.func_searchVarType(currentFunc, varFor)
     if not idType: #Si no la encuentra en el contexto actual, cambia de contexto a Tipos
-        idType = directorioFunciones.func_searchVarType(CONTEXT_GLOBAL, varFor)
+        idType = directorioFunciones.func_searchVarType(GBL, varFor)
     
     if not idType:
         print("Error: Variable ", idName, " no declarada")
@@ -1290,15 +1291,15 @@ def p_pnQuadGenCiclos7(p):
     '''
     pnQuadGenCiclos7 :
     '''
-    if topOperador() in OPERADORES_REL:
+    if topOperador() in OP_REL:
         quad_rightOperand = popOperandos()
         quad_rightType = popTipos()
         quad_leftOperand = popOperandos()
         quad_leftType = popTipos()
         quad_operator = popOperadores()
         
-        global validaCubo
-        quad_resultType = validaCubo.getType(quad_leftType, quad_rightType, quad_operator)
+        global cuboSem
+        quad_resultType = cuboSem.getType(quad_leftType, quad_rightType, quad_operator)
         
         if quad_resultType == 'error':
             print('Error: Type Mismatch')
@@ -1364,4 +1365,4 @@ parser = yacc.yacc()
 result = parser.parse(data)
 
 print(result)
-# print(directorioFunciones.func_search(CONTEXT_GLOBAL))
+# print(directorioFunciones.func_search(GBL))

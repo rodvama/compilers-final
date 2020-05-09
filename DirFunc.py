@@ -20,7 +20,7 @@ class DirFunc:
     Constructor que inicializa el diccionario directorio_funciones con sus atributos, empezando con la seccion de globales.
     '''
     def __init__(self):
-        self.directorio_funciones = {'global': {'nombre' : 'global', 'tipo' : 'void', 'cantParametros' : 0, 'variables': TablaVars()}}
+        self.directorio_funciones = {'global': {'nombre' : 'global', 'tipo' : 'void', 'cantParametros' : 0, 'variables': TablaVars(), 'cantQuads' : 0}}
         print("Funcion creada exitosamente: Global de tipo void")
 
 
@@ -33,7 +33,7 @@ class DirFunc:
     '''
     Funcion para agregar una funcion nueva al diccionario de directorio_funciones
     '''
-    def func_add(self, nombre, tipo, cantParametros):
+    def func_add(self, nombre, tipo, cantParametros, cantQuads):
         if self.func_existe(nombre):
             print ("Error: Declaracion multiple de funcion: ", str(nombre), "\n")
         else:
@@ -41,7 +41,8 @@ class DirFunc:
                 'nombre': nombre,
                 'tipo': tipo,
                 'cantParametros': cantParametros,
-                'variables': TablaVars()
+                'variables': TablaVars(),
+                'cantQuads': cantQuads
             }
             print ("NUEVA Funcion creada en el Directorio de Funciones: ", nombre, " de tipo: ", tipo, "\n")
 

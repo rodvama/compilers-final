@@ -49,7 +49,8 @@ ESPACIO_MEMORIA = 100 #Tamano del espacio de memoria
 currentFunc = GBL
 currentType = "void"
 varName = ""
-currentContParams = 0
+currentCantParams = 0
+currentCantVars = 0
 numRenglones = 0
 numColumnas = 0
 avail = 0
@@ -793,12 +794,12 @@ def p_pn_3_addFunction(p):
     '''
     global currentFunc
     global currentType
-    global currentContParams
+    global currentCantParams
 
-    currentContParams = 0
+    currentCantParams = 0
 
     currentFunc = p[-1]
-    directorioFunciones.func_add(currentFunc, currentType, currentContParams)
+    directorioFunciones.func_add(currentFunc, currentType, currentCantParams)
 
 '''
 Cuenta la cantidad de parametros que tiene una funcion
@@ -809,12 +810,12 @@ def p_pn_4_params(p):
     '''
     global currentFunc
     global currentType
-    global currentContParams
+    global currentCantParams
     global varName
 
     varName = p[-1]
     directorioFunciones.func_addVar(currentFunc, varName, currentType, 0, 0)
-    currentContParams += 1
+    currentCantParams += 1
 
 '''
 Modifica la cantidad de parametros de una funcion en el directorio de funciones
@@ -824,9 +825,9 @@ def p_pn_5_updateContParams(p):
     pn_5_updateContParams :  
     '''
     global currentFunc
-    global currentContParams
+    global currentCantParams
 
-    directorioFunciones.func_UpdateParametros(currentFunc, currentContParams)
+    directorioFunciones.func_UpdateParametros(currentFunc, currentCantParams)
 
 '''
 Elimina el directorio de funciones

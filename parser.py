@@ -321,15 +321,15 @@ def p_estatutos(p):
 
     #Asig
 def p_asignacion(p):
-    'asignacion : variable ASSIGN pnQuadGenSec1 asig'
+    'asignacion : variable ASSIGN pnSec1 asig'
 
 def p_asig(p):
     '''
     asig : llamada
-         | exp SEMICOLON pnQuadGenSec2
+         | exp SEMICOLON pnSec2
     '''
 def p_variable(p):
-    'variable : ID pnQuadGenExp1 di'
+    'variable : ID pnExp1 di'
 
 def p_di(p):
     '''
@@ -356,10 +356,10 @@ def p_retorno(p):
     'retorno : REGRESA LPAREN exp RPAREN SEMICOLON'
 
 def p_lectura(p):
-    'lectura : LEE pnQuadGenSec3 LPAREN variable RPAREN SEMICOLON pnQuadGenSec4'
+    'lectura : LEE pnSec3 LPAREN variable RPAREN SEMICOLON pnSec4'
 
 def p_escritura(p):
-    'escritura : ESCRIBE pnQuadGenSec3 LPAREN esc RPAREN SEMICOLON pnQuadGenSec4'
+    'escritura : ESCRIBE pnSec3 LPAREN esc RPAREN SEMICOLON pnSec4'
 
 def p_esc(p):
     'esc : esc1 esc2'
@@ -385,20 +385,20 @@ def p_ca(pa):
 
 #Condicionales y Ciclos
 def p_decision(p): #IF
-    'decision : SI LPAREN expresion RPAREN pnQuadGenCond1 ENTONCES bloque sino pnQuadGenCond2'
+    'decision : SI LPAREN expresion RPAREN pnCond1 ENTONCES bloque sino pnCond2'
 
 def p_sino(p): #ELSE
     '''
-    sino : SINO pnQuadGenCond3 bloque
+    sino : SINO pnCond3 bloque
          | empty
     '''
 
 
 def p_condicional(p): #While
-    'condicional : MIENTRAS pnQuadGenCiclos1 LPAREN expresion RPAREN pnQuadGenCiclos2 HAZ bloque pnQuadGenCiclos3'
+    'condicional : MIENTRAS pnCiclos1 LPAREN expresion RPAREN pnCiclos2 HAZ bloque pnCiclos3'
 
 def p_no_condicional(p): #For
-    'no_condicional : DESDE pnQuadGenCiclos4 variable ASSIGN pnQuadGenSec1 exp pnQuadGenCiclos5 HASTA pnQuadGenCiclos6 exp pnQuadGenCiclos7 HACER bloque pnQuadGenCiclos8'
+    'no_condicional : DESDE pnCiclos4 variable ASSIGN pnSec1 exp pnCiclos5 HASTA pnCiclos6 exp pnCiclos7 HACER bloque pnCiclos8'
 
 
 def p_funciones_especiales_void(p):
@@ -432,8 +432,8 @@ def p_v_exp(p):
 
 def p_var_cte(p):#Se modificaran los PN
     '''
-    var_cte : CTE_CH pnQuadGenCteChar
-            | CTE_STR pnQuadGenCteStr
+    var_cte : CTE_CH pnCteChar
+            | CTE_STR pnCteStr
             | SUB pnNeg var_num
             | var_num
     '''
@@ -448,8 +448,8 @@ def p_var_cte(p):#Se modificaran los PN
 
 def p_var_num(p): 
     '''
-    var_num : CTE_INT pnQuadGenCteInt
-            | CTE_FLOAT pnQuadGenCteFloat
+    var_num : CTE_INT pnCteInt
+            | CTE_FLOAT pnCteFloat
     '''
     p[0] = p[1]
 
@@ -469,7 +469,7 @@ def p_mega_exp(p):
 
 def p_meg(p):
     '''
-    meg : op_l pnQuadGenExp10 mega_exp pnQuadGenExp11
+    meg : op_l pnExp10 mega_exp pnExp11
         | empty
     '''
 def p_op_l(p):
@@ -483,21 +483,21 @@ def p_super_exp(p):
 
 def p_sp(p):
     '''
-    sp : op_r  exp pnQuadGenExp9
+    sp : op_r  exp pnExp9
        | empty
     '''
 def p_op_r(p):
     '''
-    op_r : LT pnQuadGenExp8
-         | GT pnQuadGenExp8
-         | LE pnQuadGenExp8
-         | GE pnQuadGenExp8
-         | NOT_EQUAL pnQuadGenExp8
-         | EQUAL pnQuadGenExp8
+    op_r : LT pnExp8
+         | GT pnExp8
+         | LE pnExp8
+         | GE pnExp8
+         | NOT_EQUAL pnExp8
+         | EQUAL pnExp8
     '''
 
 def p_exp(p):
-    'exp : termino pnQuadGenExp4 exp1'
+    'exp : termino pnExp4 exp1'
 
 def p_exp1(p):
     '''
@@ -506,12 +506,12 @@ def p_exp1(p):
     '''
 def p_op_a(p):
     '''
-    op_a : ADD pnQuadGenExp2
-         | SUB pnQuadGenExp2
+    op_a : ADD pnExp2
+         | SUB pnExp2
     '''
 
 def p_termino(p):
-    'termino : factor pnQuadGenExp5 term'
+    'termino : factor pnExp5 term'
 
 def p_term(p):
     '''
@@ -520,14 +520,14 @@ def p_term(p):
     '''
 def p_op_a1(p):
     '''
-    op_a1 : MUL pnQuadGenExp3
-          | DIV pnQuadGenExp3
+    op_a1 : MUL pnExp3
+          | DIV pnExp3
     '''
 
 def p_factor(p):
     '''
     factor : var_cte
-           | LPAREN pnQuadGenExp6 exp RPAREN pnQuadGenExp7
+           | LPAREN pnExp6 exp RPAREN pnExp7
            | variable
            | llamada
            | funciones_especiales
@@ -622,6 +622,7 @@ def pushQuad(quad):
     global cuadruplos
     cuadruplos.append(quad)
 
+#Agrega las constantes a la pila de Operandos y Tipos
 def pushConstante(constante):
     global d_ints
     global d_floats
@@ -686,24 +687,24 @@ def pushConstante(constante):
 
 ################ Funciones de impresion y Errores #####################
 
-#Impresion de cuadruplo agregado
+#Impresion de nuevo cuadruplo
 def printQuad(operator, leftOperand, rightOperand, result):
-    tempQuad = (operator, leftOperand, rightOperand, result)
-    pushQuad(tempQuad)
+    QuadTemporal = (operator, leftOperand, rightOperand, result)
+    pushQuad(QuadTemporal)
     print(">> Quad: ('{}','{}','{}','{}')".format(operator, leftOperand, rightOperand, result))
     print("Contador = ", nextQuad() - 1)
     print("\n")
 
 #Impresion de lista de cuadruplos
 def printQuadList():
-    print("-------Cuadruplos al momento: ")
+    print("-------Lista de Cuadruplos: ")
 
-    count = 0
+    contador = 0
     for quad in cuadruplos:
-        print("{}.\t{},\t{},\t{},\t{}".format(count,quad[0],quad[1],quad[2],quad[3]))
-        count = count + 1
+        print("{}.\t{},\t{},\t{},\t{}".format(contador,quad[0],quad[1],quad[2],quad[3]))
+        contador = contador + 1
 
-
+#Funcion que muestra menssaje de error cuando los tipos no coinciden
 def errorTypeMismatch():
     print('Error: Type Mismatch')
     sys.exit()
@@ -714,6 +715,8 @@ def errorOutOfBounds(tipoMemoria,tipoDato):
     sys.exit()
 
 ################ Funciones de manejo de memoria##############
+
+#Regresa el siguiente temporal disponible, dependiendo el tipo
 def nextAvailTemp(tipo):
     global cont_IntTemporales
     global cont_FloatTemporales
@@ -750,7 +753,11 @@ def nextAvailTemp(tipo):
 ################ PUNTOS NEURALGICOS ###################
 
 
-##########DIRECTORIO DE FUNCIONES Y TABLA DE VARIABLESpnQuadGenExp1#############
+##########DIRECTORIO DE FUNCIONES Y TABLA DE VARIABLES#############
+
+'''
+Establece el currentType
+'''
 def p_pn_1_setCurrentType(p):
     '''
     pn_1_setCurrentType :
@@ -758,6 +765,9 @@ def p_pn_1_setCurrentType(p):
     global currentType
     currentType = p[-1]
 
+'''
+Agrega la nueva variable a la tabla de variables
+'''
 def p_pn_2_addVariable(p):
     '''
     pn_2_addVariable : 
@@ -774,6 +784,9 @@ def p_pn_2_addVariable(p):
     numColumnas = 0
     numRenglones = 0
 
+'''
+Agega nueva funcion al Directorio de Funciones
+'''
 def p_pn_3_addFunction(p):
     '''
     pn_3_addFunction : 
@@ -787,6 +800,9 @@ def p_pn_3_addFunction(p):
     currentFunc = p[-1]
     directorioFunciones.func_add(currentFunc, currentType, currentContParams)
 
+'''
+Cuenta la cantidad de parametros que tiene una funcion
+'''
 def p_pn_4_params(p):
     '''
     pn_4_params :
@@ -800,7 +816,9 @@ def p_pn_4_params(p):
     directorioFunciones.func_addVar(currentFunc, varName, currentType, 0, 0)
     currentContParams += 1
 
-#Modifica la cantidad de parametros de una funcion en el directorio de funciones
+'''
+Modifica la cantidad de parametros de una funcion en el directorio de funciones
+'''
 def p_pn_5_updateContParams(p):
     '''
     pn_5_updateContParams :  
@@ -810,12 +828,18 @@ def p_pn_5_updateContParams(p):
 
     directorioFunciones.func_UpdateParametros(currentFunc, currentContParams)
 
+'''
+Elimina el directorio de funciones
+'''
 def p_pn_6_end(p):
     '''
     pn_6_end :
     '''
     #directorioFunciones.func_deleteDic()
 
+'''
+Guarda la cantidad de Renglones que tiene la variable
+'''
 def p_pn_7_decRenglones(p):
     '''
     pn_7_decRenglones :
@@ -824,6 +848,9 @@ def p_pn_7_decRenglones(p):
     global numRenglones
     numRenglones = p[-2]
 
+'''
+Guarda la cantidad de columnas que tiene la variable
+'''
 def p_pn_8_decColumnas(p):
     '''
     pn_8_decColumnas : 
@@ -831,6 +858,9 @@ def p_pn_8_decColumnas(p):
     global numColumnas
     numColumnas = p[-2]
 
+'''
+Establece que la funcion actual es la Global
+'''
 def p_pn_9_setCurrentFuncGl(p):
     '''
     pn_9_setCurrentFuncGl :
@@ -839,9 +869,12 @@ def p_pn_9_setCurrentFuncGl(p):
     currentFunc = GBL
 
 
-##### Generacion de cuadruplos #######
+################################## Generacion de cuadruplos #############################################
 
 ###### CONSTANTES ###########
+'''
+Si hay un negativo, activa el booleano para indicar que es negativo
+'''
 def p_pnNeg(p):
     '''
     pnNeg :
@@ -849,43 +882,55 @@ def p_pnNeg(p):
     global negativo
     negativo = True
 
-def p_pnQuadGenCteInt(p):
+'''
+Agrega la constante Entera a la pila de Constantes
+'''
+def p_pnCteInt(p):
     '''
-    pnQuadGenCteInt :
-    '''
-    if negativo:
-        pushConstante(-1 * p[-1])
-    else:
-        pushConstante(p[-1])
-
-def p_pnQuadGenCteFloat(p):
-    '''
-    pnQuadGenCteFloat :
+    pnCteInt :
     '''
     if negativo:
         pushConstante(-1 * p[-1])
     else:
         pushConstante(p[-1])
 
-def p_pnQuadGenCteChar(p):
+'''
+Agrega la constante Flotante a la pila de Constantes
+'''
+def p_pnCteFloat(p):
     '''
-    pnQuadGenCteChar :
+    pnCteFloat :
+    '''
+    if negativo:
+        pushConstante(-1 * p[-1])
+    else:
+        pushConstante(p[-1])
+
+'''
+Agrega la constante Char a la pila de Constantes
+'''
+def p_pnCteChar(p):
+    '''
+    pnCteChar :
     '''
     pushConstante(p[-1])
 
-def p_pnQuadGenCteStr(p):
+'''
+Agrega la constante String a la pila de Constantes
+'''
+def p_pnCteStr(p):
     '''
-    pnQuadGenCteStr :
+    pnCteStr :
     '''
     pushConstante(p[-1])
 
 
 ###### EXPRESIONES #########
 
-'''Anadir id a poper y pTipo'''
-def p_pnQuadGenExp1(p):
+'''Anade id y Tipo a poper y pTipo respectivamente'''
+def p_pnExp1(p):
     '''
-    pnQuadGenExp1 : 
+    pnExp1 : 
     '''
     global currentFunc
     global directorioFunciones
@@ -914,10 +959,10 @@ def p_pnQuadGenExp1(p):
     print("pTipos : ", pTipos)
     print("\n")
 
-'''Anadir un + o - al POper'''
-def p_pnQuadGenExp2(p):
+'''Anade  + o - al POper'''
+def p_pnExp2(p):
     '''
-    pnQuadGenExp2 : 
+    pnExp2 : 
     '''
 
     global pOper
@@ -928,10 +973,10 @@ def p_pnQuadGenExp2(p):
         pushOperador(p[-1])
         print("POper: ", pOper)
 
-'''Anadir un * o / al POper'''
-def p_pnQuadGenExp3(p):
+'''Anade * o / al POper'''
+def p_pnExp3(p):
     '''
-    pnQuadGenExp3 : 
+    pnExp3 : 
     '''
 
     global pOper
@@ -942,10 +987,10 @@ def p_pnQuadGenExp3(p):
         pushOperador(p[-1])
         print("POper: ", pOper)
 
-'''Checa si el top del POper es un + o - para crear el cuadruplo de esa operacion'''
-def p_pnQuadGenExp4(p):
+'''Checa si el top del POper es un + o - para generar el cuadruplo de esa operacion'''
+def p_pnExp4(p):
     '''
-    pnQuadGenExp4 : 
+    pnExp4 : 
     '''
     if topOperador() in OP_SUMARESTA:
         quad_rightOperand = popOperandos()
@@ -966,10 +1011,10 @@ def p_pnQuadGenExp4(p):
             pushTipo(quad_resultType)
 
 
-'''Checa si el top de la pila de operadores es un * o / para crear el cuadruplo  '''
-def p_pnQuadGenExp5(p):
+'''Checa si el top de la pila de operadores es un * o / para generar el cuadruplo  '''
+def p_pnExp5(p):
     '''
-    pnQuadGenExp5 : 
+    pnExp5 : 
     '''
     if topOperador() in OP_MULTDIV:
         
@@ -991,23 +1036,23 @@ def p_pnQuadGenExp5(p):
             pushTipo(quad_resultType)
 
 '''Agrega fondo falso '''
-def p_pnQuadGenExp6(p):
+def p_pnExp6(p):
     '''
-    pnQuadGenExp6 : 
+    pnExp6 : 
     '''
     pushOperador('(')
 
 '''Quita fondo falso '''
-def p_pnQuadGenExp7(p):
+def p_pnExp7(p):
     '''
-    pnQuadGenExp7 : 
+    pnExp7 : 
     '''
     tipo = popOperadores()
 
-'''Meter un operador relacional a la pila de operadores'''
-def p_pnQuadGenExp8(p):
+'''Mete un operador relacional a la pila de operadores'''
+def p_pnExp8(p):
     '''
-    pnQuadGenExp8 : 
+    pnExp8 : 
     '''
     global popOperadores
     if p[-1] not in OP_REL:
@@ -1016,10 +1061,10 @@ def p_pnQuadGenExp8(p):
         pushOperador(p[-1])
         print("POper : ", pOper)
 
-'''Checa si el top de la pila de operadores es un operador relacional para crear el cuadruplo de operacion'''
-def p_pnQuadGenExp9(p):
+'''Verifica si el top de la pila de operadores es un operador relacional para generar el cuadruplo de operacion'''
+def p_pnExp9(p):
     '''
-    pnQuadGenExp9 : 
+    pnExp9 : 
     '''
     if topOperador() in OP_REL:
         quad_rightOperand = popOperandos()
@@ -1042,9 +1087,9 @@ def p_pnQuadGenExp9(p):
 '''
 Meter un operador logico a pila de operadores
 '''
-def p_pnQuadGenExp10(p):
+def p_pnExp10(p):
     '''
-    pnQuadGenExp10 : 
+    pnExp10 : 
     '''
     global pOper
     if p[-1] not in OP_LOGICOS:
@@ -1054,9 +1099,9 @@ def p_pnQuadGenExp10(p):
         print("pOper : ", pOper)
 
 '''Checa si el top de la pila de operadores es un operador logico  '''
-def p_pnQuadGenExp11(p):
+def p_pnExp11(p):
     '''
-    pnQuadGenExp11 : 
+    pnExp11 : 
     '''
     if topOperador() in OP_LOGICOS:
         quad_rightOperand = popOperandos()
@@ -1078,11 +1123,11 @@ def p_pnQuadGenExp11(p):
 
 
 '''
-Meter = a la pila operadores
+Mete '=' a la pila operadores
 '''
-def p_pnQuadGenSec1(p):
+def p_pnSec1(p):
     '''
-    pnQuadGenSec1 : 
+    pnSec1 : 
     '''
     global pOper
     if p[-1] not in OP_ASIG:
@@ -1091,10 +1136,10 @@ def p_pnQuadGenSec1(p):
         pushOperador(p[-1])
         print("pOper : ", pOper)
 
-'''Checa si el top de la pila de operadores es una asignacion '''
-def p_pnQuadGenSec2(p):
+'''Checa si en el top de la pila de operadores hay una asignacion (=) '''
+def p_pnSec2(p):
     '''
-    pnQuadGenSec2 : 
+    pnSec2 : 
     '''
     if topOperador() in OP_ASIG:
         quad_rightOperand = popOperandos()
@@ -1121,9 +1166,9 @@ def p_pnQuadGenSec2(p):
 '''
 Meter escribir o leer a la pila
 '''
-def p_pnQuadGenSec3(p):
+def p_pnSec3(p):
     '''
-    pnQuadGenSec3 : 
+    pnSec3 : 
     '''
     global pOper
     if p[-1] not in OP_SECUENCIALES:
@@ -1133,9 +1178,9 @@ def p_pnQuadGenSec3(p):
         print("pOper : ", pOper)
 
 '''Checa si el top de la pila de operadores es lectura o escritura '''
-def p_pnQuadGenSec4(p):
+def p_pnSec4(p):
     '''
-    pnQuadGenSec4 : 
+    pnSec4 : 
     '''
     if topOperador() in OP_SECUENCIALES:
         quad_rightOperand = popOperandos()
@@ -1156,11 +1201,12 @@ def p_pnQuadGenSec4(p):
         
 
 # GENERACION DE CODIGO PARA ESTATUTOS NO LINEALES (CONDICIONALES)
-
-#Genera el cuadruplo GOTOF en la condicion SI (if) depues de recibir el booleano generado por la expresion
-def p_pnQuadGenCond1(p): #IF
+'''
+Genera el cuadruplo GOTOF en la condicion SI (if) depues de recibir el booleano generado por la expresion
+'''
+def p_pnCond1(p): #IF
     '''
-    pnQuadGenCond1 :
+    pnCond1 :
     '''
     global cuadruplos
     exp_type = popTipos()
@@ -1174,45 +1220,51 @@ def p_pnQuadGenCond1(p): #IF
     else:
         errorTypeMismatch
 
-    
-#Rellena el cuadruplo para saber cuando terminar la condicion
-def p_pnQuadGenCond2(p): #IF
+'''
+Rellena el cuadruplo para saber cuando terminar la condicion
+'''   
+def p_pnCond2(p): #IF
     '''
-    pnQuadGenCond2 :
+    pnCond2 :
     '''
     global cuadruplos
     
     end = popSaltos()
     
-    tempQuad = (cuadruplos[end][0], cuadruplos[end][1], cuadruplos[end][2], nextQuad())
-    cuadruplos[end] = tempQuad
+    QuadTemporal = (cuadruplos[end][0], cuadruplos[end][1], cuadruplos[end][2], nextQuad())
+    cuadruplos[end] = QuadTemporal
 
-#Genera el cuadruplo GOTO para SINO (else) y completa el cuadruplo
-def p_pnQuadGenCond3(p): #IF
+'''
+Genera el cuadruplo GOTO para SINO (else) y completa el cuadruplo
+'''
+def p_pnCond3(p): #IF
     '''
-    pnQuadGenCond3 :
+    pnCond3 :
     '''
     global cuadruplos
     printQuad('GOTO', '', '', '')
     falso = popSaltos()
     print("cond3: ", nextQuad())
     pushSaltos(nextQuad() - 1)
-    tempQuad = (cuadruplos[falso][0], cuadruplos[falso][1], cuadruplos[falso][2], nextQuad())
-    cuadruplos[falso] = tempQuad
+    QuadTemporal = (cuadruplos[falso][0], cuadruplos[falso][1], cuadruplos[falso][2], nextQuad())
+    cuadruplos[falso] = QuadTemporal
 
-
-#Mete el siguiente cuadruplo a pSaltos. Que representa la ubicacion a donde regresara al final del ciclo para volver a evaluar la condicion
-def p_pnQuadGenCiclos1(p):
+'''
+Mete el siguiente cuadruplo a pSaltos. Que representa la ubicacion a donde regresara al final del ciclo para volver a evaluar la condicion
+'''
+def p_pnCiclos1(p):
     '''
-    pnQuadGenCiclos1 :  
+    pnCiclos1 :  
     '''
     
     pushSaltos(nextQuad())
 
-
-def p_pnQuadGenCiclos2(p):
+'''
+Genera el cuadruplo de GOTOF
+'''
+def p_pnCiclos2(p):
     '''
-    pnQuadGenCiclos2 : 
+    pnCiclos2 : 
     '''
     exp_type = popTipos()
     if exp_type != 'error':
@@ -1222,31 +1274,36 @@ def p_pnQuadGenCiclos2(p):
     else:
         errorTypeMismatch()
 
-
-#Genera el cuadruplo GOTO para regresar al inicio del ciclo y volver evaluar la nueva condicion. Aqui tambien se rellena el GOTOF anterior
-def p_pnQuadGenCiclos3(p):
+'''
+Genera el cuadruplo GOTO para regresar al inicio del ciclo y volver evaluar la nueva condicion. Aqui tambien se rellena el GOTOF anterior
+'''
+def p_pnCiclos3(p):
     '''
-    pnQuadGenCiclos3 : 
+    pnCiclos3 : 
     '''
     end = popSaltos()
     retorno = popSaltos()
     printQuad('GOTO', '', '', retorno) #Genetare quad: GOTO
 
-    tempQuad = (cuadruplos[end][0], cuadruplos[end][1], cuadruplos[end][2], nextQuad())
-    cuadruplos[end] = tempQuad #FILL (end, cont)
+    QuadTemporal = (cuadruplos[end][0], cuadruplos[end][1], cuadruplos[end][2], nextQuad())
+    cuadruplos[end] = QuadTemporal #FILL (end, cont)
 
-#Activa la variable bool de ForBool para indicar que esta entrando a un For
-def p_pnQuadGenCiclos4(p):
+'''
+Activa la variable bool de ForBool para indicar que esta entrando a un For
+'''
+def p_pnCiclos4(p):
     '''
-    pnQuadGenCiclos4 : 
+    pnCiclos4 : 
     '''
     global forBool
     forBool = True
     
-
-def p_pnQuadGenCiclos5(p):
+'''
+Hace verificaciones si existen las variables y si los tipos son compatibles
+'''
+def p_pnCiclos5(p):
     '''
-    pnQuadGenCiclos5 : 
+    pnCiclos5 : 
     '''
     if topOperador() in OP_ASIG:
         quad_rightOperand = popOperandos()
@@ -1267,10 +1324,13 @@ def p_pnQuadGenCiclos5(p):
                 printQuad(quad_operator, quad_rightOperand, '', quad_leftOperand)
         else:
             print("Error")
-    
-def p_pnQuadGenCiclos6(p):
+
+'''
+
+'''
+def p_pnCiclos6(p):
     '''
-    pnQuadGenCiclos6 :
+    pnCiclos6 :
     '''
     pushOperando(varFor)
 
@@ -1286,10 +1346,12 @@ def p_pnQuadGenCiclos6(p):
     pushOperador('<=')
     pushSaltos(nextQuad())
     
+'''
 
-def p_pnQuadGenCiclos7(p):
+'''
+def p_pnCiclos7(p):
     '''
-    pnQuadGenCiclos7 :
+    pnCiclos7 :
     '''
     if topOperador() in OP_REL:
         quad_rightOperand = popOperandos()
@@ -1317,16 +1379,19 @@ def p_pnQuadGenCiclos7(p):
             printQuad('GOTOF', result, '', '')
             pushSaltos(nextQuad() - 1)
 
-def p_pnQuadGenCiclos8(p):
+'''
+
+'''
+def p_pnCiclos8(p):
     '''
-    pnQuadGenCiclos8 :
+    pnCiclos8 :
     '''
     end = popSaltos()
     retorno = popSaltos()
     printQuad('GOTO', '', '', retorno) #Genetare quad: GOTO
 
-    tempQuad = (cuadruplos[end][0], cuadruplos[end][1], cuadruplos[end][2], nextQuad())
-    cuadruplos[end] = tempQuad #FILL (end, cont) 
+    QuadTemporal = (cuadruplos[end][0], cuadruplos[end][1], cuadruplos[end][2], nextQuad())
+    cuadruplos[end] = QuadTemporal #FILL (end, cont) 
 
 
 # parser = yacc.yacc()
@@ -1358,8 +1423,8 @@ A = -5.6 +  C;
 
 }
 '''
-tempQuad = ('0', '0', '0', '0')
-pushQuad(tempQuad)
+QuadTemporal = ('0', '0', '0', '0')
+pushQuad(QuadTemporal)
 
 parser = yacc.yacc()
 result = parser.parse(data)

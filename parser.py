@@ -15,6 +15,7 @@ from CuboSemantico_FuncEsp import *
 
 #Objetos
 directorioFunciones = DirFunc()
+tablaVariables = TablaVars()
 cuboSem = CuboSemantico()
 cuboSemEsp = CuboSemantico_FuncEsp()
 
@@ -24,6 +25,8 @@ pOperandos = [] #Pila de operandos pendientes (PilaO)
 pOper = [] #Pila de operadores pendientes (POper)
 pTipos = [] #Pila de tipos
 pSaltos = [] #Pila de saltos para condiciones y ciclos
+pFunciones = [] #Pila de funciones
+pArgumentos = [] #Pila de agumentos de una funcion
 
 #Arreglo donde se almacenaran todos los cuadruplos que se vayan generando
 cuadruplos = []
@@ -58,6 +61,7 @@ constanteNegativa = False
 forBool = False
 varFor = ''
 negativo = False
+returnBool = False #sirve para saber si una funcion debe regresar algun valor (si es void o no)
 
 '''
 Espacios de memoria:
@@ -148,6 +152,11 @@ cont_StringConstantes = limite_floatConstantes
 cont_CharConstantes = limite_stringConstantes
 cont_dfConstantes = limite_charConstantes
 
+#Cambio de contexto
+GlobalMem = [0, limite_intGlobales, limite_floatGlobales, limite_stringsGlobales, limite_charGlobales, limite_dfGlobales]
+
+LocalMem = [0, limite_intLocales, limite_floatLocales, limite_stringsLocales, limite_charLocales, limite_dfLocales]
+
 
 #Se define la precedencia
 precedence = (
@@ -164,12 +173,10 @@ precedence = (
 
 #INICIO
 def p_programa(p):
-    'programa : PROGRAMA ID SEMICOLON var1 func1 principal pn_6_end'
+    'programa : PROGRAMA ID SEMICOLON var1 pnGOTOprincipal func1 principal'
     print("PROGRAMA \"", p[2], "\" terminado.")
-    printQuadList()
+    QuadGenerateList()
     
-    
-
 def p_var1(p):
     '''
     var1 : var
@@ -185,7 +192,7 @@ def p_func1(p):
     # print("FUNC'")
 
 def p_principal(p):
-    'principal : PRINCIPAL pn_9_setCurrentFuncGl LPAREN RPAREN bloque'
+    'principal : PRINCIPAL pnPrincipal2 LPAREN RPAREN bloque'
     # print("PRINCIPAL")
 
 #DECLARACION DE VARIABLES
@@ -212,7 +219,7 @@ def p_type(p):
 
 #DECLARACION DE FUNCIONES
 def p_funcion(p):
-    'funcion : FUNCION tipo_fun ID pn_3_addFunction LPAREN parametros RPAREN pn_5_updateContParams var1 bloque'
+    'funcion : FUNCION tipo_fun ID pnFunDec1 LPAREN parametros RPAREN pnFunDec4 var1 bloque pnFunDec7'
     # print("FUNCION")
 
 def p_tipo_fun(p):
@@ -230,7 +237,7 @@ def p_parametros(p):
     # print("PARAMETROS")
 
 def p_param(p):
-    'param : tipo_simple ID pn_4_params param1'
+    'param : tipo_simple ID pnFunDec_2_3 param1'
     # print("PARAM")
 
 def p_param1(p):
@@ -339,11 +346,11 @@ def p_di(p):
     '''
 
 def p_llamada(p):
-    'llamada :  ID LPAREN llamada1 RPAREN SEMICOLON'
+    'llamada :  ID pnFunCall_1_2 LPAREN llamada1 RPAREN pnFunCall_5_6 SEMICOLON'
 
 def p_llamada1(p):
     '''
-    llamada1 : exp llamada2
+    llamada1 : exp pnFunCall_3 llamada2
              | empty
     '''
 
@@ -354,7 +361,7 @@ def p_llamada2(p):
     '''
 
 def p_retorno(p):
-    'retorno : REGRESA LPAREN exp RPAREN SEMICOLON'
+    'retorno : REGRESA LPAREN exp RPAREN pnRetorno SEMICOLON'
 
 def p_lectura(p):
     'lectura : LEE pnSec3 LPAREN variable RPAREN SEMICOLON pnSec4'
@@ -642,7 +649,7 @@ def pushConstante(constante):
             if cont_IntConstantes < limite_intConstantes:
                 d_ints[constante] = cont_IntConstantes
                 cont_IntConstantes = cont_IntConstantes + 1
-                printQuad('addConstante', 'int', constante, d_ints[constante])
+                QuadGenerate('addConstante', 'int', constante, d_ints[constante])
             else:
                 print(cont_IntConstantes, limite_intConstantes)
                 errorOutOfBounds('Constantes', 'Enteras')
@@ -654,7 +661,7 @@ def pushConstante(constante):
             if cont_FloatConstantes < limite_floatConstantes:
                 d_floats[constante] = cont_FloatConstantes
                 cont_FloatConstantes = cont_FloatConstantes + 1
-                printQuad('addConstante', 'float', constante, d_floats[constante])
+                QuadGenerate('addConstante', 'float', constante, d_floats[constante])
             else:
                 errorOutOfBounds('Constantes', 'Flotantes')
         pushOperando(d_floats[constante])
@@ -665,7 +672,7 @@ def pushConstante(constante):
             if cont_StringConstantes < limite_stringConstantes:
                 d_strs[constante] = cont_StringsConst
                 cont_StringsConst = cont_StringsConst + 1
-                printQuad('addConstante', 'string', constante, d_strs[constante])
+                QuadGenerate('addConstante', 'string', constante, d_strs[constante])
             else:
                 errorOutOfBounds('Constantes', 'Strings')
         pushOperando(d_strs[constante])
@@ -676,7 +683,7 @@ def pushConstante(constante):
             if cont_CharConstantes < limite_charConstantes:
                 d_chars[constante] = cont_CharConstantes
                 cont_CharConstantes = cont_CharConstantes + 1
-                printQuad('addConstante', 'char', constante, d_chars[constante])
+                QuadGenerate('addConstante', 'char', constante, d_chars[constante])
             else:
                 errorOutOfBounds('Constantes', 'Chars')
         pushOperando(d_chars[constante])
@@ -689,7 +696,7 @@ def pushConstante(constante):
 ################ Funciones de impresion y Errores #####################
 
 #Impresion de nuevo cuadruplo
-def printQuad(operator, leftOperand, rightOperand, result):
+def QuadGenerate(operator, leftOperand, rightOperand, result):
     QuadTemporal = (operator, leftOperand, rightOperand, result)
     pushQuad(QuadTemporal)
     print(">> Quad: ('{}','{}','{}','{}')".format(operator, leftOperand, rightOperand, result))
@@ -697,7 +704,7 @@ def printQuad(operator, leftOperand, rightOperand, result):
     print("\n")
 
 #Impresion de lista de cuadruplos
-def printQuadList():
+def QuadGenerateList():
     print("-------Lista de Cuadruplos: ")
 
     contador = 0
@@ -714,6 +721,9 @@ def errorTypeMismatch():
 def errorOutOfBounds(tipoMemoria,tipoDato):
     print("Error: Memoria llena; Muchas {} de tipo {}.".format(tipoMemoria,tipoDato))
     sys.exit()
+
+def errorReturnTipo():
+    print("Error: el tipo que intenta retornar no es correcto")
 
 ################ Funciones de manejo de memoria##############
 
@@ -748,10 +758,92 @@ def nextAvailTemp(tipo):
         avail = -1
         print("Error: Tipo de variable no existente")
     return avail
+
+'''
+Modificador de memoria
+'''
+def update_pointer(alcance, tipo, cont):
+    global GlobalMem
+    global LocalMem
+
+    if alcance == 'global':
+
+        if tipo == 'int':
+            GlobalMem[0] += cont
+            if GlobalMem[0] > limite_intGlobales:
+                print('Error: Overflow Enteras Globales')
+        
+        if tipo == 'float':
+            GlobalMem[1] += cont
+            if GlobalMem[1] > limite_floatGlobales:
+                print('Error: Overflow Flotantes Globales')
+        
+        if tipo == 'string':
+            GlobalMem[2] += cont
+            if GlobalMem[2] > limite_stringsGlobales:
+                print('Error: Overflow Strings Globales')
+        
+        if tipo == 'char':
+            GlobalMem[3] += cont
+            if GlobalMem[3] > limite_charGlobales:
+                print('Error: Overflow Chars Globales')
+
+        if tipo == 'dataframe':
+            GlobalMem[4] += cont
+            if GlobalMem[4] > limite_dfGlobales:
+                print('Error: Overflow DF Globales')
+    else:
+        if tipo == 'int':
+            LocalMem[0] += cont
+            if LocalMem[0] > limite_intLocales:
+                print('Error: Overflow Enteras Locales')
+        
+        if tipo == 'float':
+            LocalMem[1] += cont
+            if LocalMem[1] > limite_floatLocales:
+                print('Error: Overflow Flotantes Locales')
+        
+        if tipo == 'string':
+            LocalMem[2] += cont
+            if LocalMem[2] > limite_stringsLocales:
+                print('Error: Overflow Strings Locales')
+        
+        if tipo == 'char':
+            LocalMem[3] += cont
+            if LocalMem[3] > limite_charLocales:
+                print('Error: Overflow Chars Locales')
+
+        if tipo == 'dataframe':
+            LocalMem[4] += cont
+            if LocalMem[4] > limite_dfLocales:
+                print('Error: Overflow DF Locales')
+
         
 
 
 ################ PUNTOS NEURALGICOS ###################
+'''
+Generador del cuadruplo GOTO Main al inicio del programa
+'''
+def p_pnGOTOprincipal(p):
+    '''
+    pnGOTOprincipal : 
+    '''
+    QuadGenerate('GOTO', '', '', '')
+    pushSaltos(nextQuad() - 1)
+
+def p_pnPrincipal2(p):
+    '''
+    pnPrincipal2 :
+    '''
+    global currentFunc
+    global cuadruplos
+
+    currentFunc = GBL
+    cuadruplos[popSaltos()] = ('GOTO', '', '', nextQuad())
+    
+    
+
 
 
 ##########DIRECTORIO DE FUNCIONES Y TABLA DE VARIABLES#############
@@ -778,51 +870,68 @@ def p_pn_2_addVariable(p):
     global currentType
     global numColumnas
     global numRenglones
+    global currentCantVars
 
     varName = p[-2]
     
     directorioFunciones.func_addVar(currentFunc, varName, currentType, numRenglones, numColumnas)
     numColumnas = 0
     numRenglones = 0
+    currentCantVars += 1
 
 '''
 Agega nueva funcion al Directorio de Funciones
 '''
-def p_pn_3_addFunction(p):
+def p_pnFunDec1(p):
     '''
-    pn_3_addFunction : 
+    pnFunDec1 : 
     '''
     global currentFunc
     global currentType
     global currentCantParams
+    global currentCantVars
+    global returnBool
 
+    currentCantVars = 0
     currentCantParams = 0
-
     currentFunc = p[-1]
-    directorioFunciones.func_add(currentFunc, currentType, currentCantParams)
+
+    directorioFunciones.func_add(currentFunc, currentType, currentCantParams, nextQuad())
+
+    if directorioFunciones.directorio_funciones[currentFunc]['tipo'] == 'void':
+        returnBool = False
+    else:
+        returnBool = True
+    
+    
 
 '''
-Cuenta la cantidad de parametros que tiene una funcion
+Cuenta la cantidad de parametros que tiene una funcion y agrega dichos parametros como variables locales de la funcion actual
 '''
-def p_pn_4_params(p):
+def p_pnFunDec_2_3(p):
     '''
-    pn_4_params :
+    pnFunDec_2_3 :
     '''
     global currentFunc
     global currentType
     global currentCantParams
+    global currentCantVars
     global varName
 
     varName = p[-1]
+
     directorioFunciones.func_addVar(currentFunc, varName, currentType, 0, 0)
+
     currentCantParams += 1
+    currentCantVars += 1
+
 
 '''
 Modifica la cantidad de parametros de una funcion en el directorio de funciones
 '''
-def p_pn_5_updateContParams(p):
+def p_pnFunDec4(p):
     '''
-    pn_5_updateContParams :  
+    pnFunDec4 :  
     '''
     global currentFunc
     global currentCantParams
@@ -832,11 +941,23 @@ def p_pn_5_updateContParams(p):
 '''
 Elimina el directorio de funciones
 '''
-def p_pn_6_end(p):
+def p_pnFunDec7(p):
     '''
-    pn_6_end :
+    pnFunDec7 :
     '''
+    global LocalMem
+    global returnBool
+    #global returnDone
+
+    global cont_IntConstantes
+
+    LocalMem = [0, limite_intLocales, limite_floatLocales, limite_stringsLocales, limite_charLocales, limite_dfLocales]
+
+    QuadGenerate('ENDFUNC', '', '', '')
+
     #directorioFunciones.func_deleteDic()
+
+    
 
 '''
 Guarda la cantidad de Renglones que tiene la variable
@@ -859,18 +980,96 @@ def p_pn_8_decColumnas(p):
     global numColumnas
     numColumnas = p[-2]
 
-'''
-Establece que la funcion actual es la Global
-'''
-def p_pn_9_setCurrentFuncGl(p):
-    '''
-    pn_9_setCurrentFuncGl :
-    '''
-    global currentFunc
-    currentFunc = GBL
+
 
 
 ################################## Generacion de cuadruplos #############################################
+
+########### Funciones ################
+
+
+
+
+
+########## Function Call ##############
+'''
+Verifica que la funcion exista en el directorio de funciones
+
+Cuadruplos 1 y 2 de las hojas de Elda
+'''
+def p_pnFunCall_1_2(p):
+    '''
+    pnFunCall_1_2 : 
+    '''
+    global pFunciones
+    global pArgumentos
+    funcId = p[-1]
+
+    if funcId in directorioFunciones.directorio_funciones:
+        pFunciones.append(funcId)
+
+        QuadGenerate('ERA', funcId, '', '')
+        pArgumentos.append(0)
+    
+    else:
+        print("Error: la funcion no existe")
+        sys.exit()
+        return
+
+'''
+
+Cuadruplo 3 de la hoja de Elda
+'''
+def p_pnFunCall_3(p):
+    '''
+    pnFunCall_3 :
+    '''
+    global pArgumentos
+    global pFunciones
+    global currentFunc
+
+    argument = popOperandos()
+    argumentType = popTipos()
+    function = pFunciones.pop()
+    args = pArgumentos.pop() + 1
+
+    pArgumentos.append(args)
+    parametro = 'param' + str(args)
+
+    Func_Parameters = directorioFunciones.directorio_funciones[function]['cantParametros']
+
+    lista = directorioFunciones.listaTipos(function) ######PENDIENTE
+
+    if Func_Parameters >= args:
+        if lista[args-1] == argumentType:
+            QuadGenerate('PARAMETER', argument, '', parametro)
+        else:
+            print("Error: Parametros incorrectos")
+    else:
+        print("Error, muchos argumentos")
+        sys.exit()
+    
+    pFunciones.append(function)
+
+'''
+Cuadruplos 5 y 6 de hojas de Elda
+'''
+def p_pnFunCall_5_6(p):
+    '''
+    pnFunCall_5_6 : 
+    '''
+
+    global pFunciones
+    global pArgumentos
+    args = pArgumentos.pop()
+    funcion = pFunciones.pop()
+
+    if args == directorioFunciones.directorio_funciones[funcion]['cantParametros']:
+        QuadGenerate('GOSUB', funcion, '', nextQuad() + 1)
+    else:
+        print("Error: Mismatch de Argumentos")
+        sys.exit()
+        result
 
 ###### CONSTANTES ###########
 '''
@@ -1007,7 +1206,7 @@ def p_pnExp4(p):
             errorTypeMismatch()
         else:
             quad_resultIndex = nextAvailTemp(quad_resultType)
-            printQuad(quad_operator, quad_leftOperand, quad_rightOperand, quad_resultIndex)
+            QuadGenerate(quad_operator, quad_leftOperand, quad_rightOperand, quad_resultIndex)
             pushOperando(quad_resultIndex)
             pushTipo(quad_resultType)
 
@@ -1032,7 +1231,7 @@ def p_pnExp5(p):
             print('Error: Type Mismatch')
         else:
             quad_resultIndex = nextAvailTemp(quad_resultType)
-            printQuad(quad_operator, quad_leftOperand, quad_rightOperand, quad_resultIndex)
+            QuadGenerate(quad_operator, quad_leftOperand, quad_rightOperand, quad_resultIndex)
             pushOperando(quad_resultIndex)
             pushTipo(quad_resultType)
 
@@ -1081,7 +1280,7 @@ def p_pnExp9(p):
             print('Error: Type Mismatch')
         else:
             quad_resultIndex = nextAvailTemp(quad_resultType)
-            printQuad(quad_operator, quad_leftOperand, quad_rightOperand, quad_resultIndex)
+            QuadGenerate(quad_operator, quad_leftOperand, quad_rightOperand, quad_resultIndex)
             pushOperando(quad_resultIndex)
             pushTipo(quad_resultType)
 
@@ -1118,7 +1317,7 @@ def p_pnExp11(p):
             print('Error: Type Mismatch')
         else:
             quad_resultIndex = nextAvailTemp(quad_resultType)
-            printQuad(quad_operator, quad_leftOperand, quad_rightOperand, quad_resultIndex)
+            QuadGenerate(quad_operator, quad_leftOperand, quad_rightOperand, quad_resultIndex)
             pushOperando(quad_resultIndex)
             pushTipo(quad_resultType)
 
@@ -1158,7 +1357,7 @@ def p_pnSec2(p):
             if quad_leftType == 'error':
                 print("Error: Operacion invalida")
             else:
-                printQuad(quad_operator, quad_rightOperand, '', quad_leftOperand)
+                QuadGenerate(quad_operator, quad_rightOperand, '', quad_leftOperand)
         else:
             print("Error")
 
@@ -1196,7 +1395,7 @@ def p_pnSec4(p):
         if quad_resultType == 'error':
             print("Error: Operacion invalida")
         else:
-            printQuad(quad_operator, quad_rightOperand, '', quad_operator)
+            QuadGenerate(quad_operator, quad_rightOperand, '', quad_operator)
             pushOperando(quad_rightOperand)
             pushTipo(quad_resultType)
         
@@ -1214,7 +1413,7 @@ def p_pnCond1(p): #IF
     
     if(exp_type != 'error'):
         result = popOperandos()
-        printQuad('GOTOF', result,'', '')
+        QuadGenerate('GOTOF', result,'', '')
         print("cond1: ", nextQuad())
         pushSaltos(nextQuad() - 1)
 
@@ -1243,7 +1442,7 @@ def p_pnCond3(p): #IF
     pnCond3 :
     '''
     global cuadruplos
-    printQuad('GOTO', '', '', '')
+    QuadGenerate('GOTO', '', '', '')
     falso = popSaltos()
     print("cond3: ", nextQuad())
     pushSaltos(nextQuad() - 1)
@@ -1270,7 +1469,7 @@ def p_pnCiclos2(p):
     exp_type = popTipos()
     if exp_type != 'error':
         result = popOperandos()
-        printQuad('GOTOF', result, '', '')
+        QuadGenerate('GOTOF', result, '', '')
         pushSaltos(nextQuad() - 1)
     else:
         errorTypeMismatch()
@@ -1284,7 +1483,7 @@ def p_pnCiclos3(p):
     '''
     end = popSaltos()
     retorno = popSaltos()
-    printQuad('GOTO', '', '', retorno) #Genetare quad: GOTO
+    QuadGenerate('GOTO', '', '', retorno) #Genetare quad: GOTO
 
     QuadTemporal = (cuadruplos[end][0], cuadruplos[end][1], cuadruplos[end][2], nextQuad())
     cuadruplos[end] = QuadTemporal #FILL (end, cont)
@@ -1322,7 +1521,7 @@ def p_pnCiclos5(p):
             if quad_leftType == 'error':
                 print("Error: Operacion invalida")
             else:
-                printQuad(quad_operator, quad_rightOperand, '', quad_leftOperand)
+                QuadGenerate(quad_operator, quad_rightOperand, '', quad_leftOperand)
         else:
             print("Error")
 
@@ -1368,7 +1567,7 @@ def p_pnCiclos7(p):
             print('Error: Type Mismatch')
         else:
             quad_resultIndex = nextAvailTemp(quad_resultType)
-            printQuad(quad_operator, quad_leftOperand, quad_rightOperand, quad_resultIndex)
+            QuadGenerate(quad_operator, quad_leftOperand, quad_rightOperand, quad_resultIndex)
             pushOperando(quad_resultIndex)
             pushTipo(quad_resultType)
             
@@ -1377,7 +1576,7 @@ def p_pnCiclos7(p):
             errorTypeMismatch()
         else:
             result = popOperandos()
-            printQuad('GOTOF', result, '', '')
+            QuadGenerate('GOTOF', result, '', '')
             pushSaltos(nextQuad() - 1)
 
 '''
@@ -1389,11 +1588,29 @@ def p_pnCiclos8(p):
     '''
     end = popSaltos()
     retorno = popSaltos()
-    printQuad('GOTO', '', '', retorno) #Genetare quad: GOTO
+    QuadGenerate('GOTO', '', '', retorno) #Genetare quad: GOTO
 
     QuadTemporal = (cuadruplos[end][0], cuadruplos[end][1], cuadruplos[end][2], nextQuad())
     cuadruplos[end] = QuadTemporal #FILL (end, cont) 
 
+#################### ESTATUTOS ###############
+'''Punto neuralgico en returno'''
+def p_pnRetorno(p):
+    '''
+    pnRetorno :
+    '''
+    global currentFunc
+    global returnBool
+
+    if returnBool:
+        operandoRetorno = popOperandos()
+        tipoRetorno = popTipos()
+
+        if directorioFunciones.directorio_funciones[currentFunc]['tipo'] == tipoRetorno:
+            QuadGenerate('REGRESA', '', '', operandoRetorno)
+        else:
+            errorReturnTipo()
+    
 
 # parser = yacc.yacc()
 
@@ -1417,10 +1634,13 @@ programa COVID19;
 var
 int : A, B, C, D;
 
+funcion void hola(int x, int y){
+
+}
 principal()
 {
 
-A = -5.6 +  C;
+hola(A, C);
 
 }
 '''

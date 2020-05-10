@@ -108,7 +108,12 @@ class DirFunc:
         else:
             print("Error: NO existe la funcion: ", nombre)
 
+    '''
     
+    '''
+    def listaTipos(self, funcion):
+        return [self.directorio_funciones[funcion]['variables'].tabla_variables[x]['tipo'] for x in self.directorio_funciones[funcion]['variables'].tabla_variables]
+
     '''
     Funcion que imprime el directorio de funciones actual
     '''

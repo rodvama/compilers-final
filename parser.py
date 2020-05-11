@@ -27,6 +27,7 @@ pTipos = [] #Pila de tipos
 pSaltos = [] #Pila de saltos para condiciones y ciclos
 pFunciones = [] #Pila de funciones
 pArgumentos = [] #Pila de agumentos de una funcion
+pMemorias = [] # Pila de direcciones de memoria
 
 #Arreglo donde se almacenaran todos los cuadruplos que se vayan generando
 cuadruplos = []
@@ -141,7 +142,21 @@ limite_charConstantes = limite_stringConstantes + ESPACIO_MEMORIA
 limite_dfConstantes = limite_charConstantes + ESPACIO_MEMORIA
 
 
-#Declaracion de inicio de index de memoria para temporales
+#Inicio de memoria para Globales
+cont_IntGlobales = 0
+cont_FloatGlobales = limite_intGlobales
+cont_StringGlobales = limite_floatGlobales
+cont_CharGlobales = limite_stringsGlobales
+cont_dfGlobales = limite_charGlobales
+
+#Inicio de memoria para Locales
+cont_IntLocales = limite_dfGlobales
+cont_FloatLocales = limite_intLocales
+cont_StringLocales = limite_floatLocales
+cont_CharLocales = limite_stringsLocales
+cont_dfLocales = limite_charLocales
+
+#Inicio de memoria para Temporales
 cont_IntTemporales = limite_dfLocales
 cont_FloatTemporales = limite_intTemporales
 cont_StringTemporales = limite_floatTemporales
@@ -150,17 +165,12 @@ cont_dfTemporales = limite_charTemporales
 cont_BoolTemporales = limite_dfTemporales
 
 
-#Declaracion de inicio de los inde de memoria para constantes 
+#Inicio de memoria para Constatnes
 cont_IntConstantes = limite_boolTemporales
 cont_FloatConstantes = limite_intConstantes
 cont_StringConstantes = limite_floatConstantes
 cont_CharConstantes = limite_stringConstantes
 cont_dfConstantes = limite_charConstantes
-
-#Cambio de contexto
-GlobalMem = [0, limite_intGlobales, limite_floatGlobales, limite_stringsGlobales, limite_charGlobales, limite_dfGlobales]
-
-LocalMem = [0, limite_intLocales, limite_floatLocales, limite_stringsLocales, limite_charLocales, limite_dfLocales]
 
 
 #Se define la precedencia
@@ -355,23 +365,23 @@ def p_di(p):
     '''
 
 def p_llamada(p):
-    'llamada :  ID pnFunCall_1_2 LPAREN llamada1 RPAREN pnFunCall_5_6'
+    'llamada :  ID pnFunCall_1_2 LPAREN llamada1 RPAREN pnFunCall_5_6_llamada'
     p[0] = 'llamada'
-    print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>LLAMADA ")
+    
 
 def p_llamada1(p):
     '''
     llamada1 : exp pnFunCall_3 llamada2
              | empty
     '''
-    print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>LLAMADA 1")
+    
 
 def p_llamada2(p):
     '''
     llamada2 : COMMA llamada1
              | empty
     '''
-    print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>LLAMADA 2")
+    
 
 def p_retorno(p):
     'retorno : REGRESA pnSec3 LPAREN exp RPAREN pnRetorno SEMICOLON'
@@ -679,11 +689,12 @@ def pushConstante(constante):
             if cont_IntConstantes < limite_intConstantes:
                 d_ints[constante] = cont_IntConstantes
                 cont_IntConstantes = cont_IntConstantes + 1
-                QuadGenerate('addConstante', 'int', constante, d_ints[constante])
+                QuadGenerate('Constante Creada', 'int', constante, d_ints[constante])
             else:
                 print(cont_IntConstantes, limite_intConstantes)
                 errorOutOfBounds('Constantes', 'Enteras')
         pushOperando(constante)
+        pushMemoria(d_ints[constante])
         pushTipo('int')
     
     elif type(constante) == float:
@@ -691,21 +702,23 @@ def pushConstante(constante):
             if cont_FloatConstantes < limite_floatConstantes:
                 d_floats[constante] = cont_FloatConstantes
                 cont_FloatConstantes = cont_FloatConstantes + 1
-                QuadGenerate('addConstante', 'float', constante, d_floats[constante])
+                QuadGenerate('Constante Creada', 'float', constante, d_floats[constante])
             else:
                 errorOutOfBounds('Constantes', 'Flotantes')
-        pushOperando(d_floats[constante])
+        pushOperando(constante)
+        pushMemoria(d_floats[constante])
         pushTipo('float')
     
     elif type(constante) == str:
         if constante not in d_strs:
             if cont_StringConstantes < limite_stringConstantes:
                 d_strs[constante] = cont_StringConstantes
-                cont_StringConstantes = cont_StringConstantes + 1
-                QuadGenerate('addConstante', 'string', constante, d_strs[constante])
+                cont_StringConstantes += 1
+                QuadGenerate('Constante Creada', 'string', constante, d_strs[constante])
             else:
                 errorOutOfBounds('Constantes', 'Strings')
         pushOperando(constante)
+        pushMemoria(d_strs[constante])
         pushTipo('string')
     
     elif type(constante) == chr: ########## POSIBLE ERROR
@@ -713,10 +726,11 @@ def pushConstante(constante):
             if cont_CharConstantes < limite_charConstantes:
                 d_chars[constante] = cont_CharConstantes
                 cont_CharConstantes = cont_CharConstantes + 1
-                QuadGenerate('addConstante', 'char', constante, d_chars[constante])
+                QuadGenerate('Constante Creada', 'char', constante, d_chars[constante])
             else:
                 errorOutOfBounds('Constantes', 'Chars')
         pushOperando(constante)
+        pushMemoria(d_chars[constante])
         pushTipo('char')
     else:
         sys.exit("Error: Tipo de Variable desconocida")
@@ -758,7 +772,9 @@ def errorReturnTipo():
 
 ################ Funciones de manejo de memoria##############
 
-#Regresa el siguiente temporal disponible, dependiendo el tipo
+'''
+Regresa el siguiente temporal disponible, dependiendo el tipo
+'''
 def nextAvailTemp(tipo):
     global cont_IntTemporales
     global cont_FloatTemporales
@@ -791,66 +807,181 @@ def nextAvailTemp(tipo):
     return avail
 
 '''
-Modificador de memoria
+Regresa el siguiente espacio de memoria disponible
 '''
-def update_pointer(alcance, tipo, cont):
-    global GlobalMem
-    global LocalMem
+def nextAvailMemory(contexto, tipo):
+    global cont_IntGlobales
+    global cont_IntLocales
+    global cont_FloatGlobales
+    global cont_FloatLocales
+    global cont_StringGlobales
+    global cont_StringLocales
+    global cont_CharGlobales
+    global cont_CharLocales
+    global cont_dfGlobales
+    global cont_dfLocales
 
-    if alcance == 'global':
+    posMem = -1
+    
+    #Global
+    if contexto == GBL:
 
         if tipo == 'int':
-            GlobalMem[0] += cont
-            if GlobalMem[0] > limite_intGlobales:
+            if cont_IntGlobales < limite_intGlobales:
+                posMem = cont_IntGlobales
+                cont_IntGlobales += 1
+            else:
+                errorOutOfBounds(GBL, 'Enteras')
+        
+
+        elif tipo == 'float':
+            if cont_FloatGlobales < limite_floatGlobales:
+                posMem = cont_FloatGlobales
+                cont_FloatGlobales += 1
+            else:
+                errorOutOfBounds(GBL, 'Floats')
+
+        elif tipo == 'string':
+            if cont_StringGlobales < limite_stringsGlobales:
+                posMem = cont_StringGlobales
+                cont_StringGlobales += 1
+            else:
+                errorOutOfBounds(GBL, 'Strings')
+
+        elif tipo == 'char':
+            if cont_CharGlobales < limite_charGlobales:
+                posMem = cont_CharGlobales
+                cont_CharGlobales += 1
+            else:
+                errorOutOfBounds(GBL, 'Chars')
+
+        elif tipo == 'dataframe':
+            if cont_dfGlobales < limite_dfGlobales:
+                posMem = cont_dfGlobales
+                cont_dfGlobales += 1
+            else:
+                errorOutOfBounds(GBL, 'Dataframes')
+    #Locales
+    else:
+        if tipo == 'int':
+            if cont_IntLocales < limite_intLocales:
+                posMem = cont_IntLocales
+                cont_IntLocales += 1
+            else:
+                errorOutOfBounds('Locales', 'Enteras')
+        
+
+        elif tipo == 'float':
+            if cont_FloatLocales < limite_floatLocales:
+                posMem = cont_FloatLocales
+                cont_FloatLocales += 1
+            else:
+                errorOutOfBounds('Locales', 'Floats')
+
+        elif tipo == 'string':
+            if cont_StringLocales < limite_stringsLocales:
+                posMem = cont_StringLocales
+                cont_StringLocales += 1
+            else:
+                errorOutOfBounds('Locales', 'Strings')
+
+        elif tipo == 'char':
+            if cont_CharLocales < limite_charLocales:
+                posMem = cont_CharLocales
+                cont_CharLocales += 1
+            else:
+                errorOutOfBounds('Locales', 'Chars')
+
+        elif tipo == 'dataframe':
+            if cont_dfLocales < limite_dfLocales:
+                posMem = cont_dfLocales
+                cont_dfLocales += 1
+            else:
+                errorOutOfBounds('Locales', 'Dataframes')
+    return posMem
+
+
+
+'''
+Modificador de memoria
+'''
+def update_pointer(contexto, tipo, cont):
+    global cont_IntGlobales
+    global cont_IntLocales
+    global cont_FloatGlobales
+    global cont_FloatLocales
+    global cont_StringGlobales
+    global cont_StringLocales
+    global cont_CharGlobales
+    global cont_CharLocales
+    global cont_dfGlobales
+    global cont_dfLocales
+
+    if contexto == GBL:
+
+        if tipo == 'int':
+            cont_IntGlobales += cont
+            if cont_IntGlobales > limite_intGlobales:
                 print('Error: Overflow Enteras Globales')
         
         if tipo == 'float':
-            GlobalMem[1] += cont
-            if GlobalMem[1] > limite_floatGlobales:
+            cont_FloatGlobales += cont
+            if cont_FloatGlobales > limite_floatGlobales:
                 print('Error: Overflow Flotantes Globales')
         
         if tipo == 'string':
-            GlobalMem[2] += cont
-            if GlobalMem[2] > limite_stringsGlobales:
+            cont_StringGlobales += cont
+            if cont_StringGlobales > limite_stringsGlobales:
                 print('Error: Overflow Strings Globales')
         
         if tipo == 'char':
-            GlobalMem[3] += cont
-            if GlobalMem[3] > limite_charGlobales:
+            cont_CharGlobales += cont
+            if cont_CharGlobales > limite_charGlobales:
                 print('Error: Overflow Chars Globales')
 
         if tipo == 'dataframe':
-            GlobalMem[4] += cont
-            if GlobalMem[4] > limite_dfGlobales:
+            cont_dfGlobales += cont
+            if cont_dfGlobales > limite_dfGlobales:
                 print('Error: Overflow DF Globales')
     else:
         if tipo == 'int':
-            LocalMem[0] += cont
-            if LocalMem[0] > limite_intLocales:
+            cont_IntLocales += cont
+            if cont_IntLocales > limite_intLocales:
                 print('Error: Overflow Enteras Locales')
         
         if tipo == 'float':
-            LocalMem[1] += cont
-            if LocalMem[1] > limite_floatLocales:
+            cont_FloatLocales += cont
+            if cont_FloatLocales > limite_floatLocales:
                 print('Error: Overflow Flotantes Locales')
         
         if tipo == 'string':
-            LocalMem[2] += cont
-            if LocalMem[2] > limite_stringsLocales:
+            cont_StringLocales += cont
+            if cont_StringLocales > limite_stringsLocales:
                 print('Error: Overflow Strings Locales')
         
         if tipo == 'char':
-            LocalMem[3] += cont
-            if LocalMem[3] > limite_charLocales:
+            cont_CharLocales += cont
+            if cont_CharLocales > limite_charLocales:
                 print('Error: Overflow Chars Locales')
 
         if tipo == 'dataframe':
-            LocalMem[4] += cont
-            if LocalMem[4] > limite_dfLocales:
+            cont_dfLocales += cont
+            if cont_dfLocales > limite_dfLocales:
                 print('Error: Overflow DF Locales')
 
         
+def popMemoria():
+    global pMemorias
+    pop = pMemorias.pop()
+    print("--------------------> POP Memorias")
+    print("Pop Memoria = ", pop)
+    return pop
 
+def pushMemoria(memoria):
+    global pMemorias
+    pMemorias.append(memoria)
+    print("------>pushMemoria : ", memoria)
+    print("pMemoria : ", pMemorias)
 
 ################ PUNTOS NEURALGICOS ###################
 '''
@@ -906,7 +1037,8 @@ def p_pn_2_addVariable(p):
 
     varName = p[-2]
     currentVarName = varName
-    directorioFunciones.func_addVar(currentFunc, varName, currentType, numRenglones, numColumnas)
+    PosMem = nextAvailMemory(currentFunc, currentType)
+    directorioFunciones.func_addVar(currentFunc, varName, currentType, numRenglones, numColumnas, PosMem)
     numColumnas = 0
     numRenglones = 0
     currentCantVars += 1
@@ -986,8 +1118,8 @@ def p_pnFunDec_2_3(p):
     global varName
 
     varName = p[-1]
-
-    directorioFunciones.func_addVar(currentFunc, varName, currentType, 0, 0)
+    PosMem = nextAvailMemory(currentFunc, currentType)
+    directorioFunciones.func_addVar(currentFunc, varName, currentType, 0, 0, PosMem)
 
     currentCantParams += 1
     currentCantVars += 1
@@ -1012,15 +1144,41 @@ def p_pnFunDec7(p):
     '''
     pnFunDec7 :
     '''
-    global LocalMem
+    
     global returnBool
     #global returnDone
 
-    global cont_IntConstantes
+    global cont_IntLocales  
+    global cont_FloatLocales
+    global cont_StringLocales
+    global cont_CharLocales   
+    global cont_dfLocales
 
-    LocalMem = [0, limite_intLocales, limite_floatLocales, limite_stringsLocales, limite_charLocales, limite_dfLocales]
+    global cont_IntTemporales  
+    global cont_FloatTemporales
+    global cont_StringTemporales
+    global cont_CharTemporales   
+    global cont_dfTemporales
+    
+    #Reinicio de apuntadores de meomria Locales y Temporales
 
+    cont_IntLocales = limite_dfGlobales
+    cont_FloatLocales = limite_intLocales
+    cont_StringLocales = limite_floatLocales
+    cont_CharLocales = limite_stringsLocales
+    cont_dfLocales = limite_charLocales
+
+   
+    cont_IntTemporales = limite_dfLocales
+    cont_FloatTemporales = limite_intTemporales
+    cont_StringTemporales = limite_floatTemporales
+    cont_CharTemporales = limite_stringsTemporales
+    cont_dfTemporales = limite_charTemporales
+    cont_BoolTemporales = limite_dfTemporales
+
+    
     QuadGenerate('ENDFUNC', '', '', '')
+    returnBool = False
 
     #directorioFunciones.func_deleteDic()
 
@@ -1068,6 +1226,7 @@ def p_pnFunCall_3(p):
 
     argument = popOperandos()
     argumentType = popTipos()
+    argumentMem = popMemoria()
     function = pFunciones.pop()
     args = pArgumentos.pop() + 1
 
@@ -1080,7 +1239,7 @@ def p_pnFunCall_3(p):
 
     if Func_Parameters >= args:
         if lista[args-1] == argumentType:
-            QuadGenerate('PARAMETER', argument, '', parametro)
+            QuadGenerate('PARAMETER', argumentMem, '', parametro)
         else:
             print("Error: Parametros incorrectos")
     else:
@@ -1092,19 +1251,23 @@ def p_pnFunCall_3(p):
 '''
 Cuadruplos 5 y 6 de hojas de Elda
 '''
-def p_pnFunCall_5_6(p):
+def p_pnFunCall_5_6_llamada(p):
     '''
-    pnFunCall_5_6 : 
+    pnFunCall_5_6_llamada : 
     '''
 
     global pFunciones
     global pArgumentos
     args = pArgumentos.pop()
     funcion = pFunciones.pop()
+    
     #Verify that the last parameter points to null
     if args == directorioFunciones.directorio_funciones[funcion]['cantParametros']:
+        quadStartFunc = directorioFunciones.directorio_funciones[funcion]['cantQuads']
+
         #Generate action GOSUB, procedure-name, '', initial address
-        QuadGenerate('GOSUB', funcion, '', nextQuad() + 1)
+        QuadGenerate('GOSUB', funcion, nextQuad() + 1, quadStartFunc )
+        
     else:
         print("Error: Mismatch de Argumentos")
         sys.exit()
@@ -1197,10 +1360,20 @@ def p_pnExp1(p):
         print("Error: Variable ", idName, " no declarada")
         return
     
+    varPosMem = directorioFunciones.func_memoria(currentFunc, idName)
+    if not varPosMem:
+        varPosMem = directorioFunciones.func_memoria(GBL, idName)
+    
+    if varPosMem < 0:
+        print("Error: Variable ", idName, " no declarada")
+        return
+    
+    
     if forBool:
         varFor = idName
 
     pushOperando(idName)
+    pushMemoria(varPosMem)
     pushTipo(idType)
     
     
@@ -1240,7 +1413,9 @@ def p_pnExp4(p):
     if topOperador() in OP_SUMARESTA:
         quad_rightOperand = popOperandos()
         quad_rightType = popTipos()
+        quad_rightMem = popMemoria()
         quad_leftOperand = popOperandos()
+        quad_leftMem = popMemoria()
         quad_leftType = popTipos()
         quad_operator = popOperadores()
 
@@ -1251,8 +1426,9 @@ def p_pnExp4(p):
             errorTypeMismatch()
         else:
             quad_resultIndex = nextAvailTemp(quad_resultType)
-            QuadGenerate(quad_operator, quad_leftOperand, quad_rightOperand, quad_resultIndex)
+            QuadGenerate(quad_operator, quad_leftMem, quad_rightMem, quad_resultIndex)
             pushOperando(quad_resultIndex)
+            pushMemoria(quad_resultIndex)
             pushTipo(quad_resultType)
 
 
@@ -1265,7 +1441,9 @@ def p_pnExp5(p):
         
         quad_rightOperand = popOperandos()
         quad_rightType = popTipos()
+        quad_rightMem = popMemoria()
         quad_leftOperand = popOperandos()
+        quad_leftMem = popMemoria()
         quad_leftType = popTipos()
         quad_operator = popOperadores()
 
@@ -1276,8 +1454,9 @@ def p_pnExp5(p):
             print('Error: Type Mismatch')
         else:
             quad_resultIndex = nextAvailTemp(quad_resultType)
-            QuadGenerate(quad_operator, quad_leftOperand, quad_rightOperand, quad_resultIndex)
+            QuadGenerate(quad_operator, quad_leftMem, quad_rightMem, quad_resultIndex)
             pushOperando(quad_resultIndex)
+            pushMemoria(quad_resultIndex)
             pushTipo(quad_resultType)
 
 '''Agrega fondo falso '''
@@ -1317,7 +1496,9 @@ def p_pnExp9(p):
     if topOperador() in OP_REL:
         quad_rightOperand = popOperandos()
         quad_rightType = popTipos()
+        quad_rightMem = popMemoria()
         quad_leftOperand = popOperandos()
+        quad_leftMem = popMemoria()
         quad_leftType = popTipos()
         quad_operator = popOperadores()
 
@@ -1328,8 +1509,9 @@ def p_pnExp9(p):
             print('Error: Type Mismatch')
         else:
             quad_resultIndex = nextAvailTemp(quad_resultType)
-            QuadGenerate(quad_operator, quad_leftOperand, quad_rightOperand, quad_resultIndex)
+            QuadGenerate(quad_operator, quad_leftMem, quad_rightMem, quad_resultIndex)
             pushOperando(quad_resultIndex)
+            pushMemoria(quad_resultIndex)
             pushTipo(quad_resultType)
 
 '''
@@ -1354,7 +1536,9 @@ def p_pnExp11(p):
     if topOperador() in OP_LOGICOS:
         quad_rightOperand = popOperandos()
         quad_rightType = popTipos()
+        quad_rightMem = popMemoria()
         quad_leftOperand = popOperandos()
+        quad_leftMem = popMemoria()
         quad_leftType = popTipos()
         quad_operator = popOperadores()
 
@@ -1365,8 +1549,9 @@ def p_pnExp11(p):
             print('Error: Type Mismatch')
         else:
             quad_resultIndex = nextAvailTemp(quad_resultType)
-            QuadGenerate(quad_operator, quad_leftOperand, quad_rightOperand, quad_resultIndex)
+            QuadGenerate(quad_operator, quad_leftMem, quad_rightMem, quad_resultIndex)
             pushOperando(quad_resultIndex)
+            pushMemoria(quad_resultIndex)
             pushTipo(quad_resultType)
 
 
@@ -1392,7 +1577,9 @@ def p_pnSec2(p):
     if topOperador() in OP_ASIG:
         quad_rightOperand = popOperandos()
         quad_rightType = popTipos()
+        quad_rightMem = popMemoria()
         quad_leftOperand = popOperandos()
+        quad_leftMem = popMemoria()
         quad_leftType = popTipos()
         quad_operator = popOperadores()
 
@@ -1405,9 +1592,9 @@ def p_pnSec2(p):
             if quad_leftType == 'error':
                 print("Error: Operacion invalida")
             else:
-                QuadGenerate(quad_operator, quad_rightOperand, '', quad_leftOperand)
+                QuadGenerate(quad_operator, quad_rightMem, '', quad_leftMem)
         else:
-            print("Error")
+            print("Error al intentar asignar una variable")
 
 
 
@@ -1436,6 +1623,7 @@ def p_pnSec4(p):
         print("Voy a ejecutar pnSEc4")
         quad_Operando = popOperandos()
         quad_rightType = popTipos()
+        quad_rightMem = popMemoria()
         quad_operator = popOperadores()
 
         quad_resultType = cuboSem.getType(quad_operator, quad_rightType, '')
@@ -1444,10 +1632,11 @@ def p_pnSec4(p):
             print("Error: Operacion invalida")
         else:
             print("HEEEY AQUII")
-            QuadGenerate(quad_operator, '', '', quad_Operando)
-            pushOperador(quad_operator)
-            #pushOperando(quad_Operando) #Posible BORRAR
-            #pushTipo(quad_resultType) #Possible BORRAR
+            QuadGenerate(quad_operator, quad_rightMem, '', quad_operator)
+            #pushOperador(quad_operator)
+            pushOperando(quad_Operando) #Posible BORRAR
+            pushMemoria(quad_Operando)
+            pushTipo(quad_resultType) #Possible BORRAR
 
 def p_pnSec5(p):
     '''
@@ -1465,6 +1654,7 @@ def p_pnCond1(p): #IF
     pnCond1 :
     '''
     global cuadruplos
+    memPos = popMemoria()
     exp_type = popTipos()
     
     if(exp_type != 'error'):
@@ -1521,6 +1711,7 @@ def p_pnCiclos2(p):
     pnCiclos2 : 
     '''
     exp_type = popTipos()
+    memPos = popMemoria()
     if exp_type != 'error':
         result = popOperandos()
         QuadGenerate('GOTOF', result, '', '')
@@ -1659,13 +1850,17 @@ def p_pnRetorno(p):
     if returnBool:
         print(pOperandos)
         print(pTipos)
+        operador = popOperadores()
         operandoRetorno = popOperandos()
         tipoRetorno = popTipos()
+        memRetorno = popMemoria()
 
         if directorioFunciones.directorio_funciones[currentFunc]['tipo'] == tipoRetorno:
-            QuadGenerate('REGRESA', '', '', operandoRetorno)
+            QuadGenerate(operador, '', '', memRetorno)
         else:
             errorReturnTipo()
+    else:
+        print ("Error: Esta funcion no debe regresar nada")
     
 
 parser = yacc.yacc()

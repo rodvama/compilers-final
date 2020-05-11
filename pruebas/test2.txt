@@ -1,0 +1,20 @@
+programa COVID19;
+var
+int : A, B, C, D;
+
+funcion int hola(int x, int y)
+var
+float : A, k;
+{
+x = 1;
+lee(x);
+}
+
+
+principal()
+{
+
+
+
+
+}

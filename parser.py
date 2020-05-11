@@ -2,7 +2,7 @@
 # Rodrigo Valencia
 # Diseno de compiladores
 # Parser
-#Ultima modificacion: 2 Mayo 2020
+#Ultima modificacion: 10 Mayo 2020
 import ply.yacc as yacc
 import os
 import codecs
@@ -45,7 +45,7 @@ OP_MULTDIV = ['*', '/']
 OP_REL = ['>', '<', '<=', '>=', '==', '!=']
 OP_LOGICOS = ['&', '|']
 OP_ASIG = ['=']
-OP_SECUENCIALES = ['lee', 'escribe']
+OP_SECUENCIALES = ['lee', 'escribe', 'regresa']
 ESPACIO_MEMORIA = 100 #Tamano del espacio de memoria
 
 ##Variables globales
@@ -347,6 +347,7 @@ def p_di(p):
 
 def p_llamada(p):
     'llamada :  ID pnFunCall_1_2 LPAREN llamada1 RPAREN pnFunCall_5_6 SEMICOLON'
+    
 
 def p_llamada1(p):
     '''
@@ -361,7 +362,7 @@ def p_llamada2(p):
     '''
 
 def p_retorno(p):
-    'retorno : REGRESA LPAREN exp RPAREN pnRetorno SEMICOLON'
+    'retorno : REGRESA pnSec3 LPAREN exp RPAREN pnRetorno SEMICOLON pnSec4'
 
 def p_lectura(p):
     'lectura : LEE pnSec3 LPAREN variable RPAREN SEMICOLON pnSec4'
@@ -560,32 +561,48 @@ def p_error(p):
 #Te regresa el ultimo elemento de la pila de operandos
 def popOperandos():
     global pOperandos
-    return pOperandos.pop()
+    pop = pOperandos.pop()
+    print("--------------------> POP Operandos")
+    print("Pop Operandos= ", pop)
+    return pop
 
 #Te regresa el ultimo elemento de la pila de operadores
 def popOperadores():
     global pOper
-    return pOper.pop()
+    pop = pOper.pop()
+    print("--------------------> POP POper")
+    print("Pop Poper= ", pop)
+    return pop
 
 #Te regresa el ultimo elemento de la pila de tipos
 def popTipos():
     global pTipos
-    return pTipos.pop()
+    pop = pTipos.pop()
+    print("--------------------> POP Tipos")
+    print("Pop Tipos = ", pop)
+    return pop
 
 #Mete a la pila operandos el nuevo operando
 def pushOperando(operando):
     global pOperandos
     pOperandos.append(operando)
+    print("------> pushOperando : ", operando)
+    print("POperandos : ", pOperandos)
 
 #Mete a la pila operador el nuevo operador
 def pushOperador(operador):
     global pOper
     pOper.append(operador)
+    print("------> pushOperador : ", operador)
+    print("POper : ", pOper)
+    
 
 #Mete a la pila tipos el nuevo tipo
 def pushTipo(tipo):
     global pTipos
     pTipos.append(tipo)
+    print("------>pushTipo : ", tipo)
+    print("pTipos : ", pTipos)
 
 #obtiene el ultimo operando ingresado a la pila de operandos
 def topOperador():
@@ -612,7 +629,7 @@ def popSaltos():
 #Agrega el nuevo salto a la pila de Saltos.
 def pushSaltos(salto):
     global pSaltos
-    print("PUSH SALTO: ", salto)
+    #print("PUSH SALTO: ", salto)
     pSaltos.append(salto)
 
 #Obtiene el indice del siguiente cuadruplo del arreglo de cuadruplos
@@ -653,7 +670,7 @@ def pushConstante(constante):
             else:
                 print(cont_IntConstantes, limite_intConstantes)
                 errorOutOfBounds('Constantes', 'Enteras')
-        pushOperando(d_ints[constante])
+        pushOperando(constante)
         pushTipo('int')
     
     elif type(constante) == float:
@@ -675,7 +692,7 @@ def pushConstante(constante):
                 QuadGenerate('addConstante', 'string', constante, d_strs[constante])
             else:
                 errorOutOfBounds('Constantes', 'Strings')
-        pushOperando(d_strs[constante])
+        pushOperando(constante)
         pushTipo('string')
     
     elif type(constante) == chr:
@@ -686,7 +703,7 @@ def pushConstante(constante):
                 QuadGenerate('addConstante', 'char', constante, d_chars[constante])
             else:
                 errorOutOfBounds('Constantes', 'Chars')
-        pushOperando(d_chars[constante])
+        pushOperando(constante)
         pushTipo('char')
     else:
         sys.exit("Error: Tipo de Variable desconocida")
@@ -699,8 +716,9 @@ def pushConstante(constante):
 def QuadGenerate(operator, leftOperand, rightOperand, result):
     QuadTemporal = (operator, leftOperand, rightOperand, result)
     pushQuad(QuadTemporal)
-    print(">> Quad: ('{}','{}','{}','{}')".format(operator, leftOperand, rightOperand, result))
-    print("Contador = ", nextQuad() - 1)
+    NumQuad = nextQuad() - 1
+    print(">> Quad {}: ('{}','{}','{}','{}')".format(NumQuad, operator, leftOperand, rightOperand, result))
+    
     print("\n")
 
 #Impresion de lista de cuadruplos
@@ -895,7 +913,8 @@ def p_pnFunDec1(p):
     currentCantVars = 0
     currentCantParams = 0
     currentFunc = p[-1]
-
+    print("CAMBIO de CONTEXTO currentFunc = ", currentFunc)
+    print("\n")
     directorioFunciones.func_add(currentFunc, currentType, currentCantParams, nextQuad())
 
     if directorioFunciones.directorio_funciones[currentFunc]['tipo'] == 'void':
@@ -1140,11 +1159,10 @@ def p_pnExp1(p):
     global varFor
 
     idName = p[-1]
-    print("ID : ", p[-1])
-    print("CurrentFunc: " , currentFunc)
     idType = directorioFunciones.func_searchVarType(currentFunc, idName)
     if not idType: #Si no la encuentra en el contexto actual, cambia de contexto a Tipos
         idType = directorioFunciones.func_searchVarType(GBL, idName)
+        print("Ahora busca la variable en el contexto Global ")
     
     if not idType:
         print("Error: Variable ", idName, " no declarada")
@@ -1155,8 +1173,8 @@ def p_pnExp1(p):
 
     pushOperando(idName)
     pushTipo(idType)
-    print("POperandos : ", pOperandos)
-    print("pTipos : ", pTipos)
+    
+    
     print("\n")
 
 '''Anade  + o - al POper'''
@@ -1171,7 +1189,6 @@ def p_pnExp2(p):
         print("Error: Operador no esperado")
     else:
         pushOperador(p[-1])
-        print("POper: ", pOper)
 
 '''Anade * o / al POper'''
 def p_pnExp3(p):
@@ -1185,7 +1202,6 @@ def p_pnExp3(p):
         print("Error: Operador no esperado")
     else:
         pushOperador(p[-1])
-        print("POper: ", pOper)
 
 '''Checa si el top del POper es un + o - para generar el cuadruplo de esa operacion'''
 def p_pnExp4(p):
@@ -1240,7 +1256,10 @@ def p_pnExp6(p):
     '''
     pnExp6 : 
     '''
+    global pOper
     pushOperador('(')
+    print("pushOperador: '('")
+    
 
 '''Quita fondo falso '''
 def p_pnExp7(p):
@@ -1248,6 +1267,7 @@ def p_pnExp7(p):
     pnExp7 : 
     '''
     tipo = popOperadores()
+    print("Quita fondo Falso ')'")
 
 '''Mete un operador relacional a la pila de operadores'''
 def p_pnExp8(p):
@@ -1259,7 +1279,6 @@ def p_pnExp8(p):
         print("Error: Operador no esperado")
     else:
         pushOperador(p[-1])
-        print("POper : ", pOper)
 
 '''Verifica si el top de la pila de operadores es un operador relacional para generar el cuadruplo de operacion'''
 def p_pnExp9(p):
@@ -1296,7 +1315,7 @@ def p_pnExp10(p):
         print("Error: Operador no esperado")
     else:
         pushOperador(p[-1])
-        print("pOper : ", pOper)
+        
 
 '''Checa si el top de la pila de operadores es un operador logico  '''
 def p_pnExp11(p):
@@ -1334,7 +1353,7 @@ def p_pnSec1(p):
         print("Error: Operador no esperado")
     else:
         pushOperador(p[-1])
-        print("pOper : ", pOper)
+        
 
 '''Checa si en el top de la pila de operadores hay una asignacion (=) '''
 def p_pnSec2(p):
@@ -1364,7 +1383,7 @@ def p_pnSec2(p):
 
 
 '''
-Meter escribir o leer a la pila
+Meter escribir o leer o regresa a la pila
 '''
 def p_pnSec3(p):
     '''
@@ -1375,14 +1394,15 @@ def p_pnSec3(p):
         print("Error: Operador no esperado")
     else:
         pushOperador(p[-1])
-        print("pOper : ", pOper)
+        
 
-'''Checa si el top de la pila de operadores es lectura o escritura '''
+'''Checa si el top de la pila de operadores es lectura o escritura o retorno'''
 def p_pnSec4(p):
     '''
     pnSec4 : 
     '''
     if topOperador() in OP_SECUENCIALES:
+        print("Voy a ejecutar pnSEc4")
         quad_rightOperand = popOperandos()
         quad_rightType = popTipos()
         quad_operator = popOperadores()
@@ -1395,6 +1415,7 @@ def p_pnSec4(p):
         if quad_resultType == 'error':
             print("Error: Operacion invalida")
         else:
+            print("HEEEY AQUII")
             QuadGenerate(quad_operator, quad_rightOperand, '', quad_operator)
             pushOperando(quad_rightOperand)
             pushTipo(quad_resultType)
@@ -1414,11 +1435,10 @@ def p_pnCond1(p): #IF
     if(exp_type != 'error'):
         result = popOperandos()
         QuadGenerate('GOTOF', result,'', '')
-        print("cond1: ", nextQuad())
         pushSaltos(nextQuad() - 1)
 
     else:
-        errorTypeMismatch
+        errorTypeMismatch()
 
 '''
 Rellena el cuadruplo para saber cuando terminar la condicion
@@ -1444,7 +1464,6 @@ def p_pnCond3(p): #IF
     global cuadruplos
     QuadGenerate('GOTO', '', '', '')
     falso = popSaltos()
-    print("cond3: ", nextQuad())
     pushSaltos(nextQuad() - 1)
     QuadTemporal = (cuadruplos[falso][0], cuadruplos[falso][1], cuadruplos[falso][2], nextQuad())
     cuadruplos[falso] = QuadTemporal
@@ -1612,43 +1631,49 @@ def p_pnRetorno(p):
             errorReturnTipo()
     
 
-# parser = yacc.yacc()
+parser = yacc.yacc()
 
 # Put all test inside prueba folder
 def main():
-    name = input('File name: ')
-    name = "pruebas/" + name
+    #name = input('File name: ')
+    name = "pruebas/" + "test2" + ".txt" #Para probar, cambia el nombre del archivo
     print(name)
     try:
         f = open(name,'r', encoding='utf-8')
-        parser.parse(f.read())
+        QuadTemporal = ('0', '0', '0', '0')
+        pushQuad(QuadTemporal)
+        result = parser.parse(f.read())
+        print(result)
         f.close()
     except EOFError:
         print (EOFError)
 
-#main()
+main()
 
 #Test it out
-data =''' 
-programa COVID19;
-var
-int : A, B, C, D;
+# data =''' 
+# programa COVID19;
+# var
+# int : A, B, C, D;
 
-funcion void hola(int x, int y){
+# funcion void hola(int x, int y)
+# var
+# float : z, k;
+# {
 
-}
-principal()
-{
+# }
+# principal()
+# {
 
-hola(A, C);
+# hola(A, C);
 
-}
-'''
-QuadTemporal = ('0', '0', '0', '0')
-pushQuad(QuadTemporal)
+# }
+# '''
+# QuadTemporal = ('0', '0', '0', '0')
+# pushQuad(QuadTemporal)
 
-parser = yacc.yacc()
-result = parser.parse(data)
+#parser = yacc.yacc()
+#result = parser.parse(data)
 
-print(result)
+#print(result)
 # print(directorioFunciones.func_search(GBL))

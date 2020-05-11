@@ -66,23 +66,23 @@ class TablaVars:
             return None
 
     
-    # '''
-    # Funcion para actualizar los atributos de Renglones y Columnas de una variable, para indicar que dicha variable es un arreglo o matriz.
-    # '''
-    # def var_upadateDims(self, nombre, renglones, columnas):
+    '''
+    Funcion para indicar que una variable es dimensionada cambiando los valores de los atributos de renglones y columans
+    '''
+    def var_upadateDims(self, nombre, renglones, columnas):
 
-    #     if self.var_exist(nombre):
-    #         if columnas < 0: #Se actualizan solo renglones
-    #             self.tabla_variables[nombre]['renglones'] = renglones
-    #         else:
-    #             self.tabla_variables[nombre]['columnas'] = columnas
-    #             self.tabla_variables[nombre]['renglones']= renglones #?
+        if self.var_exist(nombre):
+            if columnas < 0: #Se actualizan solo renglones
+                self.tabla_variables[nombre]['renglones'] = renglones
+            else:
+                self.tabla_variables[nombre]['columnas'] = columnas
+                self.tabla_variables[nombre]['renglones']= renglones #?
             
-    #         print("Dimensiones actualizadas de la variable: ", nombre)
-    #         print("Renglones: ", self.tabla_variables[nombre]['renglones'], "Columnas: ", self.tabla_variables[nombre]['columnas'])
+            print("Dimensiones actualizadas de la variable: ", nombre)
+            print("Renglones: ", self.tabla_variables[nombre]['renglones'], "Columnas: ", self.tabla_variables[nombre]['columnas'])
 
-    #     else:
-    #         print("Error. No es posible actializar las dimensaiones de una variable que no existe: ", nombre)
+        else:
+            print("Error. No es posible actializar las dimensaiones de una variable que no existe: ", nombre)
 
     
     # '''

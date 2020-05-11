@@ -52,16 +52,21 @@ ESPACIO_MEMORIA = 100 #Tamano del espacio de memoria
 currentFunc = GBL
 currentType = "void"
 varName = ""
+currentVarName = ""
 currentCantParams = 0
 currentCantVars = 0
-numRenglones = 0
-numColumnas = 0
 avail = 0
 constanteNegativa = False
 forBool = False
 varFor = ''
 negativo = False
 returnBool = False #sirve para saber si una funcion debe regresar algun valor (si es void o no)
+
+#Variables para Arreglos y matrices
+numRenglones = 0
+numColumnas = 0
+R = 1
+base = 0
 
 '''
 Espacios de memoria:
@@ -176,6 +181,10 @@ def p_programa(p):
     'programa : PROGRAMA ID SEMICOLON var1 pnGOTOprincipal func1 principal'
     print("PROGRAMA \"", p[2], "\" terminado.")
     QuadGenerateList()
+    print("Poper : ", pOper)
+    print("pOperandos: ", pOperandos)
+    print("pTipos: ", pTipos)
+    
     
 def p_var1(p):
     '''
@@ -329,13 +338,13 @@ def p_estatutos(p):
 
     #Asig
 def p_asignacion(p):
-    'asignacion : variable ASSIGN pnSec1 asig'
+    'asignacion : variable ASSIGN pnSec1 exp SEMICOLON pnSec2'
 
-def p_asig(p):
-    '''
-    asig : llamada 
-         | exp SEMICOLON pnSec2
-    '''
+# def p_asig(p):
+#     '''
+#     asig : llamada 
+#          | exp SEMICOLON pnSec2
+#     '''
 def p_variable(p):
     'variable : ID pnExp1 di'
 
@@ -346,7 +355,8 @@ def p_di(p):
     '''
 
 def p_llamada(p):
-    'llamada :  ID pnFunCall_1_2 LPAREN llamada1 RPAREN pnFunCall_5_6 SEMICOLON'
+    'llamada :  ID pnFunCall_1_2 LPAREN llamada1 RPAREN pnFunCall_5_6'
+    p[0] = 'llamada'
     print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>LLAMADA ")
 
 def p_llamada1(p):
@@ -367,17 +377,17 @@ def p_retorno(p):
     'retorno : REGRESA pnSec3 LPAREN exp RPAREN pnRetorno SEMICOLON'
 
 def p_lectura(p):
-    'lectura : LEE pnSec3 LPAREN variable RPAREN SEMICOLON pnSec4'
+    'lectura : LEE pnSec3 LPAREN variable RPAREN SEMICOLON pnSec4 pnSec5'
 
 def p_escritura(p):
-    'escritura : ESCRIBE pnSec3 LPAREN esc RPAREN SEMICOLON pnSec4'
+    'escritura : ESCRIBE pnSec3 LPAREN esc RPAREN SEMICOLON pnSec5 '
 
 def p_esc(p):
     'esc : esc1 esc2'
 
 def p_esc1(p):
     '''
-    esc1 : exp
+    esc1 : exp pnSec4 
     '''
 def p_esc2(p):
     '''
@@ -414,29 +424,29 @@ def p_no_condicional(p): #For
 
 def p_funciones_especiales_void(p):
     '''
-    funciones_especiales_void : VARIABLES LPAREN ID COMMA ID COMMA ID RPAREN SEMICOLON
+    funciones_especiales_void : VARIABLES pnFunEsp1 LPAREN ID COMMA ID COMMA ID RPAREN SEMICOLON
                               | fev LPAREN ID COMMA v_exp RPAREN SEMICOLON
     '''
 def p_fev(p):
     '''
-    fev : PLOTHIST
-        | PLOTLINE
+    fev : PLOTHIST pnFunEsp1
+        | PLOTLINE pnFunEsp1
     '''
 
 def p_funciones_especiales(p):
     '''
     funciones_especiales : fe LPAREN ID COMMA v_exp RPAREN
-                         | CORRELACIONA LPAREN ID COMMA v_exp COMMA v_exp RPAREN
+                         | CORRELACIONA pnFunEsp1 LPAREN ID COMMA v_exp COMMA v_exp RPAREN
     '''
 def p_fe(p):
     '''
-    fe : MEDIA
-       | MEDIANA
-       | MODA
-       | VARIANZA
+    fe : MEDIA pnFunEsp1
+       | MEDIANA pnFunEsp1
+       | MODA pnFunEsp1
+       | VARIANZA pnFunEsp1
     '''
 def p_v_exp(p):
-    'v_exp : VARIABLES LBRACK exp RBRACK'
+    'v_exp : VARIABLES  LBRACK exp RBRACK'
 
 
 
@@ -690,15 +700,15 @@ def pushConstante(constante):
     elif type(constante) == str:
         if constante not in d_strs:
             if cont_StringConstantes < limite_stringConstantes:
-                d_strs[constante] = cont_StringsConst
-                cont_StringsConst = cont_StringsConst + 1
+                d_strs[constante] = cont_StringConstantes
+                cont_StringConstantes = cont_StringConstantes + 1
                 QuadGenerate('addConstante', 'string', constante, d_strs[constante])
             else:
                 errorOutOfBounds('Constantes', 'Strings')
         pushOperando(constante)
         pushTipo('string')
     
-    elif type(constante) == chr:
+    elif type(constante) == chr: ########## POSIBLE ERROR
         if constante not in d_ch:
             if cont_CharConstantes < limite_charConstantes:
                 d_chars[constante] = cont_CharConstantes
@@ -889,17 +899,49 @@ def p_pn_2_addVariable(p):
     global currentFunc
     global varName
     global currentType
+    global currentVarName
     global numColumnas
     global numRenglones
     global currentCantVars
 
     varName = p[-2]
-    
+    currentVarName = varName
     directorioFunciones.func_addVar(currentFunc, varName, currentType, numRenglones, numColumnas)
     numColumnas = 0
     numRenglones = 0
     currentCantVars += 1
+  
 
+'''
+Guarda la cantidad de Renglones que tiene la variable
+'''
+def p_pn_7_decRenglones(p):
+    '''
+    pn_7_decRenglones :
+    '''
+
+    global numRenglones
+    numRenglones = p[-2]
+
+'''
+Guarda la cantidad de columnas que tiene la variable
+'''
+def p_pn_8_decColumnas(p):
+    '''
+    pn_8_decColumnas : 
+    '''
+    global numColumnas
+    numColumnas = p[-2]
+
+
+
+
+################################## Generacion de cuadruplos #############################################
+
+########### Funciones ################
+
+
+#### FUNCTION DECLARATION####
 '''
 Agega nueva funcion al Directorio de Funciones
 '''
@@ -982,36 +1024,7 @@ def p_pnFunDec7(p):
 
     #directorioFunciones.func_deleteDic()
 
-    
-
-'''
-Guarda la cantidad de Renglones que tiene la variable
-'''
-def p_pn_7_decRenglones(p):
-    '''
-    pn_7_decRenglones :
-    '''
-
-    global numRenglones
-    numRenglones = p[-2]
-
-'''
-Guarda la cantidad de columnas que tiene la variable
-'''
-def p_pn_8_decColumnas(p):
-    '''
-    pn_8_decColumnas : 
-    '''
-    global numColumnas
-    numColumnas = p[-2]
-
-
-
-
-################################## Generacion de cuadruplos #############################################
-
-########### Funciones ################
-
+  
 
 
 
@@ -1088,13 +1101,22 @@ def p_pnFunCall_5_6(p):
     global pArgumentos
     args = pArgumentos.pop()
     funcion = pFunciones.pop()
-
+    #Verify that the last parameter points to null
     if args == directorioFunciones.directorio_funciones[funcion]['cantParametros']:
+        #Generate action GOSUB, procedure-name, '', initial address
         QuadGenerate('GOSUB', funcion, '', nextQuad() + 1)
     else:
         print("Error: Mismatch de Argumentos")
         sys.exit()
         result
+
+###### FUNCIONES ESPECIALES #######
+def p_pnFunEsp1(p):
+    '''
+    pnFunEsp1 :
+    '''
+    nombreFun = str(p[-1])
+    pushOperador(nombreFun)
 
 ###### CONSTANTES ###########
 '''
@@ -1147,6 +1169,7 @@ def p_pnCteStr(p):
     '''
     pnCteStr :
     '''
+    print("p-1 : ", p[-1])
     pushConstante(p[-1])
 
 
@@ -1407,25 +1430,31 @@ def p_pnSec4(p):
     '''
     pnSec4 : 
     '''
+
+    global cuboSem
     if topOperador() in OP_SECUENCIALES:
         print("Voy a ejecutar pnSEc4")
-        quad_rightOperand = popOperandos()
+        quad_Operando = popOperandos()
         quad_rightType = popTipos()
         quad_operator = popOperadores()
 
-        global cuboSem
-
         quad_resultType = cuboSem.getType(quad_operator, quad_rightType, '')
 
-    
         if quad_resultType == 'error':
             print("Error: Operacion invalida")
         else:
             print("HEEEY AQUII")
-            QuadGenerate(quad_operator, quad_rightOperand, '', quad_operator)
-            pushOperando(quad_rightOperand)
-            pushTipo(quad_resultType)
-        
+            QuadGenerate(quad_operator, '', '', quad_Operando)
+            pushOperador(quad_operator)
+            #pushOperando(quad_Operando) #Posible BORRAR
+            #pushTipo(quad_resultType) #Possible BORRAR
+
+def p_pnSec5(p):
+    '''
+    pnSec5 : 
+    ''' 
+    popOperadores()
+
 
 # GENERACION DE CODIGO PARA ESTATUTOS NO LINEALES (CONDICIONALES)
 '''
@@ -1626,8 +1655,10 @@ def p_pnRetorno(p):
     '''
     global currentFunc
     global returnBool
-
+    print("return Bool: ", returnBool)
     if returnBool:
+        print(pOperandos)
+        print(pTipos)
         operandoRetorno = popOperandos()
         tipoRetorno = popTipos()
 

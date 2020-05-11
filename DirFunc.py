@@ -66,18 +66,15 @@ class DirFunc:
             print ("Error: No es posible crear la variable: ", nombreVar, " dentro de  la funcion: ", nombre)
     
     
-    # '''
-    # Funcion que llama a la funcion en TablaVars para actualizar renglones y columnas de una variable
-    # '''
-    # def func_updateDim(self, nombre, nombreVar, renglones, columnas):
-    #     if self.directorio_funciones[nombre]['variables'].var_exist(nombreVar):
-    #         if columnas > 0: #Se manda columnas > 0 cuando se van a actualizar columnas
-    #             return self.directorio_funciones[nombre]['variables'].var_upadateDims(nombreVar, renglones, columnas)
-    #         else: #Se manda columnas -1 cuando se actualizan rengloens
-    #             return self.directorio_funciones[nombre]['variables'].var_upadateDims(nombreVar, renglones, -1)
-    #     else:
-    #         print("Warning: Variable ", nombreVar, "no existe en este contexto ", nombre)
-    #         return None
+    '''
+    Funcion para actualizar indicar que una variable es dimensionada
+    '''
+    def func_updateDim(self, nombre, nombreVar, renglones, columnas):
+        if self.directorio_funciones[nombre]['variables'].var_exist(nombreVar):
+            return self.directorio_funciones[nombre]['variables'].var_upadateDims(nombreVar, renglones, columnas)
+        else:
+            print("Error: Variable ", nombreVar, "no existe en este contexto ", nombre)
+            return None
     
     
     '''

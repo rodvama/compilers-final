@@ -2,12 +2,16 @@ programa COVID19;
 var
 int : A, B, C, D;
 
-funcion int hola(int x, int y)
-var
-int : A, k;
+funcion int uno()
 {
-y = hola(A, k);
-regresa( hola(A, k); );
+    regresa(2);
+
+}
+
+funcion void hola(int x, int y)
+{
+x = uno();
+
 }
 
 

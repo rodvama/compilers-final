@@ -333,7 +333,7 @@ def p_asignacion(p):
 
 def p_asig(p):
     '''
-    asig : llamada
+    asig : llamada 
          | exp SEMICOLON pnSec2
     '''
 def p_variable(p):
@@ -347,22 +347,24 @@ def p_di(p):
 
 def p_llamada(p):
     'llamada :  ID pnFunCall_1_2 LPAREN llamada1 RPAREN pnFunCall_5_6 SEMICOLON'
-    
+    print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>LLAMADA ")
 
 def p_llamada1(p):
     '''
     llamada1 : exp pnFunCall_3 llamada2
              | empty
     '''
+    print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>LLAMADA 1")
 
 def p_llamada2(p):
     '''
     llamada2 : COMMA llamada1
              | empty
     '''
+    print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>LLAMADA 2")
 
 def p_retorno(p):
-    'retorno : REGRESA pnSec3 LPAREN exp RPAREN pnRetorno SEMICOLON pnSec4'
+    'retorno : REGRESA pnSec3 LPAREN exp RPAREN pnRetorno SEMICOLON'
 
 def p_lectura(p):
     'lectura : LEE pnSec3 LPAREN variable RPAREN SEMICOLON pnSec4'
@@ -541,7 +543,7 @@ def p_factor(p):
            | llamada
            | funciones_especiales
     '''
-
+    print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>FACTOOR")
 
 def p_empty(p):
     '''empty :'''
@@ -552,6 +554,7 @@ def p_error(p):
     if p:
         print("Error de sintaxis ",p.type, p.value)
         print("Error en la linea "+str(p.lineno))
+        print()
         parser.errok()
     else:
         print("Syntax error at EOF")
@@ -921,6 +924,9 @@ def p_pnFunDec1(p):
         returnBool = False
     else:
         returnBool = True
+    
+    print("Return Bool : ", returnBool)
+    print("\n")
     
     
 

@@ -4,10 +4,10 @@ int : A, B, C, D;
 
 funcion int hola(int x, int y)
 var
-float : A, k;
+int : A, k;
 {
-x = 1;
-lee(x);
+y = hola(A, k);
+regresa( hola(A, k); );
 }
 
 

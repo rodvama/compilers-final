@@ -1,24 +1,16 @@
 programa COVID19;
 var
-int : A, B, C, D;
+int : A;
 
-funcion int uno()
+funcion int tres()
 {
-    regresa(2);
-
+    
+    regresa(3);
 }
-
-funcion void hola(int x, int y)
-{
-x = uno();
-
-}
-
 
 principal()
 {
-
-
+    escribe(tres());
 
 
 }

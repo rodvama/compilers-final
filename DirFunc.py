@@ -58,9 +58,9 @@ class DirFunc:
     '''
     Funcion que agrega una variable a la tabla de variables linkeada a la funcion dada.
     '''
-    def func_addVar(self, nombre, nombreVar, tipoVar, renglonesVar, columnasVar):
+    def func_addVar(self, nombre, nombreVar, tipoVar, renglonesVar, columnasVar, memPos):
 
-        if self.directorio_funciones[nombre]['variables'].var_add(nombreVar, tipoVar, renglonesVar, columnasVar):
+        if self.directorio_funciones[nombre]['variables'].var_add(nombreVar, tipoVar, renglonesVar, columnasVar, memPos):
             print ("Variable: ", nombreVar, " creada exitosamente, dentro de la funcion:  ", nombre)
         else:
             print ("Error: No es posible crear la variable: ", nombreVar, " dentro de  la funcion: ", nombre)
@@ -110,6 +110,15 @@ class DirFunc:
     '''
     def listaTipos(self, funcion):
         return [self.directorio_funciones[funcion]['variables'].tabla_variables[x]['tipo'] for x in self.directorio_funciones[funcion]['variables'].tabla_variables]
+
+    '''
+    Funcion que regresa la posicion de memoria virtual de la variable dada
+    '''
+    def func_memoria(self, nombre, nombreVar):
+        if self.directorio_funciones[nombre]['variables'].var_exist(nombreVar):
+            return  self.directorio_funciones[nombre]['variables'].var_searchMemPos(nombreVar)
+        else:
+            print("Error: Variable: ", nombreVar, "no existe en este contexto: ", nombre)
 
     '''
     Funcion que imprime el directorio de funciones actual

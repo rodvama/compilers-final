@@ -34,7 +34,7 @@ class TablaVars:
     '''
     Funcion para agregar una nueva variable a la tabla
     '''
-    def var_add(self, nombre, tipo, renglones, columnas):
+    def var_add(self, nombre, tipo, renglones, columnas, memoria ):
         if self.var_exist(nombre):
             print("Error : Variable ", str(nombre), " duplicada")
             return False
@@ -43,7 +43,8 @@ class TablaVars:
                 'nombre' : nombre,
                 'tipo': tipo,
                 'renglones': renglones,
-                'columnas' : columnas
+                'columnas' : columnas,
+                'memoria' : memoria
             }
             return True
 
@@ -85,11 +86,11 @@ class TablaVars:
             print("Error. No es posible actializar las dimensaiones de una variable que no existe: ", nombre)
 
     
-    # '''
-    # Funcion que regresa la posicion de memoria de la variable dada
-    # '''
-    # def var_searchMemPos(self, nombre):
-    #     if self.var_exist(nombre):
-    #         return self.tabla_variables[nombre]['posMem']
-    #     else:
-    #         return None
+    '''
+    Funcion que regresa la posicion de memoria virtual de la variable dada
+    '''
+    def var_searchMemPos(self, nombre):
+        if self.var_exist(nombre):
+            return self.tabla_variables[nombre]['memoria']
+        else:
+            return None

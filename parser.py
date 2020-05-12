@@ -689,7 +689,7 @@ def pushConstante(constante):
             if cont_IntConstantes < limite_intConstantes:
                 d_ints[constante] = cont_IntConstantes
                 cont_IntConstantes = cont_IntConstantes + 1
-                QuadGenerate('Constante Creada', 'int', constante, d_ints[constante])
+                #QuadGenerate('Constante Creada', 'int', constante, d_ints[constante])
             else:
                 print(cont_IntConstantes, limite_intConstantes)
                 errorOutOfBounds('Constantes', 'Enteras')
@@ -702,7 +702,7 @@ def pushConstante(constante):
             if cont_FloatConstantes < limite_floatConstantes:
                 d_floats[constante] = cont_FloatConstantes
                 cont_FloatConstantes = cont_FloatConstantes + 1
-                QuadGenerate('Constante Creada', 'float', constante, d_floats[constante])
+                #QuadGenerate('Constante Creada', 'float', constante, d_floats[constante])
             else:
                 errorOutOfBounds('Constantes', 'Flotantes')
         pushOperando(constante)
@@ -714,7 +714,7 @@ def pushConstante(constante):
             if cont_StringConstantes < limite_stringConstantes:
                 d_strs[constante] = cont_StringConstantes
                 cont_StringConstantes += 1
-                QuadGenerate('Constante Creada', 'string', constante, d_strs[constante])
+                #QuadGenerate('Constante Creada', 'string', constante, d_strs[constante])
             else:
                 errorOutOfBounds('Constantes', 'Strings')
         pushOperando(constante)
@@ -726,7 +726,7 @@ def pushConstante(constante):
             if cont_CharConstantes < limite_charConstantes:
                 d_chars[constante] = cont_CharConstantes
                 cont_CharConstantes = cont_CharConstantes + 1
-                QuadGenerate('Constante Creada', 'char', constante, d_chars[constante])
+                #QuadGenerate('Constante Creada', 'char', constante, d_chars[constante])
             else:
                 errorOutOfBounds('Constantes', 'Chars')
         pushOperando(constante)
@@ -1255,9 +1255,10 @@ def p_pnFunCall_5_6_llamada(p):
     '''
     pnFunCall_5_6_llamada : 
     '''
-
+    global returnBool
     global pFunciones
     global pArgumentos
+
     args = pArgumentos.pop()
     funcion = pFunciones.pop()
     
@@ -1271,7 +1272,15 @@ def p_pnFunCall_5_6_llamada(p):
     else:
         print("Error: Mismatch de Argumentos")
         sys.exit()
-        result
+        resultE
+    
+    tipo =  directorioFunciones.directorio_funciones[funcion]['tipo']
+    if tipo != 'void':
+        quad_resultIndex = nextAvailTemp(tipo)
+        QuadGenerate('=', funcion,'', quad_resultIndex)
+        pushOperando(quad_resultIndex)
+        pushMemoria(quad_resultIndex)
+        pushTipo(tipo)
 
 ###### FUNCIONES ESPECIALES #######
 def p_pnFunEsp1(p):
@@ -1633,10 +1642,10 @@ def p_pnSec4(p):
         else:
             print("HEEEY AQUII")
             QuadGenerate(quad_operator, quad_rightMem, '', quad_operator)
-            #pushOperador(quad_operator)
-            pushOperando(quad_Operando) #Posible BORRAR
-            pushMemoria(quad_Operando)
-            pushTipo(quad_resultType) #Possible BORRAR
+            pushOperador(quad_operator)
+            #pushOperando(quad_Operando) #Posible BORRAR
+            #pushMemoria(quad_Operando) #Posible BORRAR
+            #pushTipo(quad_resultType) #Possible BORRAR
 
 def p_pnSec5(p):
     '''
@@ -1868,7 +1877,7 @@ parser = yacc.yacc()
 # Put all test inside prueba folder
 def main():
     #name = input('File name: ')
-    name = "pruebas/" + "test2" + ".txt" #Para probar, cambia el nombre del archivo
+    name = "pruebas/" + "test3" + ".txt" #Para probar, cambia el nombre del archivo
     print(name)
     try:
         f = open(name,'r', encoding='utf-8')

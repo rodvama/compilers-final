@@ -1,38 +1,47 @@
-programa pelos;
+programa patito;
 var
 int : i, j, k;
+float : f;
 
-funcion int uno(int j)
+funcion void uno(int a, int b)
+
+{
+
+si (a > 0) entonces {
+    i = a + b * j + i;
+    escribe(i + j);
+    uno(a - i, i);
+}
+sino {
+    escribe(a + b);
+}
+
+}
+
+funcion int dos(int a, float g)
 var
 int : i;
 {
-i = j + (k - j * 2 + j);
-si (j > 0) entonces {
-    regresa(uno(i - j));
-} sino {
-    regresa((i + k));
+i = a;
+mientras( a > 0) haz {
+    a = a - k * j;
+    uno(a*2, a+k);
+    g = g*j-k;
 }
-
-}
-
-funcion  void dos(int i, int j)
-var
-int : x, y;
-{
-x = i + j;
-    si (x > j*k) entonces {
-        escribe(uno(x-k));
-    } sino {
-        escribe(uno(j));
-    }
+regresa(i+k*j);
 }
 
 principal()
 {
 
-lee(k);
-i = 5;
-j = i * 2 + i;
-dos(j - i, j);
+i = 2; 
+k = i + 1;
+f = 3.14;
+
+mientras( i > 0) haz {
+    escribe(dos(i+k, f*3) + 3);
+    escribe(i, j*2, f*2+1.5);
+    i = i - k;
+}
 
 }

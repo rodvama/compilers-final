@@ -2,15 +2,15 @@ programa COVID19;
 var
 int : A;
 
-funcion int tres()
+funcion int dos(int x)
 {
     
-    regresa(3);
+    regresa(2);
 }
 
 principal()
 {
-    escribe(tres());
-
+    
+dos(A)
 
 }

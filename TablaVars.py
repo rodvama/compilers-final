@@ -34,7 +34,7 @@ class TablaVars:
     '''
     Funcion para agregar una nueva variable a la tabla
     '''
-    def var_add(self, nombre, tipo, renglones, columnas):
+    def var_add(self, nombre, tipo, renglones, columnas, memoria ):
         if self.var_exist(nombre):
             print("Error : Variable ", str(nombre), " duplicada")
             return False
@@ -43,7 +43,8 @@ class TablaVars:
                 'nombre' : nombre,
                 'tipo': tipo,
                 'renglones': renglones,
-                'columnas' : columnas
+                'columnas' : columnas,
+                'memoria' : memoria
             }
             return True
 
@@ -66,30 +67,30 @@ class TablaVars:
             return None
 
     
-    # '''
-    # Funcion para actualizar los atributos de Renglones y Columnas de una variable, para indicar que dicha variable es un arreglo o matriz.
-    # '''
-    # def var_upadateDims(self, nombre, renglones, columnas):
+    '''
+    Funcion para indicar que una variable es dimensionada cambiando los valores de los atributos de renglones y columans
+    '''
+    def var_upadateDims(self, nombre, renglones, columnas):
 
-    #     if self.var_exist(nombre):
-    #         if columnas < 0: #Se actualizan solo renglones
-    #             self.tabla_variables[nombre]['renglones'] = renglones
-    #         else:
-    #             self.tabla_variables[nombre]['columnas'] = columnas
-    #             self.tabla_variables[nombre]['renglones']= renglones #?
+        if self.var_exist(nombre):
+            if columnas < 0: #Se actualizan solo renglones
+                self.tabla_variables[nombre]['renglones'] = renglones
+            else:
+                self.tabla_variables[nombre]['columnas'] = columnas
+                self.tabla_variables[nombre]['renglones']= renglones #?
             
-    #         print("Dimensiones actualizadas de la variable: ", nombre)
-    #         print("Renglones: ", self.tabla_variables[nombre]['renglones'], "Columnas: ", self.tabla_variables[nombre]['columnas'])
+            print("Dimensiones actualizadas de la variable: ", nombre)
+            print("Renglones: ", self.tabla_variables[nombre]['renglones'], "Columnas: ", self.tabla_variables[nombre]['columnas'])
 
-    #     else:
-    #         print("Error. No es posible actializar las dimensaiones de una variable que no existe: ", nombre)
+        else:
+            print("Error. No es posible actializar las dimensaiones de una variable que no existe: ", nombre)
 
     
-    # '''
-    # Funcion que regresa la posicion de memoria de la variable dada
-    # '''
-    # def var_searchMemPos(self, nombre):
-    #     if self.var_exist(nombre):
-    #         return self.tabla_variables[nombre]['posMem']
-    #     else:
-    #         return None
+    '''
+    Funcion que regresa la posicion de memoria virtual de la variable dada
+    '''
+    def var_searchMemPos(self, nombre):
+        if self.var_exist(nombre):
+            return self.tabla_variables[nombre]['memoria']
+        else:
+            return None

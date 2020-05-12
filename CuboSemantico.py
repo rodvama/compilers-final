@@ -389,18 +389,25 @@ class CuboSemantico:
             ('dataframe' , 'dataframe' , '&' ) : 'error',
 
             #Lectura
-            ('lee', 'int', '') : 'char',
-            ('lee', 'float', '') : 'char',
-            ('lee', 'char', '') : 'char',
-            ('lee', 'string', '') : 'char',
-            ('lee', 'dataframe', '') : 'char',
+            ('lee', 'int', '') : 'int',
+            ('lee', 'float', '') : 'float',
+            ('lee', 'char', '') : 'error',
+            ('lee', 'string', '') : 'error',
+            ('lee', 'dataframe', '') : 'char', #?????
 
             #Escritura
-            ('escribe', 'int', '') : 'char',
-            ('escribe', 'float', '') : 'char',
-            ('escribe', 'char', '') : 'char',
-            ('escribe', 'string', '') : 'char',
-            ('escribe', 'dataframe', '') : 'char'
+            ('escribe', 'int', '') : 'string',
+            ('escribe', 'float', '') : 'string',
+            ('escribe', 'char', '') : 'string',
+            ('escribe', 'string', '') : 'string',
+            ('escribe', 'dataframe', '') : 'error',
+
+            #Retorno
+            ('regresa', 'int', '') : 'int',
+            ('regresa', 'float', '') : 'float',
+            ('regresa', 'char', '') : 'char',
+            ('regresa', 'string', '') : 'string',
+            ('regresa', 'dataframe', '') : 'dataframe'
         }
 
     '''

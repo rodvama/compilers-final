@@ -20,7 +20,7 @@ class DirFunc:
     Constructor que inicializa el diccionario directorio_funciones con sus atributos, empezando con la seccion de globales.
     '''
     def __init__(self):
-        self.directorio_funciones = {'global': {'nombre' : 'global', 'tipo' : 'void', 'cantParametros' : 0, 'variables': TablaVars()}}
+        self.directorio_funciones = {'global': {'nombre' : 'global', 'tipo' : 'void', 'cantParametros' : 0, 'variables': TablaVars(), 'cantQuads' : 0}}
         print("Funcion creada exitosamente: Global de tipo void")
 
 
@@ -33,7 +33,7 @@ class DirFunc:
     '''
     Funcion para agregar una funcion nueva al diccionario de directorio_funciones
     '''
-    def func_add(self, nombre, tipo, cantParametros):
+    def func_add(self, nombre, tipo, cantParametros, cantQuads):
         if self.func_existe(nombre):
             print ("Error: Declaracion multiple de funcion: ", str(nombre), "\n")
         else:
@@ -41,7 +41,8 @@ class DirFunc:
                 'nombre': nombre,
                 'tipo': tipo,
                 'cantParametros': cantParametros,
-                'variables': TablaVars()
+                'variables': TablaVars(),
+                'cantQuads': cantQuads
             }
             print ("NUEVA Funcion creada en el Directorio de Funciones: ", nombre, " de tipo: ", tipo, "\n")
 
@@ -57,26 +58,23 @@ class DirFunc:
     '''
     Funcion que agrega una variable a la tabla de variables linkeada a la funcion dada.
     '''
-    def func_addVar(self, nombre, nombreVar, tipoVar, renglonesVar, columnasVar):
+    def func_addVar(self, nombre, nombreVar, tipoVar, renglonesVar, columnasVar, memPos):
 
-        if self.directorio_funciones[nombre]['variables'].var_add(nombreVar, tipoVar, renglonesVar, columnasVar):
+        if self.directorio_funciones[nombre]['variables'].var_add(nombreVar, tipoVar, renglonesVar, columnasVar, memPos):
             print ("Variable: ", nombreVar, " creada exitosamente, dentro de la funcion:  ", nombre)
         else:
             print ("Error: No es posible crear la variable: ", nombreVar, " dentro de  la funcion: ", nombre)
     
     
-    # '''
-    # Funcion que llama a la funcion en TablaVars para actualizar renglones y columnas de una variable
-    # '''
-    # def func_updateDim(self, nombre, nombreVar, renglones, columnas):
-    #     if self.directorio_funciones[nombre]['variables'].var_exist(nombreVar):
-    #         if columnas > 0: #Se manda columnas > 0 cuando se van a actualizar columnas
-    #             return self.directorio_funciones[nombre]['variables'].var_upadateDims(nombreVar, renglones, columnas)
-    #         else: #Se manda columnas -1 cuando se actualizan rengloens
-    #             return self.directorio_funciones[nombre]['variables'].var_upadateDims(nombreVar, renglones, -1)
-    #     else:
-    #         print("Warning: Variable ", nombreVar, "no existe en este contexto ", nombre)
-    #         return None
+    '''
+    Funcion para actualizar indicar que una variable es dimensionada
+    '''
+    def func_updateDim(self, nombre, nombreVar, renglones, columnas):
+        if self.directorio_funciones[nombre]['variables'].var_exist(nombreVar):
+            return self.directorio_funciones[nombre]['variables'].var_upadateDims(nombreVar, renglones, columnas)
+        else:
+            print("Error: Variable ", nombreVar, "no existe en este contexto ", nombre)
+            return None
     
     
     '''
@@ -107,7 +105,21 @@ class DirFunc:
         else:
             print("Error: NO existe la funcion: ", nombre)
 
+    '''
     
+    '''
+    def listaTipos(self, funcion):
+        return [self.directorio_funciones[funcion]['variables'].tabla_variables[x]['tipo'] for x in self.directorio_funciones[funcion]['variables'].tabla_variables]
+
+    '''
+    Funcion que regresa la posicion de memoria virtual de la variable dada
+    '''
+    def func_memoria(self, nombre, nombreVar):
+        if self.directorio_funciones[nombre]['variables'].var_exist(nombreVar):
+            return  self.directorio_funciones[nombre]['variables'].var_searchMemPos(nombreVar)
+        else:
+            print("Error: Variable: ", nombreVar, "no existe en este contexto: ", nombre)
+
     '''
     Funcion que imprime el directorio de funciones actual
     '''

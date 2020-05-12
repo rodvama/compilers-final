@@ -2,7 +2,7 @@
 # Rodrigo Valencia
 # Diseno de compiladores
 # Parser
-#Ultima modificacion: 2 Mayo 2020
+#Ultima modificacion: 10 Mayo 2020
 import ply.yacc as yacc
 import os
 import codecs
@@ -15,6 +15,7 @@ from CuboSemantico_FuncEsp import *
 
 #Objetos
 directorioFunciones = DirFunc()
+tablaVariables = TablaVars()
 cuboSem = CuboSemantico()
 cuboSemEsp = CuboSemantico_FuncEsp()
 
@@ -24,6 +25,9 @@ pOperandos = [] #Pila de operandos pendientes (PilaO)
 pOper = [] #Pila de operadores pendientes (POper)
 pTipos = [] #Pila de tipos
 pSaltos = [] #Pila de saltos para condiciones y ciclos
+pFunciones = [] #Pila de funciones
+pArgumentos = [] #Pila de agumentos de una funcion
+pMemorias = [] # Pila de direcciones de memoria
 
 #Arreglo donde se almacenaran todos los cuadruplos que se vayan generando
 cuadruplos = []
@@ -42,21 +46,28 @@ OP_MULTDIV = ['*', '/']
 OP_REL = ['>', '<', '<=', '>=', '==', '!=']
 OP_LOGICOS = ['&', '|']
 OP_ASIG = ['=']
-OP_SECUENCIALES = ['lee', 'escribe']
+OP_SECUENCIALES = ['lee', 'escribe', 'regresa']
 ESPACIO_MEMORIA = 100 #Tamano del espacio de memoria
 
 ##Variables globales
 currentFunc = GBL
 currentType = "void"
 varName = ""
-currentContParams = 0
-numRenglones = 0
-numColumnas = 0
+currentVarName = ""
+currentCantParams = 0
+currentCantVars = 0
 avail = 0
 constanteNegativa = False
 forBool = False
 varFor = ''
 negativo = False
+returnBool = False #sirve para saber si una funcion debe regresar algun valor (si es void o no)
+
+#Variables para Arreglos y matrices
+numRenglones = 0
+numColumnas = 0
+R = 1
+base = 0
 
 '''
 Espacios de memoria:
@@ -131,7 +142,21 @@ limite_charConstantes = limite_stringConstantes + ESPACIO_MEMORIA
 limite_dfConstantes = limite_charConstantes + ESPACIO_MEMORIA
 
 
-#Declaracion de inicio de index de memoria para temporales
+#Inicio de memoria para Globales
+cont_IntGlobales = 0
+cont_FloatGlobales = limite_intGlobales
+cont_StringGlobales = limite_floatGlobales
+cont_CharGlobales = limite_stringsGlobales
+cont_dfGlobales = limite_charGlobales
+
+#Inicio de memoria para Locales
+cont_IntLocales = limite_dfGlobales
+cont_FloatLocales = limite_intLocales
+cont_StringLocales = limite_floatLocales
+cont_CharLocales = limite_stringsLocales
+cont_dfLocales = limite_charLocales
+
+#Inicio de memoria para Temporales
 cont_IntTemporales = limite_dfLocales
 cont_FloatTemporales = limite_intTemporales
 cont_StringTemporales = limite_floatTemporales
@@ -140,7 +165,7 @@ cont_dfTemporales = limite_charTemporales
 cont_BoolTemporales = limite_dfTemporales
 
 
-#Declaracion de inicio de los inde de memoria para constantes 
+#Inicio de memoria para Constatnes
 cont_IntConstantes = limite_boolTemporales
 cont_FloatConstantes = limite_intConstantes
 cont_StringConstantes = limite_floatConstantes
@@ -163,12 +188,14 @@ precedence = (
 
 #INICIO
 def p_programa(p):
-    'programa : PROGRAMA ID SEMICOLON var1 func1 principal pn_6_end'
+    'programa : PROGRAMA ID SEMICOLON var1 pnGOTOprincipal func1 principal'
     print("PROGRAMA \"", p[2], "\" terminado.")
-    printQuadList()
+    QuadGenerateList()
+    print("Poper : ", pOper)
+    print("pOperandos: ", pOperandos)
+    print("pTipos: ", pTipos)
     
     
-
 def p_var1(p):
     '''
     var1 : var
@@ -184,7 +211,7 @@ def p_func1(p):
     # print("FUNC'")
 
 def p_principal(p):
-    'principal : PRINCIPAL pn_9_setCurrentFuncGl LPAREN RPAREN bloque'
+    'principal : PRINCIPAL pnPrincipal2 LPAREN RPAREN bloque'
     # print("PRINCIPAL")
 
 #DECLARACION DE VARIABLES
@@ -211,7 +238,7 @@ def p_type(p):
 
 #DECLARACION DE FUNCIONES
 def p_funcion(p):
-    'funcion : FUNCION tipo_fun ID pn_3_addFunction LPAREN parametros RPAREN pn_5_updateContParams var1 bloque'
+    'funcion : FUNCION tipo_fun ID pnFunDec1 LPAREN parametros RPAREN pnFunDec4 var1 bloque pnFunDec7'
     # print("FUNCION")
 
 def p_tipo_fun(p):
@@ -229,7 +256,7 @@ def p_parametros(p):
     # print("PARAMETROS")
 
 def p_param(p):
-    'param : tipo_simple ID pn_4_params param1'
+    'param : tipo_simple ID pnFunDec_2_3 param1'
     # print("PARAM")
 
 def p_param1(p):
@@ -321,15 +348,15 @@ def p_estatutos(p):
 
     #Asig
 def p_asignacion(p):
-    'asignacion : variable ASSIGN pnQuadGenSec1 asig'
+    'asignacion : variable ASSIGN pnSec1 exp SEMICOLON pnSec2'
 
-def p_asig(p):
-    '''
-    asig : llamada
-         | exp SEMICOLON pnQuadGenSec2
-    '''
+# def p_asig(p):
+#     '''
+#     asig : llamada 
+#          | exp SEMICOLON pnSec2
+#     '''
 def p_variable(p):
-    'variable : ID pnQuadGenExp1 di'
+    'variable : ID pnExp1 di'
 
 def p_di(p):
     '''
@@ -338,35 +365,39 @@ def p_di(p):
     '''
 
 def p_llamada(p):
-    'llamada :  ID LPAREN llamada1 RPAREN SEMICOLON'
+    'llamada :  ID pnFunCall_1_2 LPAREN llamada1 RPAREN pnFunCall_5_6_llamada'
+    p[0] = 'llamada'
+    
 
 def p_llamada1(p):
     '''
-    llamada1 : exp llamada2
+    llamada1 : exp pnFunCall_3 llamada2
              | empty
     '''
+    
 
 def p_llamada2(p):
     '''
     llamada2 : COMMA llamada1
              | empty
     '''
+    
 
 def p_retorno(p):
-    'retorno : REGRESA LPAREN exp RPAREN SEMICOLON'
+    'retorno : REGRESA pnSec3 LPAREN exp RPAREN pnRetorno SEMICOLON'
 
 def p_lectura(p):
-    'lectura : LEE pnQuadGenSec3 LPAREN variable RPAREN SEMICOLON pnQuadGenSec4'
+    'lectura : LEE pnSec3 LPAREN variable RPAREN SEMICOLON pnSec4 pnSec5'
 
 def p_escritura(p):
-    'escritura : ESCRIBE pnQuadGenSec3 LPAREN esc RPAREN SEMICOLON pnQuadGenSec4'
+    'escritura : ESCRIBE pnSec3 LPAREN esc RPAREN SEMICOLON pnSec5 '
 
 def p_esc(p):
     'esc : esc1 esc2'
 
 def p_esc1(p):
     '''
-    esc1 : exp
+    esc1 : exp pnSec4 
     '''
 def p_esc2(p):
     '''
@@ -385,55 +416,55 @@ def p_ca(pa):
 
 #Condicionales y Ciclos
 def p_decision(p): #IF
-    'decision : SI LPAREN expresion RPAREN pnQuadGenCond1 ENTONCES bloque sino pnQuadGenCond2'
+    'decision : SI LPAREN expresion RPAREN pnCond1 ENTONCES bloque sino pnCond2'
 
 def p_sino(p): #ELSE
     '''
-    sino : SINO pnQuadGenCond3 bloque
+    sino : SINO pnCond3 bloque
          | empty
     '''
 
 
 def p_condicional(p): #While
-    'condicional : MIENTRAS pnQuadGenCiclos1 LPAREN expresion RPAREN pnQuadGenCiclos2 HAZ bloque pnQuadGenCiclos3'
+    'condicional : MIENTRAS pnCiclos1 LPAREN expresion RPAREN pnCiclos2 HAZ bloque pnCiclos3'
 
 def p_no_condicional(p): #For
-    'no_condicional : DESDE pnQuadGenCiclos4 variable ASSIGN pnQuadGenSec1 exp pnQuadGenCiclos5 HASTA pnQuadGenCiclos6 exp pnQuadGenCiclos7 HACER bloque pnQuadGenCiclos8'
+    'no_condicional : DESDE pnCiclos4 variable ASSIGN pnSec1 exp pnCiclos5 HASTA pnCiclos6 exp pnCiclos7 HACER bloque pnCiclos8'
 
 
 def p_funciones_especiales_void(p):
     '''
-    funciones_especiales_void : VARIABLES LPAREN ID COMMA ID COMMA ID RPAREN SEMICOLON
+    funciones_especiales_void : VARIABLES pnFunEsp1 LPAREN ID COMMA ID COMMA ID RPAREN SEMICOLON
                               | fev LPAREN ID COMMA v_exp RPAREN SEMICOLON
     '''
 def p_fev(p):
     '''
-    fev : PLOTHIST
-        | PLOTLINE
+    fev : PLOTHIST pnFunEsp1
+        | PLOTLINE pnFunEsp1
     '''
 
 def p_funciones_especiales(p):
     '''
     funciones_especiales : fe LPAREN ID COMMA v_exp RPAREN
-                         | CORRELACIONA LPAREN ID COMMA v_exp COMMA v_exp RPAREN
+                         | CORRELACIONA pnFunEsp1 LPAREN ID COMMA v_exp COMMA v_exp RPAREN
     '''
 def p_fe(p):
     '''
-    fe : MEDIA
-       | MEDIANA
-       | MODA
-       | VARIANZA
+    fe : MEDIA pnFunEsp1
+       | MEDIANA pnFunEsp1
+       | MODA pnFunEsp1
+       | VARIANZA pnFunEsp1
     '''
 def p_v_exp(p):
-    'v_exp : VARIABLES LBRACK exp RBRACK'
+    'v_exp : VARIABLES  LBRACK exp RBRACK'
 
 
 
 
 def p_var_cte(p):#Se modificaran los PN
     '''
-    var_cte : CTE_CH pnQuadGenCteChar
-            | CTE_STR pnQuadGenCteStr
+    var_cte : CTE_CH pnCteChar
+            | CTE_STR pnCteStr
             | SUB pnNeg var_num
             | var_num
     '''
@@ -448,8 +479,8 @@ def p_var_cte(p):#Se modificaran los PN
 
 def p_var_num(p): 
     '''
-    var_num : CTE_INT pnQuadGenCteInt
-            | CTE_FLOAT pnQuadGenCteFloat
+    var_num : CTE_INT pnCteInt
+            | CTE_FLOAT pnCteFloat
     '''
     p[0] = p[1]
 
@@ -469,7 +500,7 @@ def p_mega_exp(p):
 
 def p_meg(p):
     '''
-    meg : op_l pnQuadGenExp10 mega_exp pnQuadGenExp11
+    meg : op_l pnExp10 mega_exp pnExp11
         | empty
     '''
 def p_op_l(p):
@@ -483,21 +514,21 @@ def p_super_exp(p):
 
 def p_sp(p):
     '''
-    sp : op_r  exp pnQuadGenExp9
+    sp : op_r  exp pnExp9
        | empty
     '''
 def p_op_r(p):
     '''
-    op_r : LT pnQuadGenExp8
-         | GT pnQuadGenExp8
-         | LE pnQuadGenExp8
-         | GE pnQuadGenExp8
-         | NOT_EQUAL pnQuadGenExp8
-         | EQUAL pnQuadGenExp8
+    op_r : LT pnExp8
+         | GT pnExp8
+         | LE pnExp8
+         | GE pnExp8
+         | NOT_EQUAL pnExp8
+         | EQUAL pnExp8
     '''
 
 def p_exp(p):
-    'exp : termino pnQuadGenExp4 exp1'
+    'exp : termino pnExp4 exp1'
 
 def p_exp1(p):
     '''
@@ -506,12 +537,12 @@ def p_exp1(p):
     '''
 def p_op_a(p):
     '''
-    op_a : ADD pnQuadGenExp2
-         | SUB pnQuadGenExp2
+    op_a : ADD pnExp2
+         | SUB pnExp2
     '''
 
 def p_termino(p):
-    'termino : factor pnQuadGenExp5 term'
+    'termino : factor pnExp5 term'
 
 def p_term(p):
     '''
@@ -520,19 +551,19 @@ def p_term(p):
     '''
 def p_op_a1(p):
     '''
-    op_a1 : MUL pnQuadGenExp3
-          | DIV pnQuadGenExp3
+    op_a1 : MUL pnExp3
+          | DIV pnExp3
     '''
 
 def p_factor(p):
     '''
     factor : var_cte
-           | LPAREN pnQuadGenExp6 exp RPAREN pnQuadGenExp7
+           | LPAREN pnExp6 exp RPAREN pnExp7
            | variable
            | llamada
            | funciones_especiales
     '''
-
+    print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>FACTOOR")
 
 def p_empty(p):
     '''empty :'''
@@ -543,6 +574,7 @@ def p_error(p):
     if p:
         print("Error de sintaxis ",p.type, p.value)
         print("Error en la linea "+str(p.lineno))
+        print()
         parser.errok()
     else:
         print("Syntax error at EOF")
@@ -552,32 +584,48 @@ def p_error(p):
 #Te regresa el ultimo elemento de la pila de operandos
 def popOperandos():
     global pOperandos
-    return pOperandos.pop()
+    pop = pOperandos.pop()
+    print("--------------------> POP Operandos")
+    print("Pop Operandos= ", pop)
+    return pop
 
 #Te regresa el ultimo elemento de la pila de operadores
 def popOperadores():
     global pOper
-    return pOper.pop()
+    pop = pOper.pop()
+    print("--------------------> POP POper")
+    print("Pop Poper= ", pop)
+    return pop
 
 #Te regresa el ultimo elemento de la pila de tipos
 def popTipos():
     global pTipos
-    return pTipos.pop()
+    pop = pTipos.pop()
+    print("--------------------> POP Tipos")
+    print("Pop Tipos = ", pop)
+    return pop
 
 #Mete a la pila operandos el nuevo operando
 def pushOperando(operando):
     global pOperandos
     pOperandos.append(operando)
+    print("------> pushOperando : ", operando)
+    print("POperandos : ", pOperandos)
 
 #Mete a la pila operador el nuevo operador
 def pushOperador(operador):
     global pOper
     pOper.append(operador)
+    print("------> pushOperador : ", operador)
+    print("POper : ", pOper)
+    
 
 #Mete a la pila tipos el nuevo tipo
 def pushTipo(tipo):
     global pTipos
     pTipos.append(tipo)
+    print("------>pushTipo : ", tipo)
+    print("pTipos : ", pTipos)
 
 #obtiene el ultimo operando ingresado a la pila de operandos
 def topOperador():
@@ -604,7 +652,7 @@ def popSaltos():
 #Agrega el nuevo salto a la pila de Saltos.
 def pushSaltos(salto):
     global pSaltos
-    print("PUSH SALTO: ", salto)
+    #print("PUSH SALTO: ", salto)
     pSaltos.append(salto)
 
 #Obtiene el indice del siguiente cuadruplo del arreglo de cuadruplos
@@ -622,6 +670,7 @@ def pushQuad(quad):
     global cuadruplos
     cuadruplos.append(quad)
 
+#Agrega las constantes a la pila de Operandos y Tipos
 def pushConstante(constante):
     global d_ints
     global d_floats
@@ -640,11 +689,12 @@ def pushConstante(constante):
             if cont_IntConstantes < limite_intConstantes:
                 d_ints[constante] = cont_IntConstantes
                 cont_IntConstantes = cont_IntConstantes + 1
-                printQuad('addConstante', 'int', constante, d_ints[constante])
+                #QuadGenerate('Constante Creada', 'int', constante, d_ints[constante])
             else:
                 print(cont_IntConstantes, limite_intConstantes)
                 errorOutOfBounds('Constantes', 'Enteras')
-        pushOperando(d_ints[constante])
+        pushOperando(constante)
+        pushMemoria(d_ints[constante])
         pushTipo('int')
     
     elif type(constante) == float:
@@ -652,32 +702,35 @@ def pushConstante(constante):
             if cont_FloatConstantes < limite_floatConstantes:
                 d_floats[constante] = cont_FloatConstantes
                 cont_FloatConstantes = cont_FloatConstantes + 1
-                printQuad('addConstante', 'float', constante, d_floats[constante])
+                #QuadGenerate('Constante Creada', 'float', constante, d_floats[constante])
             else:
                 errorOutOfBounds('Constantes', 'Flotantes')
-        pushOperando(d_floats[constante])
+        pushOperando(constante)
+        pushMemoria(d_floats[constante])
         pushTipo('float')
     
     elif type(constante) == str:
         if constante not in d_strs:
             if cont_StringConstantes < limite_stringConstantes:
-                d_strs[constante] = cont_StringsConst
-                cont_StringsConst = cont_StringsConst + 1
-                printQuad('addConstante', 'string', constante, d_strs[constante])
+                d_strs[constante] = cont_StringConstantes
+                cont_StringConstantes += 1
+                #QuadGenerate('Constante Creada', 'string', constante, d_strs[constante])
             else:
                 errorOutOfBounds('Constantes', 'Strings')
-        pushOperando(d_strs[constante])
+        pushOperando(constante)
+        pushMemoria(d_strs[constante])
         pushTipo('string')
     
-    elif type(constante) == chr:
+    elif type(constante) == chr: ########## POSIBLE ERROR
         if constante not in d_ch:
             if cont_CharConstantes < limite_charConstantes:
                 d_chars[constante] = cont_CharConstantes
                 cont_CharConstantes = cont_CharConstantes + 1
-                printQuad('addConstante', 'char', constante, d_chars[constante])
+                #QuadGenerate('Constante Creada', 'char', constante, d_chars[constante])
             else:
                 errorOutOfBounds('Constantes', 'Chars')
-        pushOperando(d_chars[constante])
+        pushOperando(constante)
+        pushMemoria(d_chars[constante])
         pushTipo('char')
     else:
         sys.exit("Error: Tipo de Variable desconocida")
@@ -686,24 +739,25 @@ def pushConstante(constante):
 
 ################ Funciones de impresion y Errores #####################
 
-#Impresion de cuadruplo agregado
-def printQuad(operator, leftOperand, rightOperand, result):
-    tempQuad = (operator, leftOperand, rightOperand, result)
-    pushQuad(tempQuad)
-    print(">> Quad: ('{}','{}','{}','{}')".format(operator, leftOperand, rightOperand, result))
-    print("Contador = ", nextQuad() - 1)
+#Impresion de nuevo cuadruplo
+def QuadGenerate(operator, leftOperand, rightOperand, result):
+    QuadTemporal = (operator, leftOperand, rightOperand, result)
+    pushQuad(QuadTemporal)
+    NumQuad = nextQuad() - 1
+    print(">> Quad {}: ('{}','{}','{}','{}')".format(NumQuad, operator, leftOperand, rightOperand, result))
+    
     print("\n")
 
 #Impresion de lista de cuadruplos
-def printQuadList():
-    print("-------Cuadruplos al momento: ")
+def QuadGenerateList():
+    print("-------Lista de Cuadruplos: ")
 
-    count = 0
+    contador = 0
     for quad in cuadruplos:
-        print("{}.\t{},\t{},\t{},\t{}".format(count,quad[0],quad[1],quad[2],quad[3]))
-        count = count + 1
+        print("{}.\t{},\t{},\t{},\t{}".format(contador,quad[0],quad[1],quad[2],quad[3]))
+        contador = contador + 1
 
-
+#Funcion que muestra menssaje de error cuando los tipos no coinciden
 def errorTypeMismatch():
     print('Error: Type Mismatch')
     sys.exit()
@@ -713,7 +767,14 @@ def errorOutOfBounds(tipoMemoria,tipoDato):
     print("Error: Memoria llena; Muchas {} de tipo {}.".format(tipoMemoria,tipoDato))
     sys.exit()
 
+def errorReturnTipo():
+    print("Error: el tipo que intenta retornar no es correcto")
+
 ################ Funciones de manejo de memoria##############
+
+'''
+Regresa el siguiente temporal disponible, dependiendo el tipo
+'''
 def nextAvailTemp(tipo):
     global cont_IntTemporales
     global cont_FloatTemporales
@@ -744,13 +805,214 @@ def nextAvailTemp(tipo):
         avail = -1
         print("Error: Tipo de variable no existente")
     return avail
+
+'''
+Regresa el siguiente espacio de memoria disponible
+'''
+def nextAvailMemory(contexto, tipo):
+    global cont_IntGlobales
+    global cont_IntLocales
+    global cont_FloatGlobales
+    global cont_FloatLocales
+    global cont_StringGlobales
+    global cont_StringLocales
+    global cont_CharGlobales
+    global cont_CharLocales
+    global cont_dfGlobales
+    global cont_dfLocales
+
+    posMem = -1
+    
+    #Global
+    if contexto == GBL:
+
+        if tipo == 'int':
+            if cont_IntGlobales < limite_intGlobales:
+                posMem = cont_IntGlobales
+                cont_IntGlobales += 1
+            else:
+                errorOutOfBounds(GBL, 'Enteras')
         
 
+        elif tipo == 'float':
+            if cont_FloatGlobales < limite_floatGlobales:
+                posMem = cont_FloatGlobales
+                cont_FloatGlobales += 1
+            else:
+                errorOutOfBounds(GBL, 'Floats')
+
+        elif tipo == 'string':
+            if cont_StringGlobales < limite_stringsGlobales:
+                posMem = cont_StringGlobales
+                cont_StringGlobales += 1
+            else:
+                errorOutOfBounds(GBL, 'Strings')
+
+        elif tipo == 'char':
+            if cont_CharGlobales < limite_charGlobales:
+                posMem = cont_CharGlobales
+                cont_CharGlobales += 1
+            else:
+                errorOutOfBounds(GBL, 'Chars')
+
+        elif tipo == 'dataframe':
+            if cont_dfGlobales < limite_dfGlobales:
+                posMem = cont_dfGlobales
+                cont_dfGlobales += 1
+            else:
+                errorOutOfBounds(GBL, 'Dataframes')
+    #Locales
+    else:
+        if tipo == 'int':
+            if cont_IntLocales < limite_intLocales:
+                posMem = cont_IntLocales
+                cont_IntLocales += 1
+            else:
+                errorOutOfBounds('Locales', 'Enteras')
+        
+
+        elif tipo == 'float':
+            if cont_FloatLocales < limite_floatLocales:
+                posMem = cont_FloatLocales
+                cont_FloatLocales += 1
+            else:
+                errorOutOfBounds('Locales', 'Floats')
+
+        elif tipo == 'string':
+            if cont_StringLocales < limite_stringsLocales:
+                posMem = cont_StringLocales
+                cont_StringLocales += 1
+            else:
+                errorOutOfBounds('Locales', 'Strings')
+
+        elif tipo == 'char':
+            if cont_CharLocales < limite_charLocales:
+                posMem = cont_CharLocales
+                cont_CharLocales += 1
+            else:
+                errorOutOfBounds('Locales', 'Chars')
+
+        elif tipo == 'dataframe':
+            if cont_dfLocales < limite_dfLocales:
+                posMem = cont_dfLocales
+                cont_dfLocales += 1
+            else:
+                errorOutOfBounds('Locales', 'Dataframes')
+    return posMem
+
+
+
+'''
+Modificador de memoria
+'''
+def update_pointer(contexto, tipo, cont):
+    global cont_IntGlobales
+    global cont_IntLocales
+    global cont_FloatGlobales
+    global cont_FloatLocales
+    global cont_StringGlobales
+    global cont_StringLocales
+    global cont_CharGlobales
+    global cont_CharLocales
+    global cont_dfGlobales
+    global cont_dfLocales
+
+    if contexto == GBL:
+
+        if tipo == 'int':
+            cont_IntGlobales += cont
+            if cont_IntGlobales > limite_intGlobales:
+                print('Error: Overflow Enteras Globales')
+        
+        if tipo == 'float':
+            cont_FloatGlobales += cont
+            if cont_FloatGlobales > limite_floatGlobales:
+                print('Error: Overflow Flotantes Globales')
+        
+        if tipo == 'string':
+            cont_StringGlobales += cont
+            if cont_StringGlobales > limite_stringsGlobales:
+                print('Error: Overflow Strings Globales')
+        
+        if tipo == 'char':
+            cont_CharGlobales += cont
+            if cont_CharGlobales > limite_charGlobales:
+                print('Error: Overflow Chars Globales')
+
+        if tipo == 'dataframe':
+            cont_dfGlobales += cont
+            if cont_dfGlobales > limite_dfGlobales:
+                print('Error: Overflow DF Globales')
+    else:
+        if tipo == 'int':
+            cont_IntLocales += cont
+            if cont_IntLocales > limite_intLocales:
+                print('Error: Overflow Enteras Locales')
+        
+        if tipo == 'float':
+            cont_FloatLocales += cont
+            if cont_FloatLocales > limite_floatLocales:
+                print('Error: Overflow Flotantes Locales')
+        
+        if tipo == 'string':
+            cont_StringLocales += cont
+            if cont_StringLocales > limite_stringsLocales:
+                print('Error: Overflow Strings Locales')
+        
+        if tipo == 'char':
+            cont_CharLocales += cont
+            if cont_CharLocales > limite_charLocales:
+                print('Error: Overflow Chars Locales')
+
+        if tipo == 'dataframe':
+            cont_dfLocales += cont
+            if cont_dfLocales > limite_dfLocales:
+                print('Error: Overflow DF Locales')
+
+        
+def popMemoria():
+    global pMemorias
+    pop = pMemorias.pop()
+    print("--------------------> POP Memorias")
+    print("Pop Memoria = ", pop)
+    return pop
+
+def pushMemoria(memoria):
+    global pMemorias
+    pMemorias.append(memoria)
+    print("------>pushMemoria : ", memoria)
+    print("pMemoria : ", pMemorias)
 
 ################ PUNTOS NEURALGICOS ###################
+'''
+Generador del cuadruplo GOTO Main al inicio del programa
+'''
+def p_pnGOTOprincipal(p):
+    '''
+    pnGOTOprincipal : 
+    '''
+    QuadGenerate('GOTO', '', '', '')
+    pushSaltos(nextQuad() - 1)
+
+def p_pnPrincipal2(p):
+    '''
+    pnPrincipal2 :
+    '''
+    global currentFunc
+    global cuadruplos
+
+    currentFunc = GBL
+    cuadruplos[popSaltos()] = ('GOTO', '', '', nextQuad())
+    
+    
 
 
-##########DIRECTORIO DE FUNCIONES Y TABLA DE VARIABLESpnQuadGenExp1#############
+
+##########DIRECTORIO DE FUNCIONES Y TABLA DE VARIABLES#############
+
+'''
+Establece el currentType
+'''
 def p_pn_1_setCurrentType(p):
     '''
     pn_1_setCurrentType :
@@ -758,6 +1020,9 @@ def p_pn_1_setCurrentType(p):
     global currentType
     currentType = p[-1]
 
+'''
+Agrega la nueva variable a la tabla de variables
+'''
 def p_pn_2_addVariable(p):
     '''
     pn_2_addVariable : 
@@ -765,57 +1030,23 @@ def p_pn_2_addVariable(p):
     global currentFunc
     global varName
     global currentType
+    global currentVarName
     global numColumnas
     global numRenglones
+    global currentCantVars
 
     varName = p[-2]
-    
-    directorioFunciones.func_addVar(currentFunc, varName, currentType, numRenglones, numColumnas)
+    currentVarName = varName
+    PosMem = nextAvailMemory(currentFunc, currentType)
+    directorioFunciones.func_addVar(currentFunc, varName, currentType, numRenglones, numColumnas, PosMem)
     numColumnas = 0
     numRenglones = 0
+    currentCantVars += 1
+  
 
-def p_pn_3_addFunction(p):
-    '''
-    pn_3_addFunction : 
-    '''
-    global currentFunc
-    global currentType
-    global currentContParams
-
-    currentContParams = 0
-
-    currentFunc = p[-1]
-    directorioFunciones.func_add(currentFunc, currentType, currentContParams)
-
-def p_pn_4_params(p):
-    '''
-    pn_4_params :
-    '''
-    global currentFunc
-    global currentType
-    global currentContParams
-    global varName
-
-    varName = p[-1]
-    directorioFunciones.func_addVar(currentFunc, varName, currentType, 0, 0)
-    currentContParams += 1
-
-#Modifica la cantidad de parametros de una funcion en el directorio de funciones
-def p_pn_5_updateContParams(p):
-    '''
-    pn_5_updateContParams :  
-    '''
-    global currentFunc
-    global currentContParams
-
-    directorioFunciones.func_UpdateParametros(currentFunc, currentContParams)
-
-def p_pn_6_end(p):
-    '''
-    pn_6_end :
-    '''
-    #directorioFunciones.func_deleteDic()
-
+'''
+Guarda la cantidad de Renglones que tiene la variable
+'''
 def p_pn_7_decRenglones(p):
     '''
     pn_7_decRenglones :
@@ -824,6 +1055,9 @@ def p_pn_7_decRenglones(p):
     global numRenglones
     numRenglones = p[-2]
 
+'''
+Guarda la cantidad de columnas que tiene la variable
+'''
 def p_pn_8_decColumnas(p):
     '''
     pn_8_decColumnas : 
@@ -831,17 +1065,235 @@ def p_pn_8_decColumnas(p):
     global numColumnas
     numColumnas = p[-2]
 
-def p_pn_9_setCurrentFuncGl(p):
+
+
+
+################################## Generacion de cuadruplos #############################################
+
+########### Funciones ################
+
+
+#### FUNCTION DECLARATION####
+'''
+Agega nueva funcion al Directorio de Funciones
+'''
+def p_pnFunDec1(p):
     '''
-    pn_9_setCurrentFuncGl :
+    pnFunDec1 : 
     '''
     global currentFunc
-    currentFunc = GBL
+    global currentType
+    global currentCantParams
+    global currentCantVars
+    global returnBool
+
+    currentCantVars = 0
+    currentCantParams = 0
+    currentFunc = p[-1]
+    print("CAMBIO de CONTEXTO currentFunc = ", currentFunc)
+    print("\n")
+    directorioFunciones.func_add(currentFunc, currentType, currentCantParams, nextQuad())
+
+    if directorioFunciones.directorio_funciones[currentFunc]['tipo'] == 'void':
+        returnBool = False
+    else:
+        returnBool = True
+    
+    print("Return Bool : ", returnBool)
+    print("\n")
+    
+    
+
+'''
+Cuenta la cantidad de parametros que tiene una funcion y agrega dichos parametros como variables locales de la funcion actual
+'''
+def p_pnFunDec_2_3(p):
+    '''
+    pnFunDec_2_3 :
+    '''
+    global currentFunc
+    global currentType
+    global currentCantParams
+    global currentCantVars
+    global varName
+
+    varName = p[-1]
+    PosMem = nextAvailMemory(currentFunc, currentType)
+    directorioFunciones.func_addVar(currentFunc, varName, currentType, 0, 0, PosMem)
+
+    currentCantParams += 1
+    currentCantVars += 1
 
 
-##### Generacion de cuadruplos #######
+'''
+Modifica la cantidad de parametros de una funcion en el directorio de funciones
+'''
+def p_pnFunDec4(p):
+    '''
+    pnFunDec4 :  
+    '''
+    global currentFunc
+    global currentCantParams
+
+    directorioFunciones.func_UpdateParametros(currentFunc, currentCantParams)
+
+'''
+Elimina el directorio de funciones
+'''
+def p_pnFunDec7(p):
+    '''
+    pnFunDec7 :
+    '''
+    
+    global returnBool
+    #global returnDone
+
+    global cont_IntLocales  
+    global cont_FloatLocales
+    global cont_StringLocales
+    global cont_CharLocales   
+    global cont_dfLocales
+
+    global cont_IntTemporales  
+    global cont_FloatTemporales
+    global cont_StringTemporales
+    global cont_CharTemporales   
+    global cont_dfTemporales
+    
+    #Reinicio de apuntadores de meomria Locales y Temporales
+
+    cont_IntLocales = limite_dfGlobales
+    cont_FloatLocales = limite_intLocales
+    cont_StringLocales = limite_floatLocales
+    cont_CharLocales = limite_stringsLocales
+    cont_dfLocales = limite_charLocales
+
+   
+    cont_IntTemporales = limite_dfLocales
+    cont_FloatTemporales = limite_intTemporales
+    cont_StringTemporales = limite_floatTemporales
+    cont_CharTemporales = limite_stringsTemporales
+    cont_dfTemporales = limite_charTemporales
+    cont_BoolTemporales = limite_dfTemporales
+
+    
+    QuadGenerate('ENDFUNC', '', '', '')
+    returnBool = False
+
+    #directorioFunciones.func_deleteDic()
+
+  
+
+
+
+
+########## Function Call ##############
+'''
+Verifica que la funcion exista en el directorio de funciones
+
+Cuadruplos 1 y 2 de las hojas de Elda
+'''
+def p_pnFunCall_1_2(p):
+    '''
+    pnFunCall_1_2 : 
+    '''
+    global pFunciones
+    global pArgumentos
+    funcId = p[-1]
+
+    if funcId in directorioFunciones.directorio_funciones:
+        pFunciones.append(funcId)
+
+        QuadGenerate('ERA', funcId, '', '')
+        pArgumentos.append(0)
+    
+    else:
+        print("Error: la funcion no existe")
+        sys.exit()
+        return
+
+'''
+
+Cuadruplo 3 de la hoja de Elda
+'''
+def p_pnFunCall_3(p):
+    '''
+    pnFunCall_3 :
+    '''
+    global pArgumentos
+    global pFunciones
+    global currentFunc
+
+    argument = popOperandos()
+    argumentType = popTipos()
+    argumentMem = popMemoria()
+    function = pFunciones.pop()
+    args = pArgumentos.pop() + 1
+
+    pArgumentos.append(args)
+    parametro = 'param' + str(args)
+
+    Func_Parameters = directorioFunciones.directorio_funciones[function]['cantParametros']
+
+    lista = directorioFunciones.listaTipos(function) ######PENDIENTE
+
+    if Func_Parameters >= args:
+        if lista[args-1] == argumentType:
+            QuadGenerate('PARAMETER', argumentMem, '', parametro)
+        else:
+            print("Error: Parametros incorrectos")
+    else:
+        print("Error, muchos argumentos")
+        sys.exit()
+    
+    pFunciones.append(function)
+
+'''
+Cuadruplos 5 y 6 de hojas de Elda
+'''
+def p_pnFunCall_5_6_llamada(p):
+    '''
+    pnFunCall_5_6_llamada : 
+    '''
+    global returnBool
+    global pFunciones
+    global pArgumentos
+
+    args = pArgumentos.pop()
+    funcion = pFunciones.pop()
+    
+    #Verify that the last parameter points to null
+    if args == directorioFunciones.directorio_funciones[funcion]['cantParametros']:
+        quadStartFunc = directorioFunciones.directorio_funciones[funcion]['cantQuads']
+
+        #Generate action GOSUB, procedure-name, '', initial address
+        QuadGenerate('GOSUB', funcion, nextQuad() + 1, quadStartFunc )
+        
+    else:
+        print("Error: Mismatch de Argumentos")
+        sys.exit()
+        resultE
+    
+    tipo =  directorioFunciones.directorio_funciones[funcion]['tipo']
+    if tipo != 'void':
+        quad_resultIndex = nextAvailTemp(tipo)
+        QuadGenerate('=', funcion,'', quad_resultIndex)
+        pushOperando(quad_resultIndex)
+        pushMemoria(quad_resultIndex)
+        pushTipo(tipo)
+
+###### FUNCIONES ESPECIALES #######
+def p_pnFunEsp1(p):
+    '''
+    pnFunEsp1 :
+    '''
+    nombreFun = str(p[-1])
+    pushOperador(nombreFun)
 
 ###### CONSTANTES ###########
+'''
+Si hay un negativo, activa el booleano para indicar que es negativo
+'''
 def p_pnNeg(p):
     '''
     pnNeg :
@@ -849,43 +1301,56 @@ def p_pnNeg(p):
     global negativo
     negativo = True
 
-def p_pnQuadGenCteInt(p):
+'''
+Agrega la constante Entera a la pila de Constantes
+'''
+def p_pnCteInt(p):
     '''
-    pnQuadGenCteInt :
-    '''
-    if negativo:
-        pushConstante(-1 * p[-1])
-    else:
-        pushConstante(p[-1])
-
-def p_pnQuadGenCteFloat(p):
-    '''
-    pnQuadGenCteFloat :
+    pnCteInt :
     '''
     if negativo:
         pushConstante(-1 * p[-1])
     else:
         pushConstante(p[-1])
 
-def p_pnQuadGenCteChar(p):
+'''
+Agrega la constante Flotante a la pila de Constantes
+'''
+def p_pnCteFloat(p):
     '''
-    pnQuadGenCteChar :
+    pnCteFloat :
+    '''
+    if negativo:
+        pushConstante(-1 * p[-1])
+    else:
+        pushConstante(p[-1])
+
+'''
+Agrega la constante Char a la pila de Constantes
+'''
+def p_pnCteChar(p):
+    '''
+    pnCteChar :
     '''
     pushConstante(p[-1])
 
-def p_pnQuadGenCteStr(p):
+'''
+Agrega la constante String a la pila de Constantes
+'''
+def p_pnCteStr(p):
     '''
-    pnQuadGenCteStr :
+    pnCteStr :
     '''
+    print("p-1 : ", p[-1])
     pushConstante(p[-1])
 
 
 ###### EXPRESIONES #########
 
-'''Anadir id a poper y pTipo'''
-def p_pnQuadGenExp1(p):
+'''Anade id y Tipo a poper y pTipo respectivamente'''
+def p_pnExp1(p):
     '''
-    pnQuadGenExp1 : 
+    pnExp1 : 
     '''
     global currentFunc
     global directorioFunciones
@@ -895,29 +1360,38 @@ def p_pnQuadGenExp1(p):
     global varFor
 
     idName = p[-1]
-    print("ID : ", p[-1])
-    print("CurrentFunc: " , currentFunc)
     idType = directorioFunciones.func_searchVarType(currentFunc, idName)
     if not idType: #Si no la encuentra en el contexto actual, cambia de contexto a Tipos
         idType = directorioFunciones.func_searchVarType(GBL, idName)
+        print("Ahora busca la variable en el contexto Global ")
     
     if not idType:
         print("Error: Variable ", idName, " no declarada")
         return
     
+    varPosMem = directorioFunciones.func_memoria(currentFunc, idName)
+    if not varPosMem:
+        varPosMem = directorioFunciones.func_memoria(GBL, idName)
+    
+    if varPosMem < 0:
+        print("Error: Variable ", idName, " no declarada")
+        return
+    
+    
     if forBool:
         varFor = idName
 
     pushOperando(idName)
+    pushMemoria(varPosMem)
     pushTipo(idType)
-    print("POperandos : ", pOperandos)
-    print("pTipos : ", pTipos)
+    
+    
     print("\n")
 
-'''Anadir un + o - al POper'''
-def p_pnQuadGenExp2(p):
+'''Anade  + o - al POper'''
+def p_pnExp2(p):
     '''
-    pnQuadGenExp2 : 
+    pnExp2 : 
     '''
 
     global pOper
@@ -926,12 +1400,11 @@ def p_pnQuadGenExp2(p):
         print("Error: Operador no esperado")
     else:
         pushOperador(p[-1])
-        print("POper: ", pOper)
 
-'''Anadir un * o / al POper'''
-def p_pnQuadGenExp3(p):
+'''Anade * o / al POper'''
+def p_pnExp3(p):
     '''
-    pnQuadGenExp3 : 
+    pnExp3 : 
     '''
 
     global pOper
@@ -940,17 +1413,18 @@ def p_pnQuadGenExp3(p):
         print("Error: Operador no esperado")
     else:
         pushOperador(p[-1])
-        print("POper: ", pOper)
 
-'''Checa si el top del POper es un + o - para crear el cuadruplo de esa operacion'''
-def p_pnQuadGenExp4(p):
+'''Checa si el top del POper es un + o - para generar el cuadruplo de esa operacion'''
+def p_pnExp4(p):
     '''
-    pnQuadGenExp4 : 
+    pnExp4 : 
     '''
     if topOperador() in OP_SUMARESTA:
         quad_rightOperand = popOperandos()
         quad_rightType = popTipos()
+        quad_rightMem = popMemoria()
         quad_leftOperand = popOperandos()
+        quad_leftMem = popMemoria()
         quad_leftType = popTipos()
         quad_operator = popOperadores()
 
@@ -961,21 +1435,24 @@ def p_pnQuadGenExp4(p):
             errorTypeMismatch()
         else:
             quad_resultIndex = nextAvailTemp(quad_resultType)
-            printQuad(quad_operator, quad_leftOperand, quad_rightOperand, quad_resultIndex)
+            QuadGenerate(quad_operator, quad_leftMem, quad_rightMem, quad_resultIndex)
             pushOperando(quad_resultIndex)
+            pushMemoria(quad_resultIndex)
             pushTipo(quad_resultType)
 
 
-'''Checa si el top de la pila de operadores es un * o / para crear el cuadruplo  '''
-def p_pnQuadGenExp5(p):
+'''Checa si el top de la pila de operadores es un * o / para generar el cuadruplo  '''
+def p_pnExp5(p):
     '''
-    pnQuadGenExp5 : 
+    pnExp5 : 
     '''
     if topOperador() in OP_MULTDIV:
         
         quad_rightOperand = popOperandos()
         quad_rightType = popTipos()
+        quad_rightMem = popMemoria()
         quad_leftOperand = popOperandos()
+        quad_leftMem = popMemoria()
         quad_leftType = popTipos()
         quad_operator = popOperadores()
 
@@ -986,45 +1463,51 @@ def p_pnQuadGenExp5(p):
             print('Error: Type Mismatch')
         else:
             quad_resultIndex = nextAvailTemp(quad_resultType)
-            printQuad(quad_operator, quad_leftOperand, quad_rightOperand, quad_resultIndex)
+            QuadGenerate(quad_operator, quad_leftMem, quad_rightMem, quad_resultIndex)
             pushOperando(quad_resultIndex)
+            pushMemoria(quad_resultIndex)
             pushTipo(quad_resultType)
 
 '''Agrega fondo falso '''
-def p_pnQuadGenExp6(p):
+def p_pnExp6(p):
     '''
-    pnQuadGenExp6 : 
+    pnExp6 : 
     '''
+    global pOper
     pushOperador('(')
+    print("pushOperador: '('")
+    
 
 '''Quita fondo falso '''
-def p_pnQuadGenExp7(p):
+def p_pnExp7(p):
     '''
-    pnQuadGenExp7 : 
+    pnExp7 : 
     '''
     tipo = popOperadores()
+    print("Quita fondo Falso ')'")
 
-'''Meter un operador relacional a la pila de operadores'''
-def p_pnQuadGenExp8(p):
+'''Mete un operador relacional a la pila de operadores'''
+def p_pnExp8(p):
     '''
-    pnQuadGenExp8 : 
+    pnExp8 : 
     '''
     global popOperadores
     if p[-1] not in OP_REL:
         print("Error: Operador no esperado")
     else:
         pushOperador(p[-1])
-        print("POper : ", pOper)
 
-'''Checa si el top de la pila de operadores es un operador relacional para crear el cuadruplo de operacion'''
-def p_pnQuadGenExp9(p):
+'''Verifica si el top de la pila de operadores es un operador relacional para generar el cuadruplo de operacion'''
+def p_pnExp9(p):
     '''
-    pnQuadGenExp9 : 
+    pnExp9 : 
     '''
     if topOperador() in OP_REL:
         quad_rightOperand = popOperandos()
         quad_rightType = popTipos()
+        quad_rightMem = popMemoria()
         quad_leftOperand = popOperandos()
+        quad_leftMem = popMemoria()
         quad_leftType = popTipos()
         quad_operator = popOperadores()
 
@@ -1035,33 +1518,36 @@ def p_pnQuadGenExp9(p):
             print('Error: Type Mismatch')
         else:
             quad_resultIndex = nextAvailTemp(quad_resultType)
-            printQuad(quad_operator, quad_leftOperand, quad_rightOperand, quad_resultIndex)
+            QuadGenerate(quad_operator, quad_leftMem, quad_rightMem, quad_resultIndex)
             pushOperando(quad_resultIndex)
+            pushMemoria(quad_resultIndex)
             pushTipo(quad_resultType)
 
 '''
 Meter un operador logico a pila de operadores
 '''
-def p_pnQuadGenExp10(p):
+def p_pnExp10(p):
     '''
-    pnQuadGenExp10 : 
+    pnExp10 : 
     '''
     global pOper
     if p[-1] not in OP_LOGICOS:
         print("Error: Operador no esperado")
     else:
         pushOperador(p[-1])
-        print("pOper : ", pOper)
+        
 
 '''Checa si el top de la pila de operadores es un operador logico  '''
-def p_pnQuadGenExp11(p):
+def p_pnExp11(p):
     '''
-    pnQuadGenExp11 : 
+    pnExp11 : 
     '''
     if topOperador() in OP_LOGICOS:
         quad_rightOperand = popOperandos()
         quad_rightType = popTipos()
+        quad_rightMem = popMemoria()
         quad_leftOperand = popOperandos()
+        quad_leftMem = popMemoria()
         quad_leftType = popTipos()
         quad_operator = popOperadores()
 
@@ -1072,34 +1558,37 @@ def p_pnQuadGenExp11(p):
             print('Error: Type Mismatch')
         else:
             quad_resultIndex = nextAvailTemp(quad_resultType)
-            printQuad(quad_operator, quad_leftOperand, quad_rightOperand, quad_resultIndex)
+            QuadGenerate(quad_operator, quad_leftMem, quad_rightMem, quad_resultIndex)
             pushOperando(quad_resultIndex)
+            pushMemoria(quad_resultIndex)
             pushTipo(quad_resultType)
 
 
 '''
-Meter = a la pila operadores
+Mete '=' a la pila operadores
 '''
-def p_pnQuadGenSec1(p):
+def p_pnSec1(p):
     '''
-    pnQuadGenSec1 : 
+    pnSec1 : 
     '''
     global pOper
     if p[-1] not in OP_ASIG:
         print("Error: Operador no esperado")
     else:
         pushOperador(p[-1])
-        print("pOper : ", pOper)
+        
 
-'''Checa si el top de la pila de operadores es una asignacion '''
-def p_pnQuadGenSec2(p):
+'''Checa si en el top de la pila de operadores hay una asignacion (=) '''
+def p_pnSec2(p):
     '''
-    pnQuadGenSec2 : 
+    pnSec2 : 
     '''
     if topOperador() in OP_ASIG:
         quad_rightOperand = popOperandos()
         quad_rightType = popTipos()
+        quad_rightMem = popMemoria()
         quad_leftOperand = popOperandos()
+        quad_leftMem = popMemoria()
         quad_leftType = popTipos()
         quad_operator = popOperadores()
 
@@ -1112,141 +1601,163 @@ def p_pnQuadGenSec2(p):
             if quad_leftType == 'error':
                 print("Error: Operacion invalida")
             else:
-                printQuad(quad_operator, quad_rightOperand, '', quad_leftOperand)
+                QuadGenerate(quad_operator, quad_rightMem, '', quad_leftMem)
         else:
-            print("Error")
+            print("Error al intentar asignar una variable")
 
 
 
 '''
-Meter escribir o leer a la pila
+Meter escribir o leer o regresa a la pila
 '''
-def p_pnQuadGenSec3(p):
+def p_pnSec3(p):
     '''
-    pnQuadGenSec3 : 
+    pnSec3 : 
     '''
     global pOper
     if p[-1] not in OP_SECUENCIALES:
         print("Error: Operador no esperado")
     else:
         pushOperador(p[-1])
-        print("pOper : ", pOper)
+        
 
-'''Checa si el top de la pila de operadores es lectura o escritura '''
-def p_pnQuadGenSec4(p):
+'''Checa si el top de la pila de operadores es lectura o escritura o retorno'''
+def p_pnSec4(p):
     '''
-    pnQuadGenSec4 : 
+    pnSec4 : 
     '''
+
+    global cuboSem
     if topOperador() in OP_SECUENCIALES:
-        quad_rightOperand = popOperandos()
+        print("Voy a ejecutar pnSEc4")
+        quad_Operando = popOperandos()
         quad_rightType = popTipos()
+        quad_rightMem = popMemoria()
         quad_operator = popOperadores()
-
-        global cuboSem
 
         quad_resultType = cuboSem.getType(quad_operator, quad_rightType, '')
 
-    
         if quad_resultType == 'error':
             print("Error: Operacion invalida")
         else:
-            printQuad(quad_operator, quad_rightOperand, '', quad_operator)
-            pushOperando(quad_rightOperand)
-            pushTipo(quad_resultType)
-        
+            print("HEEEY AQUII")
+            QuadGenerate(quad_operator, quad_rightMem, '', quad_operator)
+            pushOperador(quad_operator)
+            #pushOperando(quad_Operando) #Posible BORRAR
+            #pushMemoria(quad_Operando) #Posible BORRAR
+            #pushTipo(quad_resultType) #Possible BORRAR
+
+def p_pnSec5(p):
+    '''
+    pnSec5 : 
+    ''' 
+    popOperadores()
+
 
 # GENERACION DE CODIGO PARA ESTATUTOS NO LINEALES (CONDICIONALES)
-
-#Genera el cuadruplo GOTOF en la condicion SI (if) depues de recibir el booleano generado por la expresion
-def p_pnQuadGenCond1(p): #IF
+'''
+Genera el cuadruplo GOTOF en la condicion SI (if) depues de recibir el booleano generado por la expresion
+'''
+def p_pnCond1(p): #IF
     '''
-    pnQuadGenCond1 :
+    pnCond1 :
     '''
     global cuadruplos
+    memPos = popMemoria()
     exp_type = popTipos()
     
     if(exp_type != 'error'):
         result = popOperandos()
-        printQuad('GOTOF', result,'', '')
-        print("cond1: ", nextQuad())
+        QuadGenerate('GOTOF', result,'', '')
         pushSaltos(nextQuad() - 1)
 
     else:
-        errorTypeMismatch
+        errorTypeMismatch()
 
-    
-#Rellena el cuadruplo para saber cuando terminar la condicion
-def p_pnQuadGenCond2(p): #IF
+'''
+Rellena el cuadruplo para saber cuando terminar la condicion
+'''   
+def p_pnCond2(p): #IF
     '''
-    pnQuadGenCond2 :
+    pnCond2 :
     '''
     global cuadruplos
     
     end = popSaltos()
     
-    tempQuad = (cuadruplos[end][0], cuadruplos[end][1], cuadruplos[end][2], nextQuad())
-    cuadruplos[end] = tempQuad
+    QuadTemporal = (cuadruplos[end][0], cuadruplos[end][1], cuadruplos[end][2], nextQuad())
+    cuadruplos[end] = QuadTemporal
 
-#Genera el cuadruplo GOTO para SINO (else) y completa el cuadruplo
-def p_pnQuadGenCond3(p): #IF
+'''
+Genera el cuadruplo GOTO para SINO (else) y completa el cuadruplo
+'''
+def p_pnCond3(p): #IF
     '''
-    pnQuadGenCond3 :
+    pnCond3 :
     '''
     global cuadruplos
-    printQuad('GOTO', '', '', '')
+    QuadGenerate('GOTO', '', '', '')
     falso = popSaltos()
-    print("cond3: ", nextQuad())
     pushSaltos(nextQuad() - 1)
-    tempQuad = (cuadruplos[falso][0], cuadruplos[falso][1], cuadruplos[falso][2], nextQuad())
-    cuadruplos[falso] = tempQuad
+    QuadTemporal = (cuadruplos[falso][0], cuadruplos[falso][1], cuadruplos[falso][2], nextQuad())
+    cuadruplos[falso] = QuadTemporal
 
-
-#Mete el siguiente cuadruplo a pSaltos. Que representa la ubicacion a donde regresara al final del ciclo para volver a evaluar la condicion
-def p_pnQuadGenCiclos1(p):
+'''
+Mete el siguiente cuadruplo a pSaltos. Que representa la ubicacion a donde regresara al final del ciclo para volver a evaluar la condicion
+'''
+def p_pnCiclos1(p):
     '''
-    pnQuadGenCiclos1 :  
+    pnCiclos1 :  
     '''
     
     pushSaltos(nextQuad())
 
-
-def p_pnQuadGenCiclos2(p):
+'''
+Genera el cuadruplo de GOTOF
+'''
+def p_pnCiclos2(p):
     '''
-    pnQuadGenCiclos2 : 
+    pnCiclos2 : 
     '''
     exp_type = popTipos()
+    memPos = popMemoria()
     if exp_type != 'error':
         result = popOperandos()
-        printQuad('GOTOF', result, '', '')
+        QuadGenerate('GOTOF', result, '', '')
         pushSaltos(nextQuad() - 1)
     else:
         errorTypeMismatch()
 
-
-#Genera el cuadruplo GOTO para regresar al inicio del ciclo y volver evaluar la nueva condicion. Aqui tambien se rellena el GOTOF anterior
-def p_pnQuadGenCiclos3(p):
+'''
+Genera el cuadruplo GOTO para regresar al inicio del ciclo y volver evaluar la nueva condicion. Aqui tambien se rellena el GOTOF anterior
+'''
+def p_pnCiclos3(p):
     '''
-    pnQuadGenCiclos3 : 
+    pnCiclos3 : 
     '''
     end = popSaltos()
     retorno = popSaltos()
-    printQuad('GOTO', '', '', retorno) #Genetare quad: GOTO
+    QuadGenerate('GOTO', '', '', retorno) #Genetare quad: GOTO
 
-    tempQuad = (cuadruplos[end][0], cuadruplos[end][1], cuadruplos[end][2], nextQuad())
-    cuadruplos[end] = tempQuad #FILL (end, cont)
+    QuadTemporal = (cuadruplos[end][0], cuadruplos[end][1], cuadruplos[end][2], nextQuad())
+    cuadruplos[end] = QuadTemporal #FILL (end, cont)
 
-#Activa la variable bool de ForBool para indicar que esta entrando a un For
-def p_pnQuadGenCiclos4(p):
+'''
+Activa la variable bool de ForBool para indicar que esta entrando a un For
+'''
+def p_pnCiclos4(p):
     '''
-    pnQuadGenCiclos4 : 
+    pnCiclos4 : 
     '''
     global forBool
     forBool = True
     
-
-def p_pnQuadGenCiclos5(p):
+'''
+Hace verificaciones si existen las variables y si los tipos son compatibles
+'''
+def p_pnCiclos5(p):
     '''
-    pnQuadGenCiclos5 : 
+    pnCiclos5 : 
     '''
     if topOperador() in OP_ASIG:
         quad_rightOperand = popOperandos()
@@ -1264,13 +1775,16 @@ def p_pnQuadGenCiclos5(p):
             if quad_leftType == 'error':
                 print("Error: Operacion invalida")
             else:
-                printQuad(quad_operator, quad_rightOperand, '', quad_leftOperand)
+                QuadGenerate(quad_operator, quad_rightOperand, '', quad_leftOperand)
         else:
             print("Error")
-    
-def p_pnQuadGenCiclos6(p):
+
+'''
+
+'''
+def p_pnCiclos6(p):
     '''
-    pnQuadGenCiclos6 :
+    pnCiclos6 :
     '''
     pushOperando(varFor)
 
@@ -1286,10 +1800,12 @@ def p_pnQuadGenCiclos6(p):
     pushOperador('<=')
     pushSaltos(nextQuad())
     
+'''
 
-def p_pnQuadGenCiclos7(p):
+'''
+def p_pnCiclos7(p):
     '''
-    pnQuadGenCiclos7 :
+    pnCiclos7 :
     '''
     if topOperador() in OP_REL:
         quad_rightOperand = popOperandos()
@@ -1305,7 +1821,7 @@ def p_pnQuadGenCiclos7(p):
             print('Error: Type Mismatch')
         else:
             quad_resultIndex = nextAvailTemp(quad_resultType)
-            printQuad(quad_operator, quad_leftOperand, quad_rightOperand, quad_resultIndex)
+            QuadGenerate(quad_operator, quad_leftOperand, quad_rightOperand, quad_resultIndex)
             pushOperando(quad_resultIndex)
             pushTipo(quad_resultType)
             
@@ -1314,55 +1830,91 @@ def p_pnQuadGenCiclos7(p):
             errorTypeMismatch()
         else:
             result = popOperandos()
-            printQuad('GOTOF', result, '', '')
+            QuadGenerate('GOTOF', result, '', '')
             pushSaltos(nextQuad() - 1)
 
-def p_pnQuadGenCiclos8(p):
+'''
+
+'''
+def p_pnCiclos8(p):
     '''
-    pnQuadGenCiclos8 :
+    pnCiclos8 :
     '''
     end = popSaltos()
     retorno = popSaltos()
-    printQuad('GOTO', '', '', retorno) #Genetare quad: GOTO
+    QuadGenerate('GOTO', '', '', retorno) #Genetare quad: GOTO
 
-    tempQuad = (cuadruplos[end][0], cuadruplos[end][1], cuadruplos[end][2], nextQuad())
-    cuadruplos[end] = tempQuad #FILL (end, cont) 
+    QuadTemporal = (cuadruplos[end][0], cuadruplos[end][1], cuadruplos[end][2], nextQuad())
+    cuadruplos[end] = QuadTemporal #FILL (end, cont) 
 
+#################### ESTATUTOS ###############
+'''Punto neuralgico en returno'''
+def p_pnRetorno(p):
+    '''
+    pnRetorno :
+    '''
+    global currentFunc
+    global returnBool
+    print("return Bool: ", returnBool)
+    if returnBool:
+        print(pOperandos)
+        print(pTipos)
+        operador = popOperadores()
+        operandoRetorno = popOperandos()
+        tipoRetorno = popTipos()
+        memRetorno = popMemoria()
 
-# parser = yacc.yacc()
+        if directorioFunciones.directorio_funciones[currentFunc]['tipo'] == tipoRetorno:
+            QuadGenerate(operador, '', '', memRetorno)
+        else:
+            errorReturnTipo()
+    else:
+        print ("Error: Esta funcion no debe regresar nada")
+    
+
+parser = yacc.yacc()
 
 # Put all test inside prueba folder
 def main():
-    name = input('File name: ')
-    name = "pruebas/" + name
+    #name = input('File name: ')
+    name = "pruebas/" + "test3" + ".txt" #Para probar, cambia el nombre del archivo
     print(name)
     try:
         f = open(name,'r', encoding='utf-8')
-        parser.parse(f.read())
+        QuadTemporal = ('0', '0', '0', '0')
+        pushQuad(QuadTemporal)
+        result = parser.parse(f.read())
+        print(result)
         f.close()
     except EOFError:
         print (EOFError)
 
-#main()
+main()
 
 #Test it out
-data =''' 
-programa COVID19;
-var
-int : A, B, C, D;
+# data =''' 
+# programa COVID19;
+# var
+# int : A, B, C, D;
 
-principal()
-{
+# funcion void hola(int x, int y)
+# var
+# float : z, k;
+# {
 
-A = -5.6 +  C;
+# }
+# principal()
+# {
 
-}
-'''
-tempQuad = ('0', '0', '0', '0')
-pushQuad(tempQuad)
+# hola(A, C);
 
-parser = yacc.yacc()
-result = parser.parse(data)
+# }
+# '''
+# QuadTemporal = ('0', '0', '0', '0')
+# pushQuad(QuadTemporal)
 
-print(result)
+#parser = yacc.yacc()
+#result = parser.parse(data)
+
+#print(result)
 # print(directorioFunciones.func_search(GBL))

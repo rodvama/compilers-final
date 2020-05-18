@@ -5,62 +5,61 @@
 
 # Quick Reference Manual
 <h2>Tipos de Datos</h2>
-Int, Float, String, Char, Bool
+<p>Int, Float, String, Char, Bool</p>
 
 <h3>Declaraciones</h3>
-var int i;
-var float j;
-var char 'c';
-var string 'ejemplo';
-var bool bandera;
+<p>var int i;</p>
+<p>var float j;</p>
+<p>var char 'c';</p>
+<p>var string 'ejemplo';</p>
+<p>var bool bandera;</p>
 
 <h2>Arreglos</h2>
-DataFrame
-
-...
+<p>DataFrame</p>
+<p>...</p>
 
 <h2>Operadores</h2>
-Asignación: =
+<p>Asignación: =</p>
 
 <h3>Matemáticos</h3>
-suma: +
-resta: -
-división: /
-multiplicación: *
+<p>suma: +</p>
+resta: -</p>
+<p>división: /
+<p>multiplicación: *</p>
 
 <h3>Relacionales y lógicos</h3>
-mayor igual que: >=
-menor igual que: <=
-mayor que: >
-menor que: <
-no igual: !=
-igual: ==
-and: &
-or: \
+<p>mayor igual que: >= </p>
+<p>menor igual que: <= </p>
+<p>mayor que: > </p>
+<p>menor que: < </p>
+<p>no igual: != </p>
+<p>igual: == </p>
+<p>and: & </p>
+<p>or: \ </p>
 
 <h2>Condicionales</h2>
-si
-haz
-sino
-mientras
-entonces
+<p>si</p>
+<p>haz</p>
+<p>sino</p>
+<p>mientras</p>
+<p>entonces</p>
 
 <h3>Ejemplos</h3>
-si i < j entonces {...} sino {...}
-mientras(j != i) haz {...}
+<p>si i < j entonces {...} sino {...}</p>
+<p>mientras(j != i) haz {...}</p>
 
 <h2>Ciclos</h2>
-Desde
-hasta
-hacer
+<p>desde</p>
+<p>hasta</p>
+<p>hacer</p>
 
 <h3>Ejemplos</h3>
-Desde i hasta j hacer {...}
+<p>desde i hasta j hacer {...}</p>
 
 <h2>Carga de archivos</h2>
-lee("nombre");
+<p>lee("nombre");</p>
 
 cargaArchivo("nombre");
 
 <h2>Imprimir</h2>
-escribe("mensaje");
+<p>escribe("mensaje");</p>

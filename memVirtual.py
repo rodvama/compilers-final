@@ -16,12 +16,13 @@ class memVirtual:
         self.funNombre = fun
         # Declaramos diccionario para las direcciones de la tabla de variable
         self.direcciones = {
-            #tipo       #dirreciones
+            #tipo       #direcciones
             'int'       : {},
             'float'     : {},
             'char'      : {},
             'string'    : {},
-            'bool'      : {}
+            'bool'      : {},
+            'DataFrame' : {}
         }
 
     """

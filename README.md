@@ -5,7 +5,7 @@
 
 # Quick Reference Manual
 <h2>Tipos de Datos</h2>
-<p>Int, Float, String, Char, Bool</p>
+<p>Int, Float, String, Char, Bool, DataFrame</p>
 
 <h3>Declaraciones</h3>
 <p>var int i;</p>
@@ -23,7 +23,7 @@
 
 <h3>Matemáticos</h3>
 <p>suma: +</p>
-resta: -</p>
+<p>resta: -</p>
 <p>división: /
 <p>multiplicación: *</p>
 

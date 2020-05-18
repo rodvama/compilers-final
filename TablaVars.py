@@ -1,5 +1,5 @@
 # Jose Arturo Villalobos A00818214
-# Rodrigo Valencia
+# Rodrigo Valencia A00818256
 # Diseno de compiladores
 
 ############################## Tabla de Variables ##############################

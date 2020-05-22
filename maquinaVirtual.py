@@ -5,6 +5,9 @@
 
 import sys
 from memVirtual import *
+import numpy as np
+import statistics as stats
+import matplotlib.pyplot as plt
 
 
 CONST_LOCALES = 'locales'
@@ -18,7 +21,6 @@ ESPACIO_MEMORIA = 100
 mem_GLOBAL = memVirtual('global')
 mem_MAIN = memVirtual('main')
 
-# obejota 
 cuaLista = []
 cuaIndice = 0
 cuadruplo = ()
@@ -47,16 +49,16 @@ def push(pilaNom, mem):
 def pop(pilaNom):
     if pilaNom == "temporal":
         global pilaTemporal
-        pilaTemporal.pop()
+        return pilaTemporal.pop()
     elif pilaNom == "ejecucion":
         global pilaEjecucion
-        pilaEjecucion.pop()
+        return pilaEjecucion.pop()
     elif pilaNom == "retorno":
         global pilaRetorno
-        pilaRetorno.pop()
+        return pilaRetorno.pop()
     elif pilaNom == "funcion":
         global pilaFuncion
-        pilaFuncion.pop()
+        return pilaFuncion.pop()
 
 def top(pilaNom):
     if pilaNom == "temporal":
@@ -85,7 +87,6 @@ def top(pilaNom):
         return pilaFuncion
 
 push(CONST_EJECUCION, mem_MAIN)
-
 
 '''
 Espacios de memoria:
@@ -240,52 +241,51 @@ def getTipo(mem):
         return 'bool'
     
 
-def res(signo):
+def operadores(signo):
     tipo1 = getTipo(cuadruplo[1])
     tipo2 = getTipo(cuadruplo[2])
-    op1 = getValor(pilaCorriendo, cuadruplo[1], tipo1)
-    op2 = getValor(pilaCorriendo, cuadruplo[2], tipo2)
+    valor1 = getValor(pilaCorriendo, cuadruplo[1], tipo1)
+    valor2 = getValor(pilaCorriendo, cuadruplo[2], tipo2)
 
     if tipo1 == 'int':
-        op1 = int(op1)
+        valor1 = int(valor1)
     elif tipo1 == 'float':
-        op1 == float(op1);
+        valor1 == float(valor1);
 
     if tipo2 == 'int':
-        op2 = int (op2)
+        valor2 = int (valor2)
     elif tipo2 == 'float':
-        op2 == float(op2) 
+        valor2 == float(valor2) 
     
     if signo == '+':
-        res = op1 + op2
+        res = valor1 + valor2
     elif signo == '-':
-        res = op1 - op2
+        res = valor1 - valor2
     elif signo == '*':
-        res = op1 * op2
+        res = valor1 * valor2
     elif signo == '/':
-        res = op1 / op2
+        res = valor1 / valor2
     elif signo == '==':
-        res = op1 == op2
+        res = valor1 == valor2
     elif signo == '<':
-        res = op1 < op2
+        res = valor1 < valor2
     elif signo == '>':
-        res = op1 > op2
+        res = valor1 > valor2
     elif signo == '<=':
-        res = op1 <= op2
+        res = valor1 <= valor2
     elif signo == '>=':
-        res = op1 >= op2
+        res = valor1 >= valor2
     elif signo == '!=':
-        res = op1 != op2
+        res = valor1 != valor2
     elif signo == '|':
-        res = True if op1 == op2 and op1 == False and op2 == False else False
+        res = True if valor1 == valor2 and valor1 == False and valor2 == False else False
     elif signo == '&':
-        res = True if op1 == op2 and op1 == True else False
+        res = True if valor1 == valor2 and valor1 == True else False
 
     llenarValor(pilaCorriendo, cuadruplo[3], getTipo(cuadruplo[3]), res)
 
-    
-
-def run():
+def correr():
+    print("entre")
     global cuaLista
     global cuaIndice
     global cuadruplo
@@ -294,28 +294,176 @@ def run():
     global sigCuaIndice
     global pilaCorriendo
 
-    terminado = True
-    while terminado != False:
+    terminado = False
+    while not terminado:
         sigCuaIndice = -1
         pilaCorriendo = top(CONST_EJECUCION)
         cuadruplo = cuaLista[cuaIndice]
         
+        # ASIGNACION
         if cuadruplo[0] == '=':
-        # =
-        # escribe
+            return
+        # COMANDOS        
         # GOTO
+        elif cuadruplo[0] == 'GOTO':
+            sigCuaIndice = int(cuadruplo[3])
         # GOTOF
+        elif cuadruplo[0] == 'GOTOF':
+            tipo = getTipo(cuadruplo[1])
+            auxValor = getValor(pilaCorriendo, cuadruplo[1], tipo)
+            if not auxValor:
+                sigCuaIndice = int(cuadruplo[3])
         # ERA
+        elif cuadruplo[0] == 'ERA':
+            funcion = str(cuadruplo[1])
+            memNueva = memVirtual(funcion)
+            push(CONST_TEMPORAL, memNueva)
         # PARAMETER
+        elif cuadruplo[0] == 'PARAMETER':
+            tipo = getTipo(cuadruplo[1])
+            valor = getValor(pilaCorriendo, cuadruplo[1], tipo)
+            auxMem = top(CONST_TEMPORAL)
+            mem = auxMem.sigDireccionDisponible(tipo, limite_dfGlobales, ESPACIO_MEMORIA)
+            llenarValor(auxMem, mem, getTipo(mem), valor)
         # GOSUB
+        elif cuadruplo[0] == 'GOSUB':
+            pilaCorriendo = pop(CONST_TEMPORAL)
+            push(CONST_EJECUCION, pilaCorriendo)
+            push(CONST_FUNCION_RETORNO, cuadruplo[2])
+            sigCuaIndice = int(cuadruplo[3])
         # ENDFUNC
+        elif cuadruplo[0] == 'ENDFUNC':
+            pop(CONST_EJECUCION)
+            sigCuaIndice = int(pop(CONST_FUNCION_RETORNO))
         # regresa
+        elif cuadruplo[0] == 'regresa':
+            if cuadruplo[3] != '':
+                valor = getValor(pilaCorriendo, cuadruplo[3], getTipo(cuadruplo[3]))
+                push(CONST_RETORNO_VALOR, valor)
+            pop(CONST_EJECUCION)
+            sigCuaIndice = int(pop(CONST_FUNCION_RETORNO));
         # lee
+        elif cuadruplo[0] == 'lee':
+            texto = input("> ")
+            try:
+                int(texto)
+                tipo = 'int'
+            except:
+                try:
+                    float(texto)
+                    tipo = 'float'
+                except:
+                    try:
+                        str(texto)
+                        tipo = 'char' if len(texto) == 1 else 'string'
+                    except:
+                        print("Error: {}".format(sys.exc_info()[0], cuaIndice))
+            # TODO: Ver lo de los arreglos
+        # escribe
+        elif cuadruplo[0] == 'escribe':
+            texto = getValor(pilaCorriendo, cuadruplo[1], getTipo(cuadruplo[1]))
+            print(str(texto))
+        # FUNCIONES ESPECIALES
         # Media
+        elif cuadruplo[0] == 'media':
+            arreglo = []
+            base = int(cuadruplo[1])
+            col = int(cuadruplo[2])
+            for x in range(col):
+                auxValor = getValor(pilaCorriendo, base+x, getTipo(base+x))
+                arreglo.append(float(auxValor))
+            auxTipo = getTipo(cuadruplo[3])
+            llenarValor(pilaCorriendo, cuadruplo[3], auxTipo, np.mean(arreglo))
         # plothist
+        elif cuadruplo[0] == 'plothist':
+            base = int(cuadruplo[1])
+            col = int(cuadruplo[2])
+            auxBins = getValor(pilaCorriendo, int(cuadruplo[3]), getTipo(int(cuadruplo[3])))
+            auxBins = int(auxBins)
+            auxArray = []
+            for x in range(col - 1):
+                auxArray.append(getValor(pilaCorriendo, base+x, getTipo(base+x)))
+            plt.hist(auxArray, bins=auxBins)
+            plt.show()
+            plt.close()
         # plotline
+        elif cuadruplo[0] == 'plotline':
+            col = int(cuadruplo[3])
+            base1 = int(cuadruplo[1])
+            base2 = int(cuadruplo[2])
+            arreglo1 = []
+            arreglo2 = []
+            for x in range(col -1):
+                arreglo1.append(getValor(pilaCorriendo, base1+x, getTipo(base1+x)))
+                arreglo2.append(getValor(pilaCorriendo, base2+x, getTipo(base2+x)))
+            plt.plot(arreglo1, arreglo2)
+            plt.show()
+            plt.close()
         # Mediana
+        elif cuadruplo[0] == 'mediana':
+            arreglo = []
+            base = int(cuadruplo[1])
+            col = int(cuadruplo[2])
+            for x in range(col):
+                auxValor = getValor(pilaCorriendo, base+x, getTipo(base+x))
+                arreglo.append(float(auxValor))
+            auxTipo = getTipo(cuadruplo[3])
+            llenarValor(pilaCorriendo, cuadruplo[3], auxTipo, np.median(arreglo))
         # moda
+        elif cuadruplo[0] == 'moda':
+            arreglo = []
+            base = int(cuadruplo[1])
+            col = int(cuadruplo[2])
+            for x in range(col):
+                auxValor = getValor(pilaCorriendo, base+x, getTipo(base+x))
+                arreglo.append(float(auxValor))
+            auxTipo = getTipo(cuadruplo[3])
+            try:
+                res = stats.mode(arreglo)
+                llenarValor(pilaCorriendo, cuadruplo[3], auxTipo, res)
+            except:
+                print("Error: El arreglo no tiene una moda definida, se regresa el ultimo valor.")
+                llenarValor(pilaCorriendo, cuadruplo[3], auxTipo, auxValor)
+        # varianza
+        elif cuadruplo[0] == 'varianza':
+            arreglo = []
+            base = int(cuadruplo[1])
+            col = int(cuadruplo[2])
+            for x in range(col):
+                auxValor = getValor(pilaEjecucion, base+x, getTipo(base+x))
+                arreglo.append(float(auxValor))
+            auxTipo = getTipo(cuadruplo[3])
+            llenarValor(pilaEjecucion, cuadruplo[3], auxTipo, np.var(arreglo))
+        elif cuadruplo[0] == 'FINPROGRAMA':
+            terminado = True
+        # OPERADORES 
+        else:
+            operadores(cuadruplo[0])
+        if sigCuaIndice != -1:
+            cuaIndice = sigCuaIndice
+        else: #Solo se ejecuta el siguiente quad
+            cuaIndice = cuaIndice + 1
 
+# Put all test inside prueba folder
+def getArchivo():
+    #name = input('File name: ')
+    name =  "obj"+ ".txt" #Para probar, cambia el nombre del archivo
+    try:
+        f = open(name,'r', encoding='utf-8')
+        return f
+        f.close()
+    except EOFError:
+        print (EOFError)
 
- 
+# TODO: lectura de archivos
+cuadruplos = getArchivo()
+for linea in cuadruplos:
+    linea = linea.replace('\n','')
+    linea = linea.replace('\'','')
+    linea = linea.replace(' ','')
+    cuadruplo = tuple(linea.split(','))
+    # print(cuadruplo[1])
+    cuadruplo = (cuadruplo[0], cuadruplo[1], cuadruplo[2], cuadruplo[3])
+    cuaLista.append(cuadruplo)
+
+correr()

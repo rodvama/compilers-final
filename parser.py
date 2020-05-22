@@ -78,7 +78,7 @@ Espacios de memoria:
 +---------------------+
 +globales strings     + batch_size
 +---------------------+
-+globales char       + batch_size
++globales char        + batch_size
 +---------------------+
 +globales dataframes  + batch_size
 +++++++++++++++++++++++
@@ -112,7 +112,7 @@ Espacios de memoria:
 +---------------------+
 +constantes char      + batch_size
 +---------------------+
-+constantes dataframe    + batch_size
++constantes dataframe + batch_size
 +++++++++++++++++++++++
 '''
 #Declaracion de espacio de memoria por tipo de memoria
@@ -137,8 +137,8 @@ limite_boolTemporales = limite_dfTemporales + ESPACIO_MEMORIA
 
 limite_intConstantes = limite_boolTemporales + ESPACIO_MEMORIA
 limite_floatConstantes = limite_intConstantes + ESPACIO_MEMORIA
-limite_stringConstantes = limite_floatConstantes + ESPACIO_MEMORIA
-limite_charConstantes = limite_stringConstantes + ESPACIO_MEMORIA
+limite_stringsConstantes = limite_floatConstantes + ESPACIO_MEMORIA
+limite_charConstantes = limite_stringsConstantes + ESPACIO_MEMORIA
 limite_dfConstantes = limite_charConstantes + ESPACIO_MEMORIA
 
 
@@ -169,7 +169,7 @@ cont_BoolTemporales = limite_dfTemporales
 cont_IntConstantes = limite_boolTemporales
 cont_FloatConstantes = limite_intConstantes
 cont_StringConstantes = limite_floatConstantes
-cont_CharConstantes = limite_stringConstantes
+cont_CharConstantes = limite_stringsConstantes
 cont_dfConstantes = limite_charConstantes
 
 
@@ -711,7 +711,7 @@ def pushConstante(constante):
     
     elif type(constante) == str:
         if constante not in d_strs:
-            if cont_StringConstantes < limite_stringConstantes:
+            if cont_StringConstantes < limite_stringsConstantes:
                 d_strs[constante] = cont_StringConstantes
                 cont_StringConstantes += 1
                 #QuadGenerate('Constante Creada', 'string', constante, d_strs[constante])

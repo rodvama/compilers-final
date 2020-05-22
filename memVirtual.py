@@ -21,7 +21,6 @@ class memVirtual:
             'float'     : {},
             'char'      : {},
             'string'    : {},
-            'bool'      : {},
             'DataFrame' : {}
         }
 

@@ -71,7 +71,10 @@ class DirFunc:
     '''
     def func_updateDim(self, nombre, nombreVar, renglones, columnas):
         if self.directorio_funciones[nombre]['variables'].var_exist(nombreVar):
-            return self.directorio_funciones[nombre]['variables'].var_upadateDims(nombreVar, renglones, columnas)
+            if columnas > 0:
+                return self.directorio_funciones[nombre]['variables'].var_upadateDims(nombreVar, renglones, columnas)
+            else:
+                return self.directorio_funciones[nombre]['variables'].var_upadateDims(nombreVar, renglones, -1)
         else:
             print("Error: Variable ", nombreVar, "no existe en este contexto ", nombre)
             return None

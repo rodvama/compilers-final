@@ -2,7 +2,7 @@
 # Rodrigo Valencia A00818256
 # Diseno de compiladores
 # Parser
-#Ultima modificacion: 10 Mayo 2020
+#Ultima modificacion: 23 Mayo 2020
 import ply.yacc as yacc
 import os
 import codecs
@@ -63,11 +63,15 @@ varFor = ''
 negativo = False
 returnBool = False #sirve para saber si una funcion debe regresar algun valor (si es void o no)
 
+
 #Variables para Arreglos y matrices
+isArray = False
+isMatrix = False
 numRenglones = 0
 numColumnas = 0
-R = 1
-base = 0
+R = 1 #m0
+dirBase = 0 #Direccion base
+currentConstArrays = []
 
 '''
 Espacios de memoria:
@@ -284,11 +288,11 @@ def p_lista_ids(p):
     'lista_ids : lista SEMICOLON'
 
 def p_lista(p):
-    'lista : ID dd pn_2_addVariable lista1'
+    'lista : ID pn_2_addVariable dd lista1'
 
 def p_dd(p):
     '''
-    dd : dim_dec
+    dd : dim_dec pnDimDec8
        | empty
     '''
 
@@ -300,11 +304,11 @@ def p_lista1(p):
 
 #Dimensiones
 def p_dim_dec(p):
-    'dim_dec : LBRACK CTE_INT RBRACK pn_7_decRenglones dim_dec1'
+    'dim_dec : LBRACK pnDimDec2_3 CTE_INT pnDimDec5 RBRACK pn_7_decRenglones dim_dec1'
 
 def p_dim_dec1(p):
     '''
-    dim_dec1 : LBRACK CTE_INT RBRACK pn_8_decColumnas
+    dim_dec1 : LBRACK CTE_INT pnDimDec6 RBRACK pn_8_decColumnas
              | empty
     '''
 
@@ -1031,16 +1035,15 @@ def p_pn_2_addVariable(p):
     global varName
     global currentType
     global currentVarName
-    global numColumnas
-    global numRenglones
     global currentCantVars
 
-    varName = p[-2]
+    varName = p[-1]
     currentVarName = varName
+    
     PosMem = nextAvailMemory(currentFunc, currentType)
-    directorioFunciones.func_addVar(currentFunc, varName, currentType, numRenglones, numColumnas, PosMem)
-    numColumnas = 0
-    numRenglones = 0
+    
+    directorioFunciones.func_addVar(currentFunc, varName, currentType, 0, 0, PosMem)
+    
     currentCantVars += 1
   
 
@@ -1871,13 +1874,100 @@ def p_pnRetorno(p):
     else:
         print ("Error: Esta funcion no debe regresar nada")
     
+######## ARREGLOS ###############
+'''
+Punto neuralgico 2 y 3
+Set id as an Array (isArray = true)
+'''
+def p_pnDimDec2_3(p):
+    '''
+    pnDimDec2_3 : 
+    '''
+    global isArray
+    isArray = True
+
+    # t = popTipos()
+    # t = popOperandos()
+    # t = popMemoria()
+
+
+
+'''
+Punto neuralgico 5 de Elda
+Guardar limite de Columnas
+'''
+def p_pnDimDec5(p):
+    '''
+    pnDimDec5 : 
+    '''
+    global R
+    global numColumnas
+    global directorioFunciones
+    global currentFunc
+    global currentVarName
+
+    columnas = p[-1]
+    if columnas > 0:
+        R = R * columnas # R = (LimSup - LimInf + 1) * R
+        print("PN5Arreglos.  R = ", R)
+        numColumnas = columnas
+
+        directorioFunciones.func_updateDim(currentFunc, currentVarName, 0, columnas)
+    else:
+        sys.exit("Error: Index de arreglo invalido: ", columnas)
+
+def p_pnDimDec6(p):
+    '''
+    pnDimDec6 :
+    '''
+    # global isMatrix
+    global R
+    global numRenglones
+    global directorioFunciones
+    global currentFunc
+    global currentVarName
+
+    isMatrix = True
+    renglones = p[-1]
+    if renglones > 0:
+        R = R * renglones 
+        numRenglones = renglones
+
+        directorioFunciones.func_updateDim(currentFunc, currentVarName, renglones, -1)
+    else: 
+        sys.exit("Error. Index menor o igual a cero no es valido")
+        return
+
+def p_pnDimDec8(p):
+    '''
+    pnDimDec8 : 
+    '''
+    global R
+    global directorioFunciones
+    global currentFunc
+    global currentVarName
+    global isArray
+    # global isMatrix
+    global currentConstArrays
+    NumEspacios = R - 1
+    
+    currentType = directorioFunciones.func_searchVarType(currentFunc, currentVarName)
+
+    update_pointer(currentFunc, currentType, NumEspacios) #Separa los espacios que va a usar para el arreglo o matriz
+    
+    
+    #Reseteo
+    R = 1
+    isArray = False
+    currentConstArrays = []
+
 
 parser = yacc.yacc()
 
 # Put all test inside prueba folder
 def main():
     #name = input('File name: ')
-    name = "pruebas/" + "test3" + ".txt" #Para probar, cambia el nombre del archivo
+    name = "pruebas/" + "test4" + ".txt" #Para probar, cambia el nombre del archivo
     print(name)
     try:
         f = open(name,'r', encoding='utf-8')

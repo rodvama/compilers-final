@@ -1,0 +1,11 @@
+programa COVID19;
+
+var 
+int: i[2][2];
+
+
+
+principal()
+{
+
+}

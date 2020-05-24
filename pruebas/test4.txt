@@ -1,11 +1,11 @@
 programa COVID19;
 
 var 
-int: i[2][2];
+int: B[5][7], A[9], j, i, k;
 
 
 
 principal()
-{
-
+{   
+    B[i+j][k] = i + j;
 }

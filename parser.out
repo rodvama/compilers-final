@@ -41,9 +41,9 @@ Rule 31    lista1 -> empty
 Rule 32    dim_dec -> LBRACK pnDimDec2_3 CTE_INT pnDimDec5 RBRACK pn_7_decRenglones dim_dec1
 Rule 33    dim_dec1 -> LBRACK CTE_INT pnDimDec6 RBRACK pn_8_decColumnas
 Rule 34    dim_dec1 -> empty
-Rule 35    dim_index -> LBRACK exp RBRACK dim_index1
-Rule 36    dim_index1 -> LBRACK exp RBRACK
-Rule 37    dim_index1 -> empty
+Rule 35    dim_index -> LBRACK pnDimAccess2 pnExp6 exp pnActivaArray RBRACK pnExp7 dim_index1
+Rule 36    dim_index1 -> LBRACK pnExp6 exp pnActivaArray RBRACK pnExp7 pnMatrizAcc
+Rule 37    dim_index1 -> empty pnArregloAcc
 Rule 38    bloque -> LBRACE est RBRACE
 Rule 39    est -> estatutos est
 Rule 40    est -> empty
@@ -182,6 +182,10 @@ Rule 172   pnDimDec2_3 -> <empty>
 Rule 173   pnDimDec5 -> <empty>
 Rule 174   pnDimDec6 -> <empty>
 Rule 175   pnDimDec8 -> <empty>
+Rule 176   pnDimAccess2 -> <empty>
+Rule 177   pnArregloAcc -> <empty>
+Rule 178   pnMatrizAcc -> <empty>
+Rule 179   pnActivaArray -> <empty>
 
 Terminals, with rules where they appear
 
@@ -294,6 +298,8 @@ op_r                 : 101
 param                : 16 19
 param1               : 18
 parametros           : 13
+pnActivaArray        : 35 36
+pnArregloAcc         : 37
 pnCiclos1            : 73
 pnCiclos2            : 73
 pnCiclos3            : 73
@@ -309,6 +315,7 @@ pnCteChar            : 86
 pnCteFloat           : 91
 pnCteInt             : 90
 pnCteStr             : 87
+pnDimAccess2         : 35
 pnDimDec2_3          : 32
 pnDimDec5            : 32
 pnDimDec6            : 33
@@ -320,8 +327,8 @@ pnExp2               : 112 113
 pnExp3               : 117 118
 pnExp4               : 109
 pnExp5               : 114
-pnExp6               : 120
-pnExp7               : 120
+pnExp6               : 35 36 120
+pnExp7               : 35 36 120
 pnExp8               : 103 104 105 106 107 108
 pnExp9               : 101
 pnFunCall_1_2        : 55
@@ -333,6 +340,7 @@ pnFunDec7            : 13
 pnFunDec_2_3         : 18
 pnFunEsp1            : 75 77 78 80 81 82 83 84
 pnGOTOprincipal      : 1
+pnMatrizAcc          : 36
 pnNeg                : 88
 pnPrincipal2         : 6
 pnRetorno            : 60
@@ -1518,7 +1526,7 @@ state 100
     (52) variable -> ID pnExp1 . di
     (53) di -> . dim_index
     (54) di -> . empty
-    (35) dim_index -> . LBRACK exp RBRACK dim_index1
+    (35) dim_index -> . LBRACK pnDimAccess2 pnExp6 exp pnActivaArray RBRACK pnExp7 dim_index1
     (124) empty -> .
 
     LBRACK          shift and go to state 120
@@ -1890,51 +1898,23 @@ state 119
 
 state 120
 
-    (35) dim_index -> LBRACK . exp RBRACK dim_index1
-    (109) exp -> . termino pnExp4 exp1
-    (114) termino -> . factor pnExp5 term
-    (119) factor -> . var_cte
-    (120) factor -> . LPAREN pnExp6 exp RPAREN pnExp7
-    (121) factor -> . variable
-    (122) factor -> . llamada
-    (123) factor -> . funciones_especiales
-    (86) var_cte -> . CTE_CH pnCteChar
-    (87) var_cte -> . CTE_STR pnCteStr
-    (88) var_cte -> . SUB pnNeg var_num
-    (89) var_cte -> . var_num
-    (52) variable -> . ID pnExp1 di
-    (55) llamada -> . ID pnFunCall_1_2 LPAREN llamada1 RPAREN pnFunCall_5_6_llamada
-    (79) funciones_especiales -> . fe LPAREN ID COMMA v_exp RPAREN
-    (80) funciones_especiales -> . CORRELACIONA pnFunEsp1 LPAREN ID COMMA v_exp COMMA v_exp RPAREN
-    (90) var_num -> . CTE_INT pnCteInt
-    (91) var_num -> . CTE_FLOAT pnCteFloat
-    (81) fe -> . MEDIA pnFunEsp1
-    (82) fe -> . MEDIANA pnFunEsp1
-    (83) fe -> . MODA pnFunEsp1
-    (84) fe -> . VARIANZA pnFunEsp1
+    (35) dim_index -> LBRACK . pnDimAccess2 pnExp6 exp pnActivaArray RBRACK pnExp7 dim_index1
+    (176) pnDimAccess2 -> .
 
-    LPAREN          shift and go to state 125
-    CTE_CH          shift and go to state 136
-    CTE_STR         shift and go to state 137
-    SUB             shift and go to state 138
-    ID              shift and go to state 140
-    CORRELACIONA    shift and go to state 142
-    CTE_INT         shift and go to state 143
-    CTE_FLOAT       shift and go to state 144
-    MEDIA           shift and go to state 145
-    MEDIANA         shift and go to state 146
-    MODA            shift and go to state 147
-    VARIANZA        shift and go to state 148
+    LPAREN          reduce using rule 176 (pnDimAccess2 -> .)
+    CTE_CH          reduce using rule 176 (pnDimAccess2 -> .)
+    CTE_STR         reduce using rule 176 (pnDimAccess2 -> .)
+    SUB             reduce using rule 176 (pnDimAccess2 -> .)
+    ID              reduce using rule 176 (pnDimAccess2 -> .)
+    CORRELACIONA    reduce using rule 176 (pnDimAccess2 -> .)
+    CTE_INT         reduce using rule 176 (pnDimAccess2 -> .)
+    CTE_FLOAT       reduce using rule 176 (pnDimAccess2 -> .)
+    MEDIA           reduce using rule 176 (pnDimAccess2 -> .)
+    MEDIANA         reduce using rule 176 (pnDimAccess2 -> .)
+    MODA            reduce using rule 176 (pnDimAccess2 -> .)
+    VARIANZA        reduce using rule 176 (pnDimAccess2 -> .)
 
-    exp                            shift and go to state 163
-    termino                        shift and go to state 130
-    factor                         shift and go to state 131
-    var_cte                        shift and go to state 132
-    variable                       shift and go to state 133
-    llamada                        shift and go to state 134
-    funciones_especiales           shift and go to state 135
-    var_num                        shift and go to state 139
-    fe                             shift and go to state 141
+    pnDimAccess2                   shift and go to state 163
 
 state 121
 
@@ -2688,10 +2668,23 @@ state 162
 
 state 163
 
-    (35) dim_index -> LBRACK exp . RBRACK dim_index1
+    (35) dim_index -> LBRACK pnDimAccess2 . pnExp6 exp pnActivaArray RBRACK pnExp7 dim_index1
+    (149) pnExp6 -> .
 
-    RBRACK          shift and go to state 214
+    LPAREN          reduce using rule 149 (pnExp6 -> .)
+    CTE_CH          reduce using rule 149 (pnExp6 -> .)
+    CTE_STR         reduce using rule 149 (pnExp6 -> .)
+    SUB             reduce using rule 149 (pnExp6 -> .)
+    ID              reduce using rule 149 (pnExp6 -> .)
+    CORRELACIONA    reduce using rule 149 (pnExp6 -> .)
+    CTE_INT         reduce using rule 149 (pnExp6 -> .)
+    CTE_FLOAT       reduce using rule 149 (pnExp6 -> .)
+    MEDIA           reduce using rule 149 (pnExp6 -> .)
+    MEDIANA         reduce using rule 149 (pnExp6 -> .)
+    MODA            reduce using rule 149 (pnExp6 -> .)
+    VARIANZA        reduce using rule 149 (pnExp6 -> .)
 
+    pnExp6                         shift and go to state 214
 
 state 164
 
@@ -3503,34 +3496,51 @@ state 213
 
 state 214
 
-    (35) dim_index -> LBRACK exp RBRACK . dim_index1
-    (36) dim_index1 -> . LBRACK exp RBRACK
-    (37) dim_index1 -> . empty
-    (124) empty -> .
+    (35) dim_index -> LBRACK pnDimAccess2 pnExp6 . exp pnActivaArray RBRACK pnExp7 dim_index1
+    (109) exp -> . termino pnExp4 exp1
+    (114) termino -> . factor pnExp5 term
+    (119) factor -> . var_cte
+    (120) factor -> . LPAREN pnExp6 exp RPAREN pnExp7
+    (121) factor -> . variable
+    (122) factor -> . llamada
+    (123) factor -> . funciones_especiales
+    (86) var_cte -> . CTE_CH pnCteChar
+    (87) var_cte -> . CTE_STR pnCteStr
+    (88) var_cte -> . SUB pnNeg var_num
+    (89) var_cte -> . var_num
+    (52) variable -> . ID pnExp1 di
+    (55) llamada -> . ID pnFunCall_1_2 LPAREN llamada1 RPAREN pnFunCall_5_6_llamada
+    (79) funciones_especiales -> . fe LPAREN ID COMMA v_exp RPAREN
+    (80) funciones_especiales -> . CORRELACIONA pnFunEsp1 LPAREN ID COMMA v_exp COMMA v_exp RPAREN
+    (90) var_num -> . CTE_INT pnCteInt
+    (91) var_num -> . CTE_FLOAT pnCteFloat
+    (81) fe -> . MEDIA pnFunEsp1
+    (82) fe -> . MEDIANA pnFunEsp1
+    (83) fe -> . MODA pnFunEsp1
+    (84) fe -> . VARIANZA pnFunEsp1
 
-    LBRACK          shift and go to state 259
-    ASSIGN          reduce using rule 124 (empty -> .)
-    MUL             reduce using rule 124 (empty -> .)
-    DIV             reduce using rule 124 (empty -> .)
-    ADD             reduce using rule 124 (empty -> .)
-    SUB             reduce using rule 124 (empty -> .)
-    LT              reduce using rule 124 (empty -> .)
-    GT              reduce using rule 124 (empty -> .)
-    LE              reduce using rule 124 (empty -> .)
-    GE              reduce using rule 124 (empty -> .)
-    NOT_EQUAL       reduce using rule 124 (empty -> .)
-    EQUAL           reduce using rule 124 (empty -> .)
-    AND             reduce using rule 124 (empty -> .)
-    OR              reduce using rule 124 (empty -> .)
-    RPAREN          reduce using rule 124 (empty -> .)
-    SEMICOLON       reduce using rule 124 (empty -> .)
-    COMMA           reduce using rule 124 (empty -> .)
-    RBRACK          reduce using rule 124 (empty -> .)
-    HASTA           reduce using rule 124 (empty -> .)
-    HACER           reduce using rule 124 (empty -> .)
+    LPAREN          shift and go to state 125
+    CTE_CH          shift and go to state 136
+    CTE_STR         shift and go to state 137
+    SUB             shift and go to state 138
+    ID              shift and go to state 140
+    CORRELACIONA    shift and go to state 142
+    CTE_INT         shift and go to state 143
+    CTE_FLOAT       shift and go to state 144
+    MEDIA           shift and go to state 145
+    MEDIANA         shift and go to state 146
+    MODA            shift and go to state 147
+    VARIANZA        shift and go to state 148
 
-    dim_index1                     shift and go to state 260
-    empty                          shift and go to state 261
+    exp                            shift and go to state 259
+    termino                        shift and go to state 130
+    factor                         shift and go to state 131
+    var_cte                        shift and go to state 132
+    variable                       shift and go to state 133
+    llamada                        shift and go to state 134
+    funciones_especiales           shift and go to state 135
+    var_num                        shift and go to state 139
+    fe                             shift and go to state 141
 
 state 215
 
@@ -3539,20 +3549,20 @@ state 215
 
     SEMICOLON       reduce using rule 171 (pnRetorno -> .)
 
-    pnRetorno                      shift and go to state 262
+    pnRetorno                      shift and go to state 260
 
 state 216
 
     (61) lectura -> LEE pnSec3 LPAREN variable RPAREN . SEMICOLON pnSec4 pnSec5
 
-    SEMICOLON       shift and go to state 263
+    SEMICOLON       shift and go to state 261
 
 
 state 217
 
     (62) escritura -> ESCRIBE pnSec3 LPAREN esc RPAREN . SEMICOLON pnSec5
 
-    SEMICOLON       shift and go to state 264
+    SEMICOLON       shift and go to state 262
 
 
 state 218
@@ -3602,7 +3612,7 @@ state 219
     MODA            shift and go to state 147
     VARIANZA        shift and go to state 148
 
-    esc                            shift and go to state 265
+    esc                            shift and go to state 263
     esc1                           shift and go to state 167
     exp                            shift and go to state 168
     termino                        shift and go to state 130
@@ -3633,21 +3643,21 @@ state 222
 
     (67) carga_datos -> CARGA LPAREN ID COMMA CTE_STR . COMMA ca COMMA ca RPAREN SEMICOLON
 
-    COMMA           shift and go to state 266
+    COMMA           shift and go to state 264
 
 
 state 223
 
     (120) factor -> LPAREN pnExp6 exp . RPAREN pnExp7
 
-    RPAREN          shift and go to state 267
+    RPAREN          shift and go to state 265
 
 
 state 224
 
     (70) decision -> SI LPAREN expresion RPAREN pnCond1 . ENTONCES bloque sino pnCond2
 
-    ENTONCES        shift and go to state 268
+    ENTONCES        shift and go to state 266
 
 
 state 225
@@ -3697,7 +3707,7 @@ state 226
     MODA            shift and go to state 147
     VARIANZA        shift and go to state 148
 
-    mega_exp                       shift and go to state 269
+    mega_exp                       shift and go to state 267
     super_exp                      shift and go to state 128
     exp                            shift and go to state 129
     termino                        shift and go to state 130
@@ -3719,7 +3729,7 @@ state 227
     ASSIGN          reduce using rule 152 (pnExp9 -> .)
     RPAREN          reduce using rule 152 (pnExp9 -> .)
 
-    pnExp9                         shift and go to state 270
+    pnExp9                         shift and go to state 268
 
 state 228
 
@@ -3888,7 +3898,7 @@ state 235
     MODA            shift and go to state 147
     VARIANZA        shift and go to state 148
 
-    exp                            shift and go to state 271
+    exp                            shift and go to state 269
     termino                        shift and go to state 130
     factor                         shift and go to state 131
     var_cte                        shift and go to state 132
@@ -3937,7 +3947,7 @@ state 237
     MODA            reduce using rule 145 (pnExp2 -> .)
     VARIANZA        reduce using rule 145 (pnExp2 -> .)
 
-    pnExp2                         shift and go to state 272
+    pnExp2                         shift and go to state 270
 
 state 238
 
@@ -3957,7 +3967,7 @@ state 238
     MODA            reduce using rule 145 (pnExp2 -> .)
     VARIANZA        reduce using rule 145 (pnExp2 -> .)
 
-    pnExp2                         shift and go to state 273
+    pnExp2                         shift and go to state 271
 
 state 239
 
@@ -4019,7 +4029,7 @@ state 240
     MODA            shift and go to state 147
     VARIANZA        shift and go to state 148
 
-    termino                        shift and go to state 274
+    termino                        shift and go to state 272
     factor                         shift and go to state 131
     var_cte                        shift and go to state 132
     variable                       shift and go to state 133
@@ -4069,7 +4079,7 @@ state 242
     MODA            reduce using rule 146 (pnExp3 -> .)
     VARIANZA        reduce using rule 146 (pnExp3 -> .)
 
-    pnExp3                         shift and go to state 275
+    pnExp3                         shift and go to state 273
 
 state 243
 
@@ -4089,7 +4099,7 @@ state 243
     MODA            reduce using rule 146 (pnExp3 -> .)
     VARIANZA        reduce using rule 146 (pnExp3 -> .)
 
-    pnExp3                         shift and go to state 276
+    pnExp3                         shift and go to state 274
 
 state 244
 
@@ -4120,14 +4130,14 @@ state 245
 
     (79) funciones_especiales -> fe LPAREN ID . COMMA v_exp RPAREN
 
-    COMMA           shift and go to state 277
+    COMMA           shift and go to state 275
 
 
 state 246
 
     (80) funciones_especiales -> CORRELACIONA pnFunEsp1 LPAREN . ID COMMA v_exp COMMA v_exp RPAREN
 
-    ID              shift and go to state 278
+    ID              shift and go to state 276
 
 
 state 247
@@ -4137,7 +4147,7 @@ state 247
 
     HAZ             reduce using rule 164 (pnCiclos2 -> .)
 
-    pnCiclos2                      shift and go to state 279
+    pnCiclos2                      shift and go to state 277
 
 state 248
 
@@ -4178,7 +4188,7 @@ state 248
     VARIANZA        shift and go to state 148
 
     variable                       shift and go to state 133
-    exp                            shift and go to state 280
+    exp                            shift and go to state 278
     termino                        shift and go to state 130
     factor                         shift and go to state 131
     var_cte                        shift and go to state 132
@@ -4191,21 +4201,21 @@ state 249
 
     (75) funciones_especiales_void -> VARIABLES pnFunEsp1 LPAREN ID COMMA . ID COMMA ID RPAREN SEMICOLON
 
-    ID              shift and go to state 281
+    ID              shift and go to state 279
 
 
 state 250
 
     (76) funciones_especiales_void -> fev LPAREN ID COMMA v_exp . RPAREN SEMICOLON
 
-    RPAREN          shift and go to state 282
+    RPAREN          shift and go to state 280
 
 
 state 251
 
     (85) v_exp -> VARIABLES . LBRACK exp RBRACK
 
-    LBRACK          shift and go to state 283
+    LBRACK          shift and go to state 281
 
 
 state 252
@@ -4223,7 +4233,7 @@ state 253
 
     RBRACK          reduce using rule 174 (pnDimDec6 -> .)
 
-    pnDimDec6                      shift and go to state 284
+    pnDimDec6                      shift and go to state 282
 
 state 254
 
@@ -4329,7 +4339,7 @@ state 257
     MODA            shift and go to state 147
     VARIANZA        shift and go to state 148
 
-    llamada1                       shift and go to state 285
+    llamada1                       shift and go to state 283
     exp                            shift and go to state 161
     empty                          shift and go to state 162
     termino                        shift and go to state 130
@@ -4350,110 +4360,21 @@ state 258
 
 state 259
 
-    (36) dim_index1 -> LBRACK . exp RBRACK
-    (109) exp -> . termino pnExp4 exp1
-    (114) termino -> . factor pnExp5 term
-    (119) factor -> . var_cte
-    (120) factor -> . LPAREN pnExp6 exp RPAREN pnExp7
-    (121) factor -> . variable
-    (122) factor -> . llamada
-    (123) factor -> . funciones_especiales
-    (86) var_cte -> . CTE_CH pnCteChar
-    (87) var_cte -> . CTE_STR pnCteStr
-    (88) var_cte -> . SUB pnNeg var_num
-    (89) var_cte -> . var_num
-    (52) variable -> . ID pnExp1 di
-    (55) llamada -> . ID pnFunCall_1_2 LPAREN llamada1 RPAREN pnFunCall_5_6_llamada
-    (79) funciones_especiales -> . fe LPAREN ID COMMA v_exp RPAREN
-    (80) funciones_especiales -> . CORRELACIONA pnFunEsp1 LPAREN ID COMMA v_exp COMMA v_exp RPAREN
-    (90) var_num -> . CTE_INT pnCteInt
-    (91) var_num -> . CTE_FLOAT pnCteFloat
-    (81) fe -> . MEDIA pnFunEsp1
-    (82) fe -> . MEDIANA pnFunEsp1
-    (83) fe -> . MODA pnFunEsp1
-    (84) fe -> . VARIANZA pnFunEsp1
+    (35) dim_index -> LBRACK pnDimAccess2 pnExp6 exp . pnActivaArray RBRACK pnExp7 dim_index1
+    (179) pnActivaArray -> .
 
-    LPAREN          shift and go to state 125
-    CTE_CH          shift and go to state 136
-    CTE_STR         shift and go to state 137
-    SUB             shift and go to state 138
-    ID              shift and go to state 140
-    CORRELACIONA    shift and go to state 142
-    CTE_INT         shift and go to state 143
-    CTE_FLOAT       shift and go to state 144
-    MEDIA           shift and go to state 145
-    MEDIANA         shift and go to state 146
-    MODA            shift and go to state 147
-    VARIANZA        shift and go to state 148
+    RBRACK          reduce using rule 179 (pnActivaArray -> .)
 
-    exp                            shift and go to state 286
-    termino                        shift and go to state 130
-    factor                         shift and go to state 131
-    var_cte                        shift and go to state 132
-    variable                       shift and go to state 133
-    llamada                        shift and go to state 134
-    funciones_especiales           shift and go to state 135
-    var_num                        shift and go to state 139
-    fe                             shift and go to state 141
+    pnActivaArray                  shift and go to state 284
 
 state 260
 
-    (35) dim_index -> LBRACK exp RBRACK dim_index1 .
+    (60) retorno -> REGRESA pnSec3 LPAREN exp RPAREN pnRetorno . SEMICOLON
 
-    ASSIGN          reduce using rule 35 (dim_index -> LBRACK exp RBRACK dim_index1 .)
-    MUL             reduce using rule 35 (dim_index -> LBRACK exp RBRACK dim_index1 .)
-    DIV             reduce using rule 35 (dim_index -> LBRACK exp RBRACK dim_index1 .)
-    ADD             reduce using rule 35 (dim_index -> LBRACK exp RBRACK dim_index1 .)
-    SUB             reduce using rule 35 (dim_index -> LBRACK exp RBRACK dim_index1 .)
-    LT              reduce using rule 35 (dim_index -> LBRACK exp RBRACK dim_index1 .)
-    GT              reduce using rule 35 (dim_index -> LBRACK exp RBRACK dim_index1 .)
-    LE              reduce using rule 35 (dim_index -> LBRACK exp RBRACK dim_index1 .)
-    GE              reduce using rule 35 (dim_index -> LBRACK exp RBRACK dim_index1 .)
-    NOT_EQUAL       reduce using rule 35 (dim_index -> LBRACK exp RBRACK dim_index1 .)
-    EQUAL           reduce using rule 35 (dim_index -> LBRACK exp RBRACK dim_index1 .)
-    AND             reduce using rule 35 (dim_index -> LBRACK exp RBRACK dim_index1 .)
-    OR              reduce using rule 35 (dim_index -> LBRACK exp RBRACK dim_index1 .)
-    RPAREN          reduce using rule 35 (dim_index -> LBRACK exp RBRACK dim_index1 .)
-    SEMICOLON       reduce using rule 35 (dim_index -> LBRACK exp RBRACK dim_index1 .)
-    COMMA           reduce using rule 35 (dim_index -> LBRACK exp RBRACK dim_index1 .)
-    RBRACK          reduce using rule 35 (dim_index -> LBRACK exp RBRACK dim_index1 .)
-    HASTA           reduce using rule 35 (dim_index -> LBRACK exp RBRACK dim_index1 .)
-    HACER           reduce using rule 35 (dim_index -> LBRACK exp RBRACK dim_index1 .)
+    SEMICOLON       shift and go to state 285
 
 
 state 261
-
-    (37) dim_index1 -> empty .
-
-    ASSIGN          reduce using rule 37 (dim_index1 -> empty .)
-    MUL             reduce using rule 37 (dim_index1 -> empty .)
-    DIV             reduce using rule 37 (dim_index1 -> empty .)
-    ADD             reduce using rule 37 (dim_index1 -> empty .)
-    SUB             reduce using rule 37 (dim_index1 -> empty .)
-    LT              reduce using rule 37 (dim_index1 -> empty .)
-    GT              reduce using rule 37 (dim_index1 -> empty .)
-    LE              reduce using rule 37 (dim_index1 -> empty .)
-    GE              reduce using rule 37 (dim_index1 -> empty .)
-    NOT_EQUAL       reduce using rule 37 (dim_index1 -> empty .)
-    EQUAL           reduce using rule 37 (dim_index1 -> empty .)
-    AND             reduce using rule 37 (dim_index1 -> empty .)
-    OR              reduce using rule 37 (dim_index1 -> empty .)
-    RPAREN          reduce using rule 37 (dim_index1 -> empty .)
-    SEMICOLON       reduce using rule 37 (dim_index1 -> empty .)
-    COMMA           reduce using rule 37 (dim_index1 -> empty .)
-    RBRACK          reduce using rule 37 (dim_index1 -> empty .)
-    HASTA           reduce using rule 37 (dim_index1 -> empty .)
-    HACER           reduce using rule 37 (dim_index1 -> empty .)
-
-
-state 262
-
-    (60) retorno -> REGRESA pnSec3 LPAREN exp RPAREN pnRetorno . SEMICOLON
-
-    SEMICOLON       shift and go to state 287
-
-
-state 263
 
     (61) lectura -> LEE pnSec3 LPAREN variable RPAREN SEMICOLON . pnSec4 pnSec5
     (158) pnSec4 -> .
@@ -4471,9 +4392,9 @@ state 263
     PLOTLINE        reduce using rule 158 (pnSec4 -> .)
     RBRACE          reduce using rule 158 (pnSec4 -> .)
 
-    pnSec4                         shift and go to state 288
+    pnSec4                         shift and go to state 286
 
-state 264
+state 262
 
     (62) escritura -> ESCRIBE pnSec3 LPAREN esc RPAREN SEMICOLON . pnSec5
     (159) pnSec5 -> .
@@ -4491,27 +4412,27 @@ state 264
     PLOTLINE        reduce using rule 159 (pnSec5 -> .)
     RBRACE          reduce using rule 159 (pnSec5 -> .)
 
-    pnSec5                         shift and go to state 289
+    pnSec5                         shift and go to state 287
 
-state 265
+state 263
 
     (65) esc2 -> COMMA esc .
 
     RPAREN          reduce using rule 65 (esc2 -> COMMA esc .)
 
 
-state 266
+state 264
 
     (67) carga_datos -> CARGA LPAREN ID COMMA CTE_STR COMMA . ca COMMA ca RPAREN SEMICOLON
     (68) ca -> . ID
     (69) ca -> . CTE_INT
 
-    ID              shift and go to state 290
-    CTE_INT         shift and go to state 292
+    ID              shift and go to state 288
+    CTE_INT         shift and go to state 290
 
-    ca                             shift and go to state 291
+    ca                             shift and go to state 289
 
-state 267
+state 265
 
     (120) factor -> LPAREN pnExp6 exp RPAREN . pnExp7
     (150) pnExp7 -> .
@@ -4536,18 +4457,18 @@ state 267
     HASTA           reduce using rule 150 (pnExp7 -> .)
     HACER           reduce using rule 150 (pnExp7 -> .)
 
-    pnExp7                         shift and go to state 293
+    pnExp7                         shift and go to state 291
 
-state 268
+state 266
 
     (70) decision -> SI LPAREN expresion RPAREN pnCond1 ENTONCES . bloque sino pnCond2
     (38) bloque -> . LBRACE est RBRACE
 
     LBRACE          shift and go to state 60
 
-    bloque                         shift and go to state 294
+    bloque                         shift and go to state 292
 
-state 269
+state 267
 
     (96) meg -> op_l pnExp10 mega_exp . pnExp11
     (154) pnExp11 -> .
@@ -4555,9 +4476,9 @@ state 269
     ASSIGN          reduce using rule 154 (pnExp11 -> .)
     RPAREN          reduce using rule 154 (pnExp11 -> .)
 
-    pnExp11                        shift and go to state 295
+    pnExp11                        shift and go to state 293
 
-state 270
+state 268
 
     (101) sp -> op_r exp pnExp9 .
 
@@ -4567,7 +4488,7 @@ state 270
     RPAREN          reduce using rule 101 (sp -> op_r exp pnExp9 .)
 
 
-state 271
+state 269
 
     (110) exp1 -> op_a exp .
 
@@ -4588,7 +4509,7 @@ state 271
     HACER           reduce using rule 110 (exp1 -> op_a exp .)
 
 
-state 272
+state 270
 
     (112) op_a -> ADD pnExp2 .
 
@@ -4606,7 +4527,7 @@ state 272
     VARIANZA        reduce using rule 112 (op_a -> ADD pnExp2 .)
 
 
-state 273
+state 271
 
     (113) op_a -> SUB pnExp2 .
 
@@ -4624,7 +4545,7 @@ state 273
     VARIANZA        reduce using rule 113 (op_a -> SUB pnExp2 .)
 
 
-state 274
+state 272
 
     (115) term -> op_a1 termino .
 
@@ -4647,7 +4568,7 @@ state 274
     HACER           reduce using rule 115 (term -> op_a1 termino .)
 
 
-state 275
+state 273
 
     (117) op_a1 -> MUL pnExp3 .
 
@@ -4665,7 +4586,7 @@ state 275
     VARIANZA        reduce using rule 117 (op_a1 -> MUL pnExp3 .)
 
 
-state 276
+state 274
 
     (118) op_a1 -> DIV pnExp3 .
 
@@ -4683,53 +4604,53 @@ state 276
     VARIANZA        reduce using rule 118 (op_a1 -> DIV pnExp3 .)
 
 
-state 277
+state 275
 
     (79) funciones_especiales -> fe LPAREN ID COMMA . v_exp RPAREN
     (85) v_exp -> . VARIABLES LBRACK exp RBRACK
 
     VARIABLES       shift and go to state 251
 
-    v_exp                          shift and go to state 296
+    v_exp                          shift and go to state 294
 
-state 278
+state 276
 
     (80) funciones_especiales -> CORRELACIONA pnFunEsp1 LPAREN ID . COMMA v_exp COMMA v_exp RPAREN
 
-    COMMA           shift and go to state 297
+    COMMA           shift and go to state 295
 
 
-state 279
+state 277
 
     (73) condicional -> MIENTRAS pnCiclos1 LPAREN expresion RPAREN pnCiclos2 . HAZ bloque pnCiclos3
 
-    HAZ             shift and go to state 298
+    HAZ             shift and go to state 296
 
 
-state 280
+state 278
 
     (74) no_condicional -> DESDE pnCiclos4 variable ASSIGN pnSec1 exp . pnCiclos5 HASTA pnCiclos6 exp pnCiclos7 HACER bloque pnCiclos8
     (167) pnCiclos5 -> .
 
     HASTA           reduce using rule 167 (pnCiclos5 -> .)
 
-    pnCiclos5                      shift and go to state 299
+    pnCiclos5                      shift and go to state 297
 
-state 281
+state 279
 
     (75) funciones_especiales_void -> VARIABLES pnFunEsp1 LPAREN ID COMMA ID . COMMA ID RPAREN SEMICOLON
 
-    COMMA           shift and go to state 300
+    COMMA           shift and go to state 298
 
 
-state 282
+state 280
 
     (76) funciones_especiales_void -> fev LPAREN ID COMMA v_exp RPAREN . SEMICOLON
 
-    SEMICOLON       shift and go to state 301
+    SEMICOLON       shift and go to state 299
 
 
-state 283
+state 281
 
     (85) v_exp -> VARIABLES LBRACK . exp RBRACK
     (109) exp -> . termino pnExp4 exp1
@@ -4767,7 +4688,7 @@ state 283
     MODA            shift and go to state 147
     VARIANZA        shift and go to state 148
 
-    exp                            shift and go to state 302
+    exp                            shift and go to state 300
     termino                        shift and go to state 130
     factor                         shift and go to state 131
     var_cte                        shift and go to state 132
@@ -4777,28 +4698,28 @@ state 283
     var_num                        shift and go to state 139
     fe                             shift and go to state 141
 
-state 284
+state 282
 
     (33) dim_dec1 -> LBRACK CTE_INT pnDimDec6 . RBRACK pn_8_decColumnas
 
-    RBRACK          shift and go to state 303
+    RBRACK          shift and go to state 301
 
 
-state 285
+state 283
 
     (58) llamada2 -> COMMA llamada1 .
 
     RPAREN          reduce using rule 58 (llamada2 -> COMMA llamada1 .)
 
 
-state 286
+state 284
 
-    (36) dim_index1 -> LBRACK exp . RBRACK
+    (35) dim_index -> LBRACK pnDimAccess2 pnExp6 exp pnActivaArray . RBRACK pnExp7 dim_index1
 
-    RBRACK          shift and go to state 304
+    RBRACK          shift and go to state 302
 
 
-state 287
+state 285
 
     (60) retorno -> REGRESA pnSec3 LPAREN exp RPAREN pnRetorno SEMICOLON .
 
@@ -4816,7 +4737,7 @@ state 287
     RBRACE          reduce using rule 60 (retorno -> REGRESA pnSec3 LPAREN exp RPAREN pnRetorno SEMICOLON .)
 
 
-state 288
+state 286
 
     (61) lectura -> LEE pnSec3 LPAREN variable RPAREN SEMICOLON pnSec4 . pnSec5
     (159) pnSec5 -> .
@@ -4834,9 +4755,9 @@ state 288
     PLOTLINE        reduce using rule 159 (pnSec5 -> .)
     RBRACE          reduce using rule 159 (pnSec5 -> .)
 
-    pnSec5                         shift and go to state 305
+    pnSec5                         shift and go to state 303
 
-state 289
+state 287
 
     (62) escritura -> ESCRIBE pnSec3 LPAREN esc RPAREN SEMICOLON pnSec5 .
 
@@ -4854,7 +4775,7 @@ state 289
     RBRACE          reduce using rule 62 (escritura -> ESCRIBE pnSec3 LPAREN esc RPAREN SEMICOLON pnSec5 .)
 
 
-state 290
+state 288
 
     (68) ca -> ID .
 
@@ -4862,14 +4783,14 @@ state 290
     RPAREN          reduce using rule 68 (ca -> ID .)
 
 
-state 291
+state 289
 
     (67) carga_datos -> CARGA LPAREN ID COMMA CTE_STR COMMA ca . COMMA ca RPAREN SEMICOLON
 
-    COMMA           shift and go to state 306
+    COMMA           shift and go to state 304
 
 
-state 292
+state 290
 
     (69) ca -> CTE_INT .
 
@@ -4877,7 +4798,7 @@ state 292
     RPAREN          reduce using rule 69 (ca -> CTE_INT .)
 
 
-state 293
+state 291
 
     (120) factor -> LPAREN pnExp6 exp RPAREN pnExp7 .
 
@@ -4902,14 +4823,14 @@ state 293
     HACER           reduce using rule 120 (factor -> LPAREN pnExp6 exp RPAREN pnExp7 .)
 
 
-state 294
+state 292
 
     (70) decision -> SI LPAREN expresion RPAREN pnCond1 ENTONCES bloque . sino pnCond2
     (71) sino -> . SINO pnCond3 bloque
     (72) sino -> . empty
     (124) empty -> .
 
-    SINO            shift and go to state 308
+    SINO            shift and go to state 306
     ID              reduce using rule 124 (empty -> .)
     REGRESA         reduce using rule 124 (empty -> .)
     LEE             reduce using rule 124 (empty -> .)
@@ -4923,10 +4844,10 @@ state 294
     PLOTLINE        reduce using rule 124 (empty -> .)
     RBRACE          reduce using rule 124 (empty -> .)
 
-    sino                           shift and go to state 307
-    empty                          shift and go to state 309
+    sino                           shift and go to state 305
+    empty                          shift and go to state 307
 
-state 295
+state 293
 
     (96) meg -> op_l pnExp10 mega_exp pnExp11 .
 
@@ -4934,46 +4855,46 @@ state 295
     RPAREN          reduce using rule 96 (meg -> op_l pnExp10 mega_exp pnExp11 .)
 
 
-state 296
+state 294
 
     (79) funciones_especiales -> fe LPAREN ID COMMA v_exp . RPAREN
 
-    RPAREN          shift and go to state 310
+    RPAREN          shift and go to state 308
 
 
-state 297
+state 295
 
     (80) funciones_especiales -> CORRELACIONA pnFunEsp1 LPAREN ID COMMA . v_exp COMMA v_exp RPAREN
     (85) v_exp -> . VARIABLES LBRACK exp RBRACK
 
     VARIABLES       shift and go to state 251
 
-    v_exp                          shift and go to state 311
+    v_exp                          shift and go to state 309
 
-state 298
+state 296
 
     (73) condicional -> MIENTRAS pnCiclos1 LPAREN expresion RPAREN pnCiclos2 HAZ . bloque pnCiclos3
     (38) bloque -> . LBRACE est RBRACE
 
     LBRACE          shift and go to state 60
 
-    bloque                         shift and go to state 312
+    bloque                         shift and go to state 310
 
-state 299
+state 297
 
     (74) no_condicional -> DESDE pnCiclos4 variable ASSIGN pnSec1 exp pnCiclos5 . HASTA pnCiclos6 exp pnCiclos7 HACER bloque pnCiclos8
 
-    HASTA           shift and go to state 313
+    HASTA           shift and go to state 311
 
 
-state 300
+state 298
 
     (75) funciones_especiales_void -> VARIABLES pnFunEsp1 LPAREN ID COMMA ID COMMA . ID RPAREN SEMICOLON
 
-    ID              shift and go to state 314
+    ID              shift and go to state 312
 
 
-state 301
+state 299
 
     (76) funciones_especiales_void -> fev LPAREN ID COMMA v_exp RPAREN SEMICOLON .
 
@@ -4991,14 +4912,14 @@ state 301
     RBRACE          reduce using rule 76 (funciones_especiales_void -> fev LPAREN ID COMMA v_exp RPAREN SEMICOLON .)
 
 
-state 302
+state 300
 
     (85) v_exp -> VARIABLES LBRACK exp . RBRACK
 
-    RBRACK          shift and go to state 315
+    RBRACK          shift and go to state 313
 
 
-state 303
+state 301
 
     (33) dim_dec1 -> LBRACK CTE_INT pnDimDec6 RBRACK . pn_8_decColumnas
     (130) pn_8_decColumnas -> .
@@ -5006,34 +4927,37 @@ state 303
     COMMA           reduce using rule 130 (pn_8_decColumnas -> .)
     SEMICOLON       reduce using rule 130 (pn_8_decColumnas -> .)
 
-    pn_8_decColumnas               shift and go to state 316
+    pn_8_decColumnas               shift and go to state 314
 
-state 304
+state 302
 
-    (36) dim_index1 -> LBRACK exp RBRACK .
+    (35) dim_index -> LBRACK pnDimAccess2 pnExp6 exp pnActivaArray RBRACK . pnExp7 dim_index1
+    (150) pnExp7 -> .
 
-    ASSIGN          reduce using rule 36 (dim_index1 -> LBRACK exp RBRACK .)
-    MUL             reduce using rule 36 (dim_index1 -> LBRACK exp RBRACK .)
-    DIV             reduce using rule 36 (dim_index1 -> LBRACK exp RBRACK .)
-    ADD             reduce using rule 36 (dim_index1 -> LBRACK exp RBRACK .)
-    SUB             reduce using rule 36 (dim_index1 -> LBRACK exp RBRACK .)
-    LT              reduce using rule 36 (dim_index1 -> LBRACK exp RBRACK .)
-    GT              reduce using rule 36 (dim_index1 -> LBRACK exp RBRACK .)
-    LE              reduce using rule 36 (dim_index1 -> LBRACK exp RBRACK .)
-    GE              reduce using rule 36 (dim_index1 -> LBRACK exp RBRACK .)
-    NOT_EQUAL       reduce using rule 36 (dim_index1 -> LBRACK exp RBRACK .)
-    EQUAL           reduce using rule 36 (dim_index1 -> LBRACK exp RBRACK .)
-    AND             reduce using rule 36 (dim_index1 -> LBRACK exp RBRACK .)
-    OR              reduce using rule 36 (dim_index1 -> LBRACK exp RBRACK .)
-    RPAREN          reduce using rule 36 (dim_index1 -> LBRACK exp RBRACK .)
-    SEMICOLON       reduce using rule 36 (dim_index1 -> LBRACK exp RBRACK .)
-    COMMA           reduce using rule 36 (dim_index1 -> LBRACK exp RBRACK .)
-    RBRACK          reduce using rule 36 (dim_index1 -> LBRACK exp RBRACK .)
-    HASTA           reduce using rule 36 (dim_index1 -> LBRACK exp RBRACK .)
-    HACER           reduce using rule 36 (dim_index1 -> LBRACK exp RBRACK .)
+    LBRACK          reduce using rule 150 (pnExp7 -> .)
+    ASSIGN          reduce using rule 150 (pnExp7 -> .)
+    MUL             reduce using rule 150 (pnExp7 -> .)
+    DIV             reduce using rule 150 (pnExp7 -> .)
+    ADD             reduce using rule 150 (pnExp7 -> .)
+    SUB             reduce using rule 150 (pnExp7 -> .)
+    LT              reduce using rule 150 (pnExp7 -> .)
+    GT              reduce using rule 150 (pnExp7 -> .)
+    LE              reduce using rule 150 (pnExp7 -> .)
+    GE              reduce using rule 150 (pnExp7 -> .)
+    NOT_EQUAL       reduce using rule 150 (pnExp7 -> .)
+    EQUAL           reduce using rule 150 (pnExp7 -> .)
+    AND             reduce using rule 150 (pnExp7 -> .)
+    OR              reduce using rule 150 (pnExp7 -> .)
+    RPAREN          reduce using rule 150 (pnExp7 -> .)
+    SEMICOLON       reduce using rule 150 (pnExp7 -> .)
+    COMMA           reduce using rule 150 (pnExp7 -> .)
+    RBRACK          reduce using rule 150 (pnExp7 -> .)
+    HASTA           reduce using rule 150 (pnExp7 -> .)
+    HACER           reduce using rule 150 (pnExp7 -> .)
 
+    pnExp7                         shift and go to state 315
 
-state 305
+state 303
 
     (61) lectura -> LEE pnSec3 LPAREN variable RPAREN SEMICOLON pnSec4 pnSec5 .
 
@@ -5051,18 +4975,18 @@ state 305
     RBRACE          reduce using rule 61 (lectura -> LEE pnSec3 LPAREN variable RPAREN SEMICOLON pnSec4 pnSec5 .)
 
 
-state 306
+state 304
 
     (67) carga_datos -> CARGA LPAREN ID COMMA CTE_STR COMMA ca COMMA . ca RPAREN SEMICOLON
     (68) ca -> . ID
     (69) ca -> . CTE_INT
 
-    ID              shift and go to state 290
-    CTE_INT         shift and go to state 292
+    ID              shift and go to state 288
+    CTE_INT         shift and go to state 290
 
-    ca                             shift and go to state 317
+    ca                             shift and go to state 316
 
-state 307
+state 305
 
     (70) decision -> SI LPAREN expresion RPAREN pnCond1 ENTONCES bloque sino . pnCond2
     (161) pnCond2 -> .
@@ -5080,18 +5004,18 @@ state 307
     PLOTLINE        reduce using rule 161 (pnCond2 -> .)
     RBRACE          reduce using rule 161 (pnCond2 -> .)
 
-    pnCond2                        shift and go to state 318
+    pnCond2                        shift and go to state 317
 
-state 308
+state 306
 
     (71) sino -> SINO . pnCond3 bloque
     (162) pnCond3 -> .
 
     LBRACE          reduce using rule 162 (pnCond3 -> .)
 
-    pnCond3                        shift and go to state 319
+    pnCond3                        shift and go to state 318
 
-state 309
+state 307
 
     (72) sino -> empty .
 
@@ -5109,7 +5033,7 @@ state 309
     RBRACE          reduce using rule 72 (sino -> empty .)
 
 
-state 310
+state 308
 
     (79) funciones_especiales -> fe LPAREN ID COMMA v_exp RPAREN .
 
@@ -5134,14 +5058,14 @@ state 310
     HACER           reduce using rule 79 (funciones_especiales -> fe LPAREN ID COMMA v_exp RPAREN .)
 
 
-state 311
+state 309
 
     (80) funciones_especiales -> CORRELACIONA pnFunEsp1 LPAREN ID COMMA v_exp . COMMA v_exp RPAREN
 
-    COMMA           shift and go to state 320
+    COMMA           shift and go to state 319
 
 
-state 312
+state 310
 
     (73) condicional -> MIENTRAS pnCiclos1 LPAREN expresion RPAREN pnCiclos2 HAZ bloque . pnCiclos3
     (165) pnCiclos3 -> .
@@ -5159,9 +5083,9 @@ state 312
     PLOTLINE        reduce using rule 165 (pnCiclos3 -> .)
     RBRACE          reduce using rule 165 (pnCiclos3 -> .)
 
-    pnCiclos3                      shift and go to state 321
+    pnCiclos3                      shift and go to state 320
 
-state 313
+state 311
 
     (74) no_condicional -> DESDE pnCiclos4 variable ASSIGN pnSec1 exp pnCiclos5 HASTA . pnCiclos6 exp pnCiclos7 HACER bloque pnCiclos8
     (168) pnCiclos6 -> .
@@ -5179,16 +5103,16 @@ state 313
     MODA            reduce using rule 168 (pnCiclos6 -> .)
     VARIANZA        reduce using rule 168 (pnCiclos6 -> .)
 
-    pnCiclos6                      shift and go to state 322
+    pnCiclos6                      shift and go to state 321
 
-state 314
+state 312
 
     (75) funciones_especiales_void -> VARIABLES pnFunEsp1 LPAREN ID COMMA ID COMMA ID . RPAREN SEMICOLON
 
-    RPAREN          shift and go to state 323
+    RPAREN          shift and go to state 322
 
 
-state 315
+state 313
 
     (85) v_exp -> VARIABLES LBRACK exp RBRACK .
 
@@ -5196,7 +5120,7 @@ state 315
     COMMA           reduce using rule 85 (v_exp -> VARIABLES LBRACK exp RBRACK .)
 
 
-state 316
+state 314
 
     (33) dim_dec1 -> LBRACK CTE_INT pnDimDec6 RBRACK pn_8_decColumnas .
 
@@ -5204,14 +5128,45 @@ state 316
     SEMICOLON       reduce using rule 33 (dim_dec1 -> LBRACK CTE_INT pnDimDec6 RBRACK pn_8_decColumnas .)
 
 
-state 317
+state 315
+
+    (35) dim_index -> LBRACK pnDimAccess2 pnExp6 exp pnActivaArray RBRACK pnExp7 . dim_index1
+    (36) dim_index1 -> . LBRACK pnExp6 exp pnActivaArray RBRACK pnExp7 pnMatrizAcc
+    (37) dim_index1 -> . empty pnArregloAcc
+    (124) empty -> .
+
+    LBRACK          shift and go to state 323
+    ASSIGN          reduce using rule 124 (empty -> .)
+    MUL             reduce using rule 124 (empty -> .)
+    DIV             reduce using rule 124 (empty -> .)
+    ADD             reduce using rule 124 (empty -> .)
+    SUB             reduce using rule 124 (empty -> .)
+    LT              reduce using rule 124 (empty -> .)
+    GT              reduce using rule 124 (empty -> .)
+    LE              reduce using rule 124 (empty -> .)
+    GE              reduce using rule 124 (empty -> .)
+    NOT_EQUAL       reduce using rule 124 (empty -> .)
+    EQUAL           reduce using rule 124 (empty -> .)
+    AND             reduce using rule 124 (empty -> .)
+    OR              reduce using rule 124 (empty -> .)
+    RPAREN          reduce using rule 124 (empty -> .)
+    SEMICOLON       reduce using rule 124 (empty -> .)
+    COMMA           reduce using rule 124 (empty -> .)
+    RBRACK          reduce using rule 124 (empty -> .)
+    HASTA           reduce using rule 124 (empty -> .)
+    HACER           reduce using rule 124 (empty -> .)
+
+    dim_index1                     shift and go to state 324
+    empty                          shift and go to state 325
+
+state 316
 
     (67) carga_datos -> CARGA LPAREN ID COMMA CTE_STR COMMA ca COMMA ca . RPAREN SEMICOLON
 
-    RPAREN          shift and go to state 324
+    RPAREN          shift and go to state 326
 
 
-state 318
+state 317
 
     (70) decision -> SI LPAREN expresion RPAREN pnCond1 ENTONCES bloque sino pnCond2 .
 
@@ -5229,25 +5184,25 @@ state 318
     RBRACE          reduce using rule 70 (decision -> SI LPAREN expresion RPAREN pnCond1 ENTONCES bloque sino pnCond2 .)
 
 
-state 319
+state 318
 
     (71) sino -> SINO pnCond3 . bloque
     (38) bloque -> . LBRACE est RBRACE
 
     LBRACE          shift and go to state 60
 
-    bloque                         shift and go to state 325
+    bloque                         shift and go to state 327
 
-state 320
+state 319
 
     (80) funciones_especiales -> CORRELACIONA pnFunEsp1 LPAREN ID COMMA v_exp COMMA . v_exp RPAREN
     (85) v_exp -> . VARIABLES LBRACK exp RBRACK
 
     VARIABLES       shift and go to state 251
 
-    v_exp                          shift and go to state 326
+    v_exp                          shift and go to state 328
 
-state 321
+state 320
 
     (73) condicional -> MIENTRAS pnCiclos1 LPAREN expresion RPAREN pnCiclos2 HAZ bloque pnCiclos3 .
 
@@ -5265,7 +5220,7 @@ state 321
     RBRACE          reduce using rule 73 (condicional -> MIENTRAS pnCiclos1 LPAREN expresion RPAREN pnCiclos2 HAZ bloque pnCiclos3 .)
 
 
-state 322
+state 321
 
     (74) no_condicional -> DESDE pnCiclos4 variable ASSIGN pnSec1 exp pnCiclos5 HASTA pnCiclos6 . exp pnCiclos7 HACER bloque pnCiclos8
     (109) exp -> . termino pnExp4 exp1
@@ -5304,7 +5259,7 @@ state 322
     VARIANZA        shift and go to state 148
 
     variable                       shift and go to state 133
-    exp                            shift and go to state 327
+    exp                            shift and go to state 329
     termino                        shift and go to state 130
     factor                         shift and go to state 131
     var_cte                        shift and go to state 132
@@ -5313,21 +5268,93 @@ state 322
     var_num                        shift and go to state 139
     fe                             shift and go to state 141
 
-state 323
+state 322
 
     (75) funciones_especiales_void -> VARIABLES pnFunEsp1 LPAREN ID COMMA ID COMMA ID RPAREN . SEMICOLON
 
-    SEMICOLON       shift and go to state 328
+    SEMICOLON       shift and go to state 330
 
+
+state 323
+
+    (36) dim_index1 -> LBRACK . pnExp6 exp pnActivaArray RBRACK pnExp7 pnMatrizAcc
+    (149) pnExp6 -> .
+
+    LPAREN          reduce using rule 149 (pnExp6 -> .)
+    CTE_CH          reduce using rule 149 (pnExp6 -> .)
+    CTE_STR         reduce using rule 149 (pnExp6 -> .)
+    SUB             reduce using rule 149 (pnExp6 -> .)
+    ID              reduce using rule 149 (pnExp6 -> .)
+    CORRELACIONA    reduce using rule 149 (pnExp6 -> .)
+    CTE_INT         reduce using rule 149 (pnExp6 -> .)
+    CTE_FLOAT       reduce using rule 149 (pnExp6 -> .)
+    MEDIA           reduce using rule 149 (pnExp6 -> .)
+    MEDIANA         reduce using rule 149 (pnExp6 -> .)
+    MODA            reduce using rule 149 (pnExp6 -> .)
+    VARIANZA        reduce using rule 149 (pnExp6 -> .)
+
+    pnExp6                         shift and go to state 331
 
 state 324
 
-    (67) carga_datos -> CARGA LPAREN ID COMMA CTE_STR COMMA ca COMMA ca RPAREN . SEMICOLON
+    (35) dim_index -> LBRACK pnDimAccess2 pnExp6 exp pnActivaArray RBRACK pnExp7 dim_index1 .
 
-    SEMICOLON       shift and go to state 329
+    ASSIGN          reduce using rule 35 (dim_index -> LBRACK pnDimAccess2 pnExp6 exp pnActivaArray RBRACK pnExp7 dim_index1 .)
+    MUL             reduce using rule 35 (dim_index -> LBRACK pnDimAccess2 pnExp6 exp pnActivaArray RBRACK pnExp7 dim_index1 .)
+    DIV             reduce using rule 35 (dim_index -> LBRACK pnDimAccess2 pnExp6 exp pnActivaArray RBRACK pnExp7 dim_index1 .)
+    ADD             reduce using rule 35 (dim_index -> LBRACK pnDimAccess2 pnExp6 exp pnActivaArray RBRACK pnExp7 dim_index1 .)
+    SUB             reduce using rule 35 (dim_index -> LBRACK pnDimAccess2 pnExp6 exp pnActivaArray RBRACK pnExp7 dim_index1 .)
+    LT              reduce using rule 35 (dim_index -> LBRACK pnDimAccess2 pnExp6 exp pnActivaArray RBRACK pnExp7 dim_index1 .)
+    GT              reduce using rule 35 (dim_index -> LBRACK pnDimAccess2 pnExp6 exp pnActivaArray RBRACK pnExp7 dim_index1 .)
+    LE              reduce using rule 35 (dim_index -> LBRACK pnDimAccess2 pnExp6 exp pnActivaArray RBRACK pnExp7 dim_index1 .)
+    GE              reduce using rule 35 (dim_index -> LBRACK pnDimAccess2 pnExp6 exp pnActivaArray RBRACK pnExp7 dim_index1 .)
+    NOT_EQUAL       reduce using rule 35 (dim_index -> LBRACK pnDimAccess2 pnExp6 exp pnActivaArray RBRACK pnExp7 dim_index1 .)
+    EQUAL           reduce using rule 35 (dim_index -> LBRACK pnDimAccess2 pnExp6 exp pnActivaArray RBRACK pnExp7 dim_index1 .)
+    AND             reduce using rule 35 (dim_index -> LBRACK pnDimAccess2 pnExp6 exp pnActivaArray RBRACK pnExp7 dim_index1 .)
+    OR              reduce using rule 35 (dim_index -> LBRACK pnDimAccess2 pnExp6 exp pnActivaArray RBRACK pnExp7 dim_index1 .)
+    RPAREN          reduce using rule 35 (dim_index -> LBRACK pnDimAccess2 pnExp6 exp pnActivaArray RBRACK pnExp7 dim_index1 .)
+    SEMICOLON       reduce using rule 35 (dim_index -> LBRACK pnDimAccess2 pnExp6 exp pnActivaArray RBRACK pnExp7 dim_index1 .)
+    COMMA           reduce using rule 35 (dim_index -> LBRACK pnDimAccess2 pnExp6 exp pnActivaArray RBRACK pnExp7 dim_index1 .)
+    RBRACK          reduce using rule 35 (dim_index -> LBRACK pnDimAccess2 pnExp6 exp pnActivaArray RBRACK pnExp7 dim_index1 .)
+    HASTA           reduce using rule 35 (dim_index -> LBRACK pnDimAccess2 pnExp6 exp pnActivaArray RBRACK pnExp7 dim_index1 .)
+    HACER           reduce using rule 35 (dim_index -> LBRACK pnDimAccess2 pnExp6 exp pnActivaArray RBRACK pnExp7 dim_index1 .)
 
 
 state 325
+
+    (37) dim_index1 -> empty . pnArregloAcc
+    (177) pnArregloAcc -> .
+
+    ASSIGN          reduce using rule 177 (pnArregloAcc -> .)
+    MUL             reduce using rule 177 (pnArregloAcc -> .)
+    DIV             reduce using rule 177 (pnArregloAcc -> .)
+    ADD             reduce using rule 177 (pnArregloAcc -> .)
+    SUB             reduce using rule 177 (pnArregloAcc -> .)
+    LT              reduce using rule 177 (pnArregloAcc -> .)
+    GT              reduce using rule 177 (pnArregloAcc -> .)
+    LE              reduce using rule 177 (pnArregloAcc -> .)
+    GE              reduce using rule 177 (pnArregloAcc -> .)
+    NOT_EQUAL       reduce using rule 177 (pnArregloAcc -> .)
+    EQUAL           reduce using rule 177 (pnArregloAcc -> .)
+    AND             reduce using rule 177 (pnArregloAcc -> .)
+    OR              reduce using rule 177 (pnArregloAcc -> .)
+    RPAREN          reduce using rule 177 (pnArregloAcc -> .)
+    SEMICOLON       reduce using rule 177 (pnArregloAcc -> .)
+    COMMA           reduce using rule 177 (pnArregloAcc -> .)
+    RBRACK          reduce using rule 177 (pnArregloAcc -> .)
+    HASTA           reduce using rule 177 (pnArregloAcc -> .)
+    HACER           reduce using rule 177 (pnArregloAcc -> .)
+
+    pnArregloAcc                   shift and go to state 332
+
+state 326
+
+    (67) carga_datos -> CARGA LPAREN ID COMMA CTE_STR COMMA ca COMMA ca RPAREN . SEMICOLON
+
+    SEMICOLON       shift and go to state 333
+
+
+state 327
 
     (71) sino -> SINO pnCond3 bloque .
 
@@ -5345,23 +5372,23 @@ state 325
     RBRACE          reduce using rule 71 (sino -> SINO pnCond3 bloque .)
 
 
-state 326
+state 328
 
     (80) funciones_especiales -> CORRELACIONA pnFunEsp1 LPAREN ID COMMA v_exp COMMA v_exp . RPAREN
 
-    RPAREN          shift and go to state 330
+    RPAREN          shift and go to state 334
 
 
-state 327
+state 329
 
     (74) no_condicional -> DESDE pnCiclos4 variable ASSIGN pnSec1 exp pnCiclos5 HASTA pnCiclos6 exp . pnCiclos7 HACER bloque pnCiclos8
     (169) pnCiclos7 -> .
 
     HACER           reduce using rule 169 (pnCiclos7 -> .)
 
-    pnCiclos7                      shift and go to state 331
+    pnCiclos7                      shift and go to state 335
 
-state 328
+state 330
 
     (75) funciones_especiales_void -> VARIABLES pnFunEsp1 LPAREN ID COMMA ID COMMA ID RPAREN SEMICOLON .
 
@@ -5379,7 +5406,80 @@ state 328
     RBRACE          reduce using rule 75 (funciones_especiales_void -> VARIABLES pnFunEsp1 LPAREN ID COMMA ID COMMA ID RPAREN SEMICOLON .)
 
 
-state 329
+state 331
+
+    (36) dim_index1 -> LBRACK pnExp6 . exp pnActivaArray RBRACK pnExp7 pnMatrizAcc
+    (109) exp -> . termino pnExp4 exp1
+    (114) termino -> . factor pnExp5 term
+    (119) factor -> . var_cte
+    (120) factor -> . LPAREN pnExp6 exp RPAREN pnExp7
+    (121) factor -> . variable
+    (122) factor -> . llamada
+    (123) factor -> . funciones_especiales
+    (86) var_cte -> . CTE_CH pnCteChar
+    (87) var_cte -> . CTE_STR pnCteStr
+    (88) var_cte -> . SUB pnNeg var_num
+    (89) var_cte -> . var_num
+    (52) variable -> . ID pnExp1 di
+    (55) llamada -> . ID pnFunCall_1_2 LPAREN llamada1 RPAREN pnFunCall_5_6_llamada
+    (79) funciones_especiales -> . fe LPAREN ID COMMA v_exp RPAREN
+    (80) funciones_especiales -> . CORRELACIONA pnFunEsp1 LPAREN ID COMMA v_exp COMMA v_exp RPAREN
+    (90) var_num -> . CTE_INT pnCteInt
+    (91) var_num -> . CTE_FLOAT pnCteFloat
+    (81) fe -> . MEDIA pnFunEsp1
+    (82) fe -> . MEDIANA pnFunEsp1
+    (83) fe -> . MODA pnFunEsp1
+    (84) fe -> . VARIANZA pnFunEsp1
+
+    LPAREN          shift and go to state 125
+    CTE_CH          shift and go to state 136
+    CTE_STR         shift and go to state 137
+    SUB             shift and go to state 138
+    ID              shift and go to state 140
+    CORRELACIONA    shift and go to state 142
+    CTE_INT         shift and go to state 143
+    CTE_FLOAT       shift and go to state 144
+    MEDIA           shift and go to state 145
+    MEDIANA         shift and go to state 146
+    MODA            shift and go to state 147
+    VARIANZA        shift and go to state 148
+
+    exp                            shift and go to state 336
+    termino                        shift and go to state 130
+    factor                         shift and go to state 131
+    var_cte                        shift and go to state 132
+    variable                       shift and go to state 133
+    llamada                        shift and go to state 134
+    funciones_especiales           shift and go to state 135
+    var_num                        shift and go to state 139
+    fe                             shift and go to state 141
+
+state 332
+
+    (37) dim_index1 -> empty pnArregloAcc .
+
+    ASSIGN          reduce using rule 37 (dim_index1 -> empty pnArregloAcc .)
+    MUL             reduce using rule 37 (dim_index1 -> empty pnArregloAcc .)
+    DIV             reduce using rule 37 (dim_index1 -> empty pnArregloAcc .)
+    ADD             reduce using rule 37 (dim_index1 -> empty pnArregloAcc .)
+    SUB             reduce using rule 37 (dim_index1 -> empty pnArregloAcc .)
+    LT              reduce using rule 37 (dim_index1 -> empty pnArregloAcc .)
+    GT              reduce using rule 37 (dim_index1 -> empty pnArregloAcc .)
+    LE              reduce using rule 37 (dim_index1 -> empty pnArregloAcc .)
+    GE              reduce using rule 37 (dim_index1 -> empty pnArregloAcc .)
+    NOT_EQUAL       reduce using rule 37 (dim_index1 -> empty pnArregloAcc .)
+    EQUAL           reduce using rule 37 (dim_index1 -> empty pnArregloAcc .)
+    AND             reduce using rule 37 (dim_index1 -> empty pnArregloAcc .)
+    OR              reduce using rule 37 (dim_index1 -> empty pnArregloAcc .)
+    RPAREN          reduce using rule 37 (dim_index1 -> empty pnArregloAcc .)
+    SEMICOLON       reduce using rule 37 (dim_index1 -> empty pnArregloAcc .)
+    COMMA           reduce using rule 37 (dim_index1 -> empty pnArregloAcc .)
+    RBRACK          reduce using rule 37 (dim_index1 -> empty pnArregloAcc .)
+    HASTA           reduce using rule 37 (dim_index1 -> empty pnArregloAcc .)
+    HACER           reduce using rule 37 (dim_index1 -> empty pnArregloAcc .)
+
+
+state 333
 
     (67) carga_datos -> CARGA LPAREN ID COMMA CTE_STR COMMA ca COMMA ca RPAREN SEMICOLON .
 
@@ -5397,7 +5497,7 @@ state 329
     RBRACE          reduce using rule 67 (carga_datos -> CARGA LPAREN ID COMMA CTE_STR COMMA ca COMMA ca RPAREN SEMICOLON .)
 
 
-state 330
+state 334
 
     (80) funciones_especiales -> CORRELACIONA pnFunEsp1 LPAREN ID COMMA v_exp COMMA v_exp RPAREN .
 
@@ -5422,23 +5522,39 @@ state 330
     HACER           reduce using rule 80 (funciones_especiales -> CORRELACIONA pnFunEsp1 LPAREN ID COMMA v_exp COMMA v_exp RPAREN .)
 
 
-state 331
+state 335
 
     (74) no_condicional -> DESDE pnCiclos4 variable ASSIGN pnSec1 exp pnCiclos5 HASTA pnCiclos6 exp pnCiclos7 . HACER bloque pnCiclos8
 
-    HACER           shift and go to state 332
+    HACER           shift and go to state 337
 
 
-state 332
+state 336
+
+    (36) dim_index1 -> LBRACK pnExp6 exp . pnActivaArray RBRACK pnExp7 pnMatrizAcc
+    (179) pnActivaArray -> .
+
+    RBRACK          reduce using rule 179 (pnActivaArray -> .)
+
+    pnActivaArray                  shift and go to state 338
+
+state 337
 
     (74) no_condicional -> DESDE pnCiclos4 variable ASSIGN pnSec1 exp pnCiclos5 HASTA pnCiclos6 exp pnCiclos7 HACER . bloque pnCiclos8
     (38) bloque -> . LBRACE est RBRACE
 
     LBRACE          shift and go to state 60
 
-    bloque                         shift and go to state 333
+    bloque                         shift and go to state 339
 
-state 333
+state 338
+
+    (36) dim_index1 -> LBRACK pnExp6 exp pnActivaArray . RBRACK pnExp7 pnMatrizAcc
+
+    RBRACK          shift and go to state 340
+
+
+state 339
 
     (74) no_condicional -> DESDE pnCiclos4 variable ASSIGN pnSec1 exp pnCiclos5 HASTA pnCiclos6 exp pnCiclos7 HACER bloque . pnCiclos8
     (170) pnCiclos8 -> .
@@ -5456,9 +5572,36 @@ state 333
     PLOTLINE        reduce using rule 170 (pnCiclos8 -> .)
     RBRACE          reduce using rule 170 (pnCiclos8 -> .)
 
-    pnCiclos8                      shift and go to state 334
+    pnCiclos8                      shift and go to state 341
 
-state 334
+state 340
+
+    (36) dim_index1 -> LBRACK pnExp6 exp pnActivaArray RBRACK . pnExp7 pnMatrizAcc
+    (150) pnExp7 -> .
+
+    ASSIGN          reduce using rule 150 (pnExp7 -> .)
+    MUL             reduce using rule 150 (pnExp7 -> .)
+    DIV             reduce using rule 150 (pnExp7 -> .)
+    ADD             reduce using rule 150 (pnExp7 -> .)
+    SUB             reduce using rule 150 (pnExp7 -> .)
+    LT              reduce using rule 150 (pnExp7 -> .)
+    GT              reduce using rule 150 (pnExp7 -> .)
+    LE              reduce using rule 150 (pnExp7 -> .)
+    GE              reduce using rule 150 (pnExp7 -> .)
+    NOT_EQUAL       reduce using rule 150 (pnExp7 -> .)
+    EQUAL           reduce using rule 150 (pnExp7 -> .)
+    AND             reduce using rule 150 (pnExp7 -> .)
+    OR              reduce using rule 150 (pnExp7 -> .)
+    RPAREN          reduce using rule 150 (pnExp7 -> .)
+    SEMICOLON       reduce using rule 150 (pnExp7 -> .)
+    COMMA           reduce using rule 150 (pnExp7 -> .)
+    RBRACK          reduce using rule 150 (pnExp7 -> .)
+    HASTA           reduce using rule 150 (pnExp7 -> .)
+    HACER           reduce using rule 150 (pnExp7 -> .)
+
+    pnExp7                         shift and go to state 342
+
+state 341
 
     (74) no_condicional -> DESDE pnCiclos4 variable ASSIGN pnSec1 exp pnCiclos5 HASTA pnCiclos6 exp pnCiclos7 HACER bloque pnCiclos8 .
 
@@ -5474,4 +5617,56 @@ state 334
     PLOTHIST        reduce using rule 74 (no_condicional -> DESDE pnCiclos4 variable ASSIGN pnSec1 exp pnCiclos5 HASTA pnCiclos6 exp pnCiclos7 HACER bloque pnCiclos8 .)
     PLOTLINE        reduce using rule 74 (no_condicional -> DESDE pnCiclos4 variable ASSIGN pnSec1 exp pnCiclos5 HASTA pnCiclos6 exp pnCiclos7 HACER bloque pnCiclos8 .)
     RBRACE          reduce using rule 74 (no_condicional -> DESDE pnCiclos4 variable ASSIGN pnSec1 exp pnCiclos5 HASTA pnCiclos6 exp pnCiclos7 HACER bloque pnCiclos8 .)
+
+
+state 342
+
+    (36) dim_index1 -> LBRACK pnExp6 exp pnActivaArray RBRACK pnExp7 . pnMatrizAcc
+    (178) pnMatrizAcc -> .
+
+    ASSIGN          reduce using rule 178 (pnMatrizAcc -> .)
+    MUL             reduce using rule 178 (pnMatrizAcc -> .)
+    DIV             reduce using rule 178 (pnMatrizAcc -> .)
+    ADD             reduce using rule 178 (pnMatrizAcc -> .)
+    SUB             reduce using rule 178 (pnMatrizAcc -> .)
+    LT              reduce using rule 178 (pnMatrizAcc -> .)
+    GT              reduce using rule 178 (pnMatrizAcc -> .)
+    LE              reduce using rule 178 (pnMatrizAcc -> .)
+    GE              reduce using rule 178 (pnMatrizAcc -> .)
+    NOT_EQUAL       reduce using rule 178 (pnMatrizAcc -> .)
+    EQUAL           reduce using rule 178 (pnMatrizAcc -> .)
+    AND             reduce using rule 178 (pnMatrizAcc -> .)
+    OR              reduce using rule 178 (pnMatrizAcc -> .)
+    RPAREN          reduce using rule 178 (pnMatrizAcc -> .)
+    SEMICOLON       reduce using rule 178 (pnMatrizAcc -> .)
+    COMMA           reduce using rule 178 (pnMatrizAcc -> .)
+    RBRACK          reduce using rule 178 (pnMatrizAcc -> .)
+    HASTA           reduce using rule 178 (pnMatrizAcc -> .)
+    HACER           reduce using rule 178 (pnMatrizAcc -> .)
+
+    pnMatrizAcc                    shift and go to state 343
+
+state 343
+
+    (36) dim_index1 -> LBRACK pnExp6 exp pnActivaArray RBRACK pnExp7 pnMatrizAcc .
+
+    ASSIGN          reduce using rule 36 (dim_index1 -> LBRACK pnExp6 exp pnActivaArray RBRACK pnExp7 pnMatrizAcc .)
+    MUL             reduce using rule 36 (dim_index1 -> LBRACK pnExp6 exp pnActivaArray RBRACK pnExp7 pnMatrizAcc .)
+    DIV             reduce using rule 36 (dim_index1 -> LBRACK pnExp6 exp pnActivaArray RBRACK pnExp7 pnMatrizAcc .)
+    ADD             reduce using rule 36 (dim_index1 -> LBRACK pnExp6 exp pnActivaArray RBRACK pnExp7 pnMatrizAcc .)
+    SUB             reduce using rule 36 (dim_index1 -> LBRACK pnExp6 exp pnActivaArray RBRACK pnExp7 pnMatrizAcc .)
+    LT              reduce using rule 36 (dim_index1 -> LBRACK pnExp6 exp pnActivaArray RBRACK pnExp7 pnMatrizAcc .)
+    GT              reduce using rule 36 (dim_index1 -> LBRACK pnExp6 exp pnActivaArray RBRACK pnExp7 pnMatrizAcc .)
+    LE              reduce using rule 36 (dim_index1 -> LBRACK pnExp6 exp pnActivaArray RBRACK pnExp7 pnMatrizAcc .)
+    GE              reduce using rule 36 (dim_index1 -> LBRACK pnExp6 exp pnActivaArray RBRACK pnExp7 pnMatrizAcc .)
+    NOT_EQUAL       reduce using rule 36 (dim_index1 -> LBRACK pnExp6 exp pnActivaArray RBRACK pnExp7 pnMatrizAcc .)
+    EQUAL           reduce using rule 36 (dim_index1 -> LBRACK pnExp6 exp pnActivaArray RBRACK pnExp7 pnMatrizAcc .)
+    AND             reduce using rule 36 (dim_index1 -> LBRACK pnExp6 exp pnActivaArray RBRACK pnExp7 pnMatrizAcc .)
+    OR              reduce using rule 36 (dim_index1 -> LBRACK pnExp6 exp pnActivaArray RBRACK pnExp7 pnMatrizAcc .)
+    RPAREN          reduce using rule 36 (dim_index1 -> LBRACK pnExp6 exp pnActivaArray RBRACK pnExp7 pnMatrizAcc .)
+    SEMICOLON       reduce using rule 36 (dim_index1 -> LBRACK pnExp6 exp pnActivaArray RBRACK pnExp7 pnMatrizAcc .)
+    COMMA           reduce using rule 36 (dim_index1 -> LBRACK pnExp6 exp pnActivaArray RBRACK pnExp7 pnMatrizAcc .)
+    RBRACK          reduce using rule 36 (dim_index1 -> LBRACK pnExp6 exp pnActivaArray RBRACK pnExp7 pnMatrizAcc .)
+    HASTA           reduce using rule 36 (dim_index1 -> LBRACK pnExp6 exp pnActivaArray RBRACK pnExp7 pnMatrizAcc .)
+    HACER           reduce using rule 36 (dim_index1 -> LBRACK pnExp6 exp pnActivaArray RBRACK pnExp7 pnMatrizAcc .)
 

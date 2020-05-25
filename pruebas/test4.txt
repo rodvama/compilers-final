@@ -7,6 +7,5 @@ int: B[12][9], A[9], j, i, k, p;
 
 principal()
 {   
-    A[2] = i;
-    
+    B[i][A[1]] = i - j;
 }

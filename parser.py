@@ -28,6 +28,7 @@ pSaltos = [] #Pila de saltos para condiciones y ciclos
 pFunciones = [] #Pila de funciones
 pArgumentos = [] #Pila de agumentos de una funcion
 pMemorias = [] # Pila de direcciones de memoria
+pDim = [] #Pila de Arreglos
 
 #Arreglo donde se almacenaran todos los cuadruplos que se vayan generando
 cuadruplos = []
@@ -2071,11 +2072,13 @@ def p_pnDimAccess2(p):
     pnDimAccess2 : 
     '''
     global isArray
+    global pDim
     isArray = True
-    print("pnDimAccess2, isArray = True")
+    
     varid = popOperandos()
     varmem = popMemoria()
     vartipo = popTipos()
+    pDim.append(varid)
 
 '''
 Acceder al indice del arreglo
@@ -2092,15 +2095,16 @@ def p_pnArregloAcc(p):
     auxMem = popMemoria()
     auxTipo = popTipos()
 
+    auxDIM = pDim.pop()
     if isArray:
         if auxTipo != 'int':
             sys.exit("Error. Es necesario que el tipo sea un entero para acceder al arreglo")
             return
         
-        varDimensiones = directorioFunciones.func_getDims(currentFunc, currentVarName)
+        varDimensiones = directorioFunciones.func_getDims(currentFunc, auxDIM)
 
         if varDimensiones == -1:
-            varDimensiones = directorioFunciones.func_getDims(GBL, currentVarName)
+            varDimensiones = directorioFunciones.func_getDims(GBL, auxDIM)
 
             if varDimensiones == -1:
                 sys.exit("Error. No existe variable dimensionada")
@@ -2114,21 +2118,21 @@ def p_pnArregloAcc(p):
         #Si es Matriz...
         if varDimensiones[1] == 0:
             #Memoria Base
-            PosicionMemoria = directorioFunciones.func_memoria(currentFunc, currentVarName)
+            PosicionMemoria = directorioFunciones.func_memoria(currentFunc, auxDIM)
             if not PosicionMemoria:
-                PosicionMemoria = directorioFunciones.func_memoria(GBL, currentVarName)
+                PosicionMemoria = directorioFunciones.func_memoria(GBL, auxDIM)
                 
             if PosicionMemoria < 0:
-                sys.exit("Error. Variable no declarada: ", currentVarName)
+                sys.exit("Error. Variable no declarada: ", auxDIM)
                 return
                 
 
-            TipoActual = directorioFunciones.func_searchVarType(currentFunc, currentVarName)
+            TipoActual = directorioFunciones.func_searchVarType(currentFunc, auxDIM)
             if not TipoActual:
-                TipoActual = directorioFunciones.func_searchVarType(GBL, currentVarName)
+                TipoActual = directorioFunciones.func_searchVarType(GBL, auxDIM)
                 
             if not TipoActual:
-                sys.exit("Error. Variable no declarada: ", currentVarName)
+                sys.exit("Error. Variable no declarada: ", auxDIM)
                 return
                 
 
@@ -2137,7 +2141,7 @@ def p_pnArregloAcc(p):
 
             valorTMem = '(' + str(tMem) + ')'
                 
-            pushOperando(currentVarName)
+            pushOperando(auxDIM)
             pushMemoria(valorTMem)
             pushTipo(TipoActual)
             isArray = False
@@ -2156,6 +2160,7 @@ def p_pnArregloAcc(p):
             pushOperando(tMem)
             pushMemoria(tMem)
             pushTipo('int')
+            pDim.append(auxDIM)
 
             
             
@@ -2177,11 +2182,14 @@ def p_pnMatrizAcc(p):
     global isArray
     global currentVarName
     global currentFunc
+    global pDim
     print("pOperandos: ", pOperandos)
 
     auxID = popOperandos()
     auxMem = popMemoria()
     auxTipo = popTipos() 
+
+    auxDIM = pDim.pop()
 
     if isArray:
         if auxTipo != 'int':
@@ -2189,9 +2197,10 @@ def p_pnMatrizAcc(p):
             return
         
         #Checa las dimensiones
-        varDimensiones = directorioFunciones.func_getDims(currentFunc, currentVarName)
+        varDimensiones = directorioFunciones.func_getDims(currentFunc, auxDIM)
+        print("MAT: ", auxDIM)
         if varDimensiones == -1:
-            varDimensiones = directorioFunciones.func_getDims(GBL, currentVarName) #Busca en global
+            varDimensiones = directorioFunciones.func_getDims(GBL, auxDIM) #Busca en global
             if varDimensiones == -1: # si no hay en global...
                 sys.exit("Error. La variable no es matriz...")
                 return
@@ -2202,20 +2211,20 @@ def p_pnMatrizAcc(p):
        
 
         #Memoria Base
-        PosicionMemoria = directorioFunciones.func_memoria(currentFunc, currentVarName)
+        PosicionMemoria = directorioFunciones.func_memoria(currentFunc, auxDIM)
         if not PosicionMemoria:
-            PosicionMemoria = directorioFunciones.func_memoria(GBL, currentVarName)
+            PosicionMemoria = directorioFunciones.func_memoria(GBL, auxDIM)
         if PosicionMemoria < 0:
-            sys.exit("Error. La variable no ha sido declarada: ", currentVarName)
+            sys.exit("Error. La variable no ha sido declarada: ", auxDIM)
             return
         
         #AHORA checamos los tipos
-        TipoActual = directorioFunciones.func_searchVarType(currentFunc, currentVarName)
+        TipoActual = directorioFunciones.func_searchVarType(currentFunc, auxDIM)
         if not TipoActual:
-            TipoActual = directorioFunciones.func_searchVarType(GBL, currentVarName)
+            TipoActual = directorioFunciones.func_searchVarType(GBL, auxDIM)
         
         if not TipoActual: #Si no está en globales
-            sys.exit("Error. La variable no ha sido declarada: ", currentVarName)
+            sys.exit("Error. La variable no ha sido declarada: ", auxDIM)
             return
         
         auxID2 = popOperandos()
@@ -2234,7 +2243,7 @@ def p_pnMatrizAcc(p):
 
         valorTMem = '(' + str(tMem3) + ')'
 
-        pushOperando(currentVarName)
+        pushOperando(auxDIM)
         pushMemoria(valorTMem)
         pushTipo(TipoActual)
 

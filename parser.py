@@ -313,12 +313,12 @@ def p_dim_dec1(p):
     '''
 
 def p_dim_index(p):
-    'dim_index : LBRACK pnDimAccess2 pnExp6 exp pnActivaArray RBRACK pnExp7 dim_index1'
+    'dim_index : LBRACK pnDimAccess2 pnExp6 exp pnActivaArray pnArregloAcc RBRACK pnExp7 dim_index1'
 
 def p_dim_index1(p):
     '''
     dim_index1 : LBRACK pnExp6 exp pnActivaArray RBRACK pnExp7 pnMatrizAcc
-               | empty pnArregloAcc
+               | empty
     '''
 
 
@@ -2108,36 +2108,58 @@ def p_pnArregloAcc(p):
             
         #Cuadruplo verifica
         QuadGenerate('VERIFICA', auxMem, 0, varDimensiones[0]) #DUDA tamaño -1
+        
+        
 
-        #Memoria Base
-        PosicionMemoria = directorioFunciones.func_memoria(currentFunc, currentVarName)
-        if not PosicionMemoria:
-            PosicionMemoria = directorioFunciones.func_memoria(GBL, currentVarName)
+        #Si es Matriz...
+        if varDimensiones[1] == 0:
+            #Memoria Base
+            PosicionMemoria = directorioFunciones.func_memoria(currentFunc, currentVarName)
+            if not PosicionMemoria:
+                PosicionMemoria = directorioFunciones.func_memoria(GBL, currentVarName)
+                
+            if PosicionMemoria < 0:
+                sys.exit("Error. Variable no declarada: ", currentVarName)
+                return
+                
+
+            TipoActual = directorioFunciones.func_searchVarType(currentFunc, currentVarName)
+            if not TipoActual:
+                TipoActual = directorioFunciones.func_searchVarType(GBL, currentVarName)
+                
+            if not TipoActual:
+                sys.exit("Error. Variable no declarada: ", currentVarName)
+                return
+                
+
+            tMem = nextAvailTemp('int')
+            QuadGenerate('+', PosicionMemoria, auxMem, tMem)
+
+            valorTMem = '(' + str(tMem) + ')'
+                
+            pushOperando(currentVarName)
+            pushMemoria(valorTMem)
+            pushTipo(TipoActual)
+            isArray = False
+            currentVarName = ''
+        else: #Si es matriz, hay que generar el cuadruplo de *
+            print("\n")
+            print("Si es matriz...")
+            print("\n")
+            print("\n")
+            print("\n")
+            print("\n")
+            print("pOperandos: ", pOperandos)
             
-        if PosicionMemoria < 0:
-            sys.exit("Error. Variable no declarada: ", currentVarName)
-            return
+            tMem = nextAvailTemp('int')
+            QuadGenerate('*', auxMem, getAddConst(varDimensiones[0]), tMem)
+            pushOperando(tMem)
+            pushMemoria(tMem)
+            pushTipo('int')
+
+            
             
 
-        TipoActual = directorioFunciones.func_searchVarType(currentFunc, currentVarName)
-        if not TipoActual:
-            TipoActual = directorioFunciones.func_searchVarType(GBL, currentVarName)
-            
-        if not TipoActual:
-            sys.exit("Error. Variable no declarada: ", currentVarName)
-            return
-            
-
-        tMem = nextAvailTemp('int')
-        QuadGenerate('+', PosicionMemoria, auxMem, tMem)
-
-        valorTMem = '(' + str(tMem) + ')'
-            
-        pushOperando(currentVarName)
-        pushMemoria(valorTMem)
-        pushTipo(TipoActual)
-        isArray = False
-        currentVarName = ''
 
     else: 
         sys.exit("Error. No se puede acceder al index porque la variable no es dimensionada")
@@ -2155,28 +2177,16 @@ def p_pnMatrizAcc(p):
     global isArray
     global currentVarName
     global currentFunc
+    print("pOperandos: ", pOperandos)
 
-    indexRenglon = popOperandos()
-    MemRenglon = popMemoria()
-    TipoRenglon = popTipos()
-
-    indexColumna = popOperandos()
-    MemColumna = popMemoria()
-    TipoColumna = popTipos()
-
+    auxID = popOperandos()
+    auxMem = popMemoria()
+    auxTipo = popTipos() 
 
     if isArray:
-
-        #Checar que sean enteros columnas y renglones
-        if TipoColumna != 'int':
-            print("Error. Solo puede haber enteros en los indices de la columna de matriz")
-            if TipoRenglon != 'int':
-                print("Error. Solo puede haber enteros en los indices de el renglon de matriz")
+        if auxTipo != 'int':
+            sys.exit("Error. Es necesario que el tipo sea un entero para acceder al arreglo")
             return
-
-        if TipoRenglon != 'int':
-                print("Error. Solo puede haber enteros en los indices de el renglon de matriz")
-                return
         
         #Checa las dimensiones
         varDimensiones = directorioFunciones.func_getDims(currentFunc, currentVarName)
@@ -2188,8 +2198,8 @@ def p_pnMatrizAcc(p):
         
         #Si obtiene las dimensiones correctamente.....
         #Genera los cuadruplos
-        QuadGenerate('VERIFICA', MemColumna, 0, varDimensiones[0]-1)
-        QuadGenerate('VERIFICA', MemRenglon, 0, varDimensiones[1]-1) #DUDA Tamaño -1
+        QuadGenerate('VERIFICA', auxMem, 0, varDimensiones[1]-1)
+       
 
         #Memoria Base
         PosicionMemoria = directorioFunciones.func_memoria(currentFunc, currentVarName)
@@ -2208,18 +2218,19 @@ def p_pnMatrizAcc(p):
             sys.exit("Error. La variable no ha sido declarada: ", currentVarName)
             return
         
-        #Si todo va bien...
-        #Sigue calcular al memoria y generar cuadruplos de sumas
-        tMem = nextAvailTemp('int')
-
-        QuadGenerate('*', MemRenglon, getAddConst(varDimensiones[0]), tMem)
+        auxID2 = popOperandos()
+        auxMem2 = popMemoria()
+        auxTipo2 = popTipos()
 
         tMem2 = nextAvailTemp('int')
-        QuadGenerate('+', tMem, MemColumna, tMem2)
+        QuadGenerate('+', auxMem2, auxMem, tMem2)
+        pushOperando(tMem2)
+        pushMemoria(tMem2)
+        pushTipo('int')
 
         tMem3 = nextAvailTemp('int')
-        j = '@' + str(PosicionMemoria)
-        QuadGenerate('+', j, tMem2, tMem3)
+        base = '@' + str(PosicionMemoria)
+        QuadGenerate('+', base, tMem2, tMem3)
 
         valorTMem = '(' + str(tMem3) + ')'
 

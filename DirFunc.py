@@ -154,7 +154,7 @@ class DirFunc:
     '''
     Funcion que imprime el directorio de funciones actual
     '''
-    def func_print(self):
+    def func_print(self, nombre):
         print (self.directorio_funciones[nombre]['variables'].tabla_variables)
         print("\n")
 

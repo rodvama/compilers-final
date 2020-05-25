@@ -47,7 +47,7 @@ OP_REL = ['>', '<', '<=', '>=', '==', '!=']
 OP_LOGICOS = ['&', '|']
 OP_ASIG = ['=']
 OP_SECUENCIALES = ['lee', 'escribe', 'regresa']
-ESPACIO_MEMORIA = 100 #Tamano del espacio de memoria
+ESPACIO_MEMORIA = 1000 #Tamano del espacio de memoria
 
 ##Variables globales
 currentFunc = GBL
@@ -824,6 +824,8 @@ def QuadGenerate(operator, leftOperand, rightOperand, result):
 
 #Impresion de lista de cuadruplos
 def QuadGenerateList():
+    
+    print(directorioFunciones.func_print(GBL))
     print("-------Lista de Cuadruplos: ")
 
     contador = 0
@@ -2186,8 +2188,8 @@ def p_pnMatrizAcc(p):
         
         #Si obtiene las dimensiones correctamente.....
         #Genera los cuadruplos
-        QuadGenerate('VERIFICA', MemColumna, 0, varDimensiones[0])
-        QuadGenerate('VERIFICA', MemRenglon, 0, varDimensiones[1]) #DUDA Tamaño -1
+        QuadGenerate('VERIFICA', MemColumna, 0, varDimensiones[0]-1)
+        QuadGenerate('VERIFICA', MemRenglon, 0, varDimensiones[1]-1) #DUDA Tamaño -1
 
         #Memoria Base
         PosicionMemoria = directorioFunciones.func_memoria(currentFunc, currentVarName)

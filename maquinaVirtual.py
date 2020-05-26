@@ -72,19 +72,7 @@ def top(pilaNom):
         aux = len(pilaEjecucion) - 1
         if (aux < 0):
             return 'vacia'
-        return pilaEjecucion
-    elif pilaNom == "retorno":
-        global pilaRetorno
-        aux = len(pilaRetorno) - 1
-        if (aux < 0):
-            return 'vacia'
-        return pilaRetorno
-    elif pilaNom == "funcion":
-        global pilaFuncion
-        aux = len(pilaFuncion) - 1
-        if (aux < 0):
-            return 'vacia'
-        return pilaFuncion
+        return pilaEjecucion[aux]
 
 push(CONST_EJECUCION, mem_MAIN)
 
@@ -163,12 +151,12 @@ limite_dfConstantes = limite_charConstantes + ESPACIO_MEMORIA
 
 def getValor(memVirtual, memDireccion, memTipo):
     global mem_GLOBAL
-    try:
-        if memDireccion[0] == '{' and memDireccion[-1] == '}':
-            memDireccion = getValor(memVirtual, memDireccion[1:-1], getTipo(memDireccion[1:-1]))
-            memTipo = getTipo(memDireccion)
-    except:
-        pass
+    # try:
+    #     if memDireccion[0] == '{' and memDireccion[-1] == '}':
+    #         memDireccion = getValor(memVirtual, memDireccion[1:-1], getTipo(memDireccion[1:-1]))
+    #         memTipo = getTipo(memDireccion)
+    # except:
+    #     pass
     
     valor = -1
     seccion = getSeccion(memDireccion)
@@ -187,12 +175,12 @@ def getValor(memVirtual, memDireccion, memTipo):
 
 def llenarValor(memVirtual, memDireccion, memTipo, valor):
     global mem_GLOBAL
-    try:
-        if memDireccion[0] == '{' and memDireccion[-1] == '}':
-            memDireccion = getValor(memVirtual, memDireccion[1:-1], getTipo(memDireccion[1:-1]))
-            memTipo = getTipo(memDireccion)
-    except:
-        pass
+    # try:
+    #     if memDireccion[0] == '{' and memDireccion[-1] == '}':
+    #         memDireccion = getValor(memVirtual, memDireccion[1:-1], getTipo(memDireccion[1:-1]))
+    #         memTipo = getTipo(memDireccion)
+    # except:
+    #     pass
     
     memTipo = str(memTipo)
     seccion = getSeccion(memDireccion)
@@ -285,7 +273,6 @@ def operadores(signo):
     llenarValor(pilaCorriendo, cuadruplo[3], getTipo(cuadruplo[3]), res)
 
 def correr():
-    print("entre")
     global cuaLista
     global cuaIndice
     global cuadruplo
@@ -299,10 +286,15 @@ def correr():
         sigCuaIndice = -1
         pilaCorriendo = top(CONST_EJECUCION)
         cuadruplo = cuaLista[cuaIndice]
-        
+
         # ASIGNACION
         if cuadruplo[0] == '=':
-            return
+            try:
+                valor = getValor(pilaCorriendo, cuadruplo[1], getTipo(cuadruplo[1]))
+            except:
+                valor = pop(CONST_RETORNO_VALOR)
+                print(valor)
+            llenarValor(pilaCorriendo, cuadruplo[3], getTipo(cuadruplo[3]), valor)
         # COMANDOS        
         # GOTO
         elif cuadruplo[0] == 'GOTO':
@@ -313,10 +305,15 @@ def correr():
             auxValor = getValor(pilaCorriendo, cuadruplo[1], tipo)
             if not auxValor:
                 sigCuaIndice = int(cuadruplo[3])
+        # GOSUB
+        elif cuadruplo[0] == 'GOSUB':
+            pilaCorriendo = pop(CONST_TEMPORAL)
+            push(CONST_EJECUCION, pilaCorriendo)
+            push(CONST_FUNCION_RETORNO, cuadruplo[2])
+            sigCuaIndice = int(cuadruplo[3])
         # ERA
         elif cuadruplo[0] == 'ERA':
-            funcion = str(cuadruplo[1])
-            memNueva = memVirtual(funcion)
+            memNueva = memVirtual(str(cuadruplo[1]))
             push(CONST_TEMPORAL, memNueva)
         # PARAMETER
         elif cuadruplo[0] == 'PARAMETER':
@@ -325,12 +322,6 @@ def correr():
             auxMem = top(CONST_TEMPORAL)
             mem = auxMem.sigDireccionDisponible(tipo, limite_dfGlobales, ESPACIO_MEMORIA)
             llenarValor(auxMem, mem, getTipo(mem), valor)
-        # GOSUB
-        elif cuadruplo[0] == 'GOSUB':
-            pilaCorriendo = pop(CONST_TEMPORAL)
-            push(CONST_EJECUCION, pilaCorriendo)
-            push(CONST_FUNCION_RETORNO, cuadruplo[2])
-            sigCuaIndice = int(cuadruplo[3])
         # ENDFUNC
         elif cuadruplo[0] == 'ENDFUNC':
             pop(CONST_EJECUCION)
@@ -344,6 +335,7 @@ def correr():
             sigCuaIndice = int(pop(CONST_FUNCION_RETORNO));
         # lee
         elif cuadruplo[0] == 'lee':
+        # TODO: Ver lo de los arreglos
             texto = input("> ")
             try:
                 int(texto)
@@ -358,7 +350,6 @@ def correr():
                         tipo = 'char' if len(texto) == 1 else 'string'
                     except:
                         print("Error: {}".format(sys.exc_info()[0], cuaIndice))
-            # TODO: Ver lo de los arreglos
         # escribe
         elif cuadruplo[0] == 'escribe':
             texto = getValor(pilaCorriendo, cuadruplo[1], getTipo(cuadruplo[1]))
@@ -439,6 +430,7 @@ def correr():
         # OPERADORES 
         else:
             operadores(cuadruplo[0])
+
         if sigCuaIndice != -1:
             cuaIndice = sigCuaIndice
         else: #Solo se ejecuta el siguiente quad
@@ -458,12 +450,12 @@ def getArchivo():
 # TODO: lectura de archivos
 cuadruplos = getArchivo()
 for linea in cuadruplos:
+    linea = linea.replace('(','')
+    linea = linea.replace(')','')
     linea = linea.replace('\n','')
     linea = linea.replace('\'','')
     linea = linea.replace(' ','')
     cuadruplo = tuple(linea.split(','))
-    # print(cuadruplo[1])
     cuadruplo = (cuadruplo[0], cuadruplo[1], cuadruplo[2], cuadruplo[3])
     cuaLista.append(cuadruplo)
-
 correr()

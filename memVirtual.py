@@ -28,7 +28,9 @@ class memVirtual:
     Guardar el valor, en una direccion específica
     """
     def guardarValor(self, direccion, tipo, valor):
+        print("entre")
         self.direcciones[str(tipo)][str(direccion)] = valor
+        print(direccion, " ", tipo, " ", valor)
 
     """
     Obtener el valor de una direccion en específico

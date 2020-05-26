@@ -753,9 +753,14 @@ def QuadGenerateList():
     print("-------Lista de Cuadruplos: ")
 
     contador = 0
+    # Opción de leer tuplas directamente - TODO: Arreglar
+    file = open("obj.txt", "w+")
     for quad in cuadruplos:
         print("{}.\t{},\t{},\t{},\t{}".format(contador,quad[0],quad[1],quad[2],quad[3]))
         contador = contador + 1
+
+        file.write(str(quad) + '\n')
+    file.close()
 
 #Funcion que muestra menssaje de error cuando los tipos no coinciden
 def errorTypeMismatch():
@@ -1876,15 +1881,15 @@ parser = yacc.yacc()
 
 # Put all test inside prueba folder
 def main():
-    #name = input('File name: ')
-    name = "pruebas/" + "test3" + ".txt" #Para probar, cambia el nombre del archivo
+    name = input('File name: ')
+    name = "pruebas/" + name + ".txt" #Para probar, cambia el nombre del archivo
     print(name)
     try:
         f = open(name,'r', encoding='utf-8')
-        QuadTemporal = ('0', '0', '0', '0')
-        pushQuad(QuadTemporal)
+        # QuadTemporal = ('0', '0', '0', '0')
+        # pushQuad(QuadTemporal)
         result = parser.parse(f.read())
-        print(result)
+        # print(result)
         f.close()
     except EOFError:
         print (EOFError)

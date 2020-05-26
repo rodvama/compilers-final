@@ -1,0 +1,11 @@
+programa COVID19;
+
+var 
+int: B[12][9], A[9], j, i, k, p;
+
+
+
+principal()
+{   
+    B[i][A[1]] = i - j;
+}

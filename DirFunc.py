@@ -71,11 +71,40 @@ class DirFunc:
     '''
     def func_updateDim(self, nombre, nombreVar, renglones, columnas):
         if self.directorio_funciones[nombre]['variables'].var_exist(nombreVar):
-            return self.directorio_funciones[nombre]['variables'].var_upadateDims(nombreVar, renglones, columnas)
+            if columnas > 0:
+                return self.directorio_funciones[nombre]['variables'].var_upadateDims(nombreVar, renglones, columnas)
+            else:
+                return self.directorio_funciones[nombre]['variables'].var_upadateDims(nombreVar, renglones, -1)
         else:
             print("Error: Variable ", nombreVar, "no existe en este contexto ", nombre)
             return None
     
+
+    '''
+    Funcion que dice si una variable dada es dimensionada en el contexto dado
+    '''
+    def func_isVarDimensionada(self, nombre, nombreVar):
+        if self.directorio_funciones[nombre]['variables'].var_exist(nombreVar):
+            print("DIRECTORIO FUNC DE ", nombreVar, "col: ", self.directorio_funciones[nombre]['variables'].tabla_variables[nombreVar]['columnas'])
+
+            if self.directorio_funciones[nombre]['variables'].tabla_variables[nombreVar]['columnas'] > 0 or self.directorio_funciones[nombre]['variables'].tabla_variables[nombreVar]['renglones'] > 0:
+                return 1
+            else:
+                return 0
+        else:
+            return -1 #No existe esa variable en este contexto
+    
+
+    '''
+    Funcion que regresa las dimensiones de una variable dimensionada en forma de lista
+    '''
+    def func_getDims(self, nombre, nombreVar):
+        if self.directorio_funciones[nombre]['variables'].var_exist(nombreVar):
+            dim = [self.directorio_funciones[nombre]['variables'].tabla_variables[nombreVar]['columnas'], self.directorio_funciones[nombre]['variables'].tabla_variables[nombreVar]['renglones']]
+            return dim
+        else:
+            return -1 #No existe esa variable en este contexto
+
     
     '''
     Funcion que regresa el string del tipo de una variable previamente creada en las funciones
@@ -105,6 +134,8 @@ class DirFunc:
         else:
             print("Error: NO existe la funcion: ", nombre)
 
+    
+
     '''
     
     '''
@@ -123,7 +154,7 @@ class DirFunc:
     '''
     Funcion que imprime el directorio de funciones actual
     '''
-    def func_print(self):
+    def func_print(self, nombre):
         print (self.directorio_funciones[nombre]['variables'].tabla_variables)
         print("\n")
 

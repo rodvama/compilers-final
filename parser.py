@@ -2,7 +2,7 @@
 # Rodrigo Valencia A00818256
 # Diseno de compiladores
 # Parser
-#Ultima modificacion: 10 Mayo 2020
+#Ultima modificacion: 23 Mayo 2020
 import ply.yacc as yacc
 import os
 import codecs
@@ -28,11 +28,12 @@ pSaltos = [] #Pila de saltos para condiciones y ciclos
 pFunciones = [] #Pila de funciones
 pArgumentos = [] #Pila de agumentos de una funcion
 pMemorias = [] # Pila de direcciones de memoria
+pDim = [] #Pila de Arreglos
 
 #Arreglo donde se almacenaran todos los cuadruplos que se vayan generando
 cuadruplos = []
 
-#Diccionarios de constantes
+#Diccionarios de constantes que cuardan la direccion de memoria de constantes
 d_ints = {}
 d_floats = {}
 d_strs = {}
@@ -47,7 +48,7 @@ OP_REL = ['>', '<', '<=', '>=', '==', '!=']
 OP_LOGICOS = ['&', '|']
 OP_ASIG = ['=']
 OP_SECUENCIALES = ['lee', 'escribe', 'regresa']
-ESPACIO_MEMORIA = 100 #Tamano del espacio de memoria
+ESPACIO_MEMORIA = 1000 #Tamano del espacio de memoria
 
 ##Variables globales
 currentFunc = GBL
@@ -63,56 +64,60 @@ varFor = ''
 negativo = False
 returnBool = False #sirve para saber si una funcion debe regresar algun valor (si es void o no)
 
+
 #Variables para Arreglos y matrices
+isArray = False
+isMatrix = False
 numRenglones = 0
 numColumnas = 0
-R = 1
-base = 0
+R = 1 #m0
+dirBase = 0 #Direccion base
+currentConstArrays = []
 
 '''
 Espacios de memoria:
 +++++++++++++++++++++++
-+globales enteras     + batch_size
++globales enteras     + ESPACIO MEMORIA
 +---------------------+
-+globales flotantes   + batch_size
++globales flotantes   + ESPACIO MEMORIA
 +---------------------+
-+globales strings     + batch_size
++globales strings     + ESPACIO MEMORIA
 +---------------------+
-+globales char       + batch_size
++globales char       + ESPACIO MEMORIA
 +---------------------+
-+globales dataframes  + batch_size
++globales dataframes  + ESPACIO MEMORIA
 +++++++++++++++++++++++
-+locales enteras      + batch_size
++locales enteras      + ESPACIO MEMORIA
 +---------------------+
-+locales flotantes    + batch_size
++locales flotantes    + ESPACIO MEMORIA
 +---------------------+
-+locales strings      + batch_size
++locales strings      + ESPACIO MEMORIA
 +---------------------+
-+locales char         + batch_size
++locales char         + ESPACIO MEMORIA
 +---------------------+
-+locales dataframes   + batch_size
++locales dataframes   + ESPACIO MEMORIA
 +++++++++++++++++++++++
-+temp enteras         + batch_size
++temp enteras         + ESPACIO MEMORIA
 +---------------------+
-+temp flotantes       + batch_size
++temp flotantes       + ESPACIO MEMORIA
 +---------------------+
-+temp strings         + batch_size
++temp strings         + ESPACIO MEMORIA
 +---------------------+
-+temp char            + batch_size
++temp char            + ESPACIO MEMORIA
 +---------------------+
-+temp dataframes      + batch_size
++temp dataframes      + ESPACIO MEMORIA
 +---------------------+
-+temp booleanas       + batch_size
++temp booleanas       + ESPACIO MEMORIA
 +++++++++++++++++++++++
-+constantes enteras   + batch_size
++constantes enteras   + ESPACIO MEMORIA
 +---------------------+
-+constantes flotantes + batch_size
++constantes flotantes + ESPACIO MEMORIA
 +---------------------+
-+constantes strings   + batch_size
++constantes strings   + ESPACIO MEMORIA
 +---------------------+
-+constantes char      + batch_size
++constantes char      + ESPACIO MEMORIA
 +---------------------+
-+constantes dataframe    + batch_size
++constantes dataframe    + ESPACIO MEMORIA
 +++++++++++++++++++++++
 '''
 #Declaracion de espacio de memoria por tipo de memoria
@@ -284,11 +289,11 @@ def p_lista_ids(p):
     'lista_ids : lista SEMICOLON'
 
 def p_lista(p):
-    'lista : ID dd pn_2_addVariable lista1'
+    'lista : ID pn_2_addVariable dd lista1'
 
 def p_dd(p):
     '''
-    dd : dim_dec
+    dd : dim_dec pnDimDec8
        | empty
     '''
 
@@ -300,20 +305,20 @@ def p_lista1(p):
 
 #Dimensiones
 def p_dim_dec(p):
-    'dim_dec : LBRACK CTE_INT RBRACK pn_7_decRenglones dim_dec1'
+    'dim_dec : LBRACK pnDimDec2_3 CTE_INT pnDimDec5 RBRACK pn_7_decRenglones dim_dec1'
 
 def p_dim_dec1(p):
     '''
-    dim_dec1 : LBRACK CTE_INT RBRACK pn_8_decColumnas
+    dim_dec1 : LBRACK CTE_INT pnDimDec6 RBRACK pn_8_decColumnas
              | empty
     '''
 
 def p_dim_index(p):
-    'dim_index : LBRACK exp RBRACK dim_index1'
+    'dim_index : LBRACK pnDimAccess2 pnExp6 exp pnActivaArray pnArregloAcc RBRACK pnExp7 dim_index1'
 
 def p_dim_index1(p):
     '''
-    dim_index1 : LBRACK exp RBRACK
+    dim_index1 : LBRACK pnExp6 exp pnActivaArray RBRACK pnExp7 pnMatrizAcc
                | empty
     '''
 
@@ -735,7 +740,77 @@ def pushConstante(constante):
     else:
         sys.exit("Error: Tipo de Variable desconocida")
 
+
+'''
+Regresa la direccion de memoria de una constante, y si no está declarada la agrega.
+''' 
+
+def getAddConst(constante):
+
+    global d_ints
+    global d_floats
+    global d_strs
+    global d_ch
+    global d_df
+
+    global cont_IntConstantes
+    global cont_FloatConstantes
+    global cont_StringConstantes
+    global cont_CharConstantes
+    global cont_dfConstantes
+
+    if type(constante) == int:
+        if constante not in d_ints:
+            if cont_IntConstantes < limite_intConstantes:
+                d_ints[constante] = cont_IntConstantes
+                cont_IntConstantes += 1
+                QuadGenerate('addConstante', 'int', constante, d_ints[constante])
+            
+            else:
+                errorOutOfBounds('constantes', 'Enteras')
+        return d_ints[constante]
     
+    elif type(constante) == float:
+        if constante not in d_floats:
+            if cont_FloatConstantes < limite_floatConstantes:
+                d_floats[constante] = cont_FloatConstantes
+                cont_FloatConstantes += 1
+                QuadGenerate('addConstante', 'float', constante, d_floats[constante])
+            
+            else:
+                errorOutOfBounds('constantes', 'Flotantes')
+        return d_floats[constante]
+    
+    elif type(constante) == str:
+        if len(constante) > 1: #String
+            if constante not in d_strs:
+                if cont_StringConstantes < limite_stringConstantes:
+                    d_strs[constante] = cont_StringConstantes
+                    cont_StringConstantes += 1
+                    QuadGenerate('addConstante', 'string', constante, d_strs[constante])
+                else:
+                    errorOutOfBounds('constantes', 'Strings')
+            
+            return d_strs[constante]
+
+        else: #Char
+            if constante not in d_ch:
+                if cont_CharConstantes < limite_charConstantes:
+                    d_ch[constante] = cont_CharConstantes
+                    cont_CharConstantes += 1
+                    QuadGenerate('addConstante', 'char', constante, d_ch[constante])
+                else:
+                    errorOutOfBounds('constantes', 'Chars')
+        
+            return d_ch[constante]
+
+    else: 
+        sys.exit("Error en getAddConst")
+
+
+
+
+
 
 ################ Funciones de impresion y Errores #####################
 
@@ -750,6 +825,8 @@ def QuadGenerate(operator, leftOperand, rightOperand, result):
 
 #Impresion de lista de cuadruplos
 def QuadGenerateList():
+    
+    print(directorioFunciones.func_print(GBL))
     print("-------Lista de Cuadruplos: ")
 
     contador = 0
@@ -1031,16 +1108,15 @@ def p_pn_2_addVariable(p):
     global varName
     global currentType
     global currentVarName
-    global numColumnas
-    global numRenglones
     global currentCantVars
 
-    varName = p[-2]
+    varName = p[-1]
     currentVarName = varName
+    
     PosMem = nextAvailMemory(currentFunc, currentType)
-    directorioFunciones.func_addVar(currentFunc, varName, currentType, numRenglones, numColumnas, PosMem)
-    numColumnas = 0
-    numRenglones = 0
+    
+    directorioFunciones.func_addVar(currentFunc, varName, currentType, 0, 0, PosMem)
+    
     currentCantVars += 1
   
 
@@ -1358,6 +1434,9 @@ def p_pnExp1(p):
     global pTipos
     global forBool
     global varFor
+    global isArray
+    global currentVarName
+
 
     idName = p[-1]
     idType = directorioFunciones.func_searchVarType(currentFunc, idName)
@@ -1377,9 +1456,26 @@ def p_pnExp1(p):
         print("Error: Variable ", idName, " no declarada")
         return
     
-    
+
     if forBool:
         varFor = idName
+
+    isDim = directorioFunciones.func_isVarDimensionada(currentFunc, idName)
+
+    print("Exp1, DIMENSIONADA: ", isDim)
+
+    if isDim == -1: #sigfinica que no esta en este contexto
+        isDim = directorioFunciones.func_isVarDimensionada(GBL, idName)
+    
+    if isDim == 1:
+        isArray = True
+        currentVarName = idName
+    elif isDim == 0:
+        isArray = False
+    else:
+        isArray = False
+        sys.exit("Error. No se ha declarado la variable : ", idName)
+        return
 
     pushOperando(idName)
     pushMemoria(varPosMem)
@@ -1871,13 +1967,311 @@ def p_pnRetorno(p):
     else:
         print ("Error: Esta funcion no debe regresar nada")
     
+######## ARREGLOS ###############
+
+
+'''
+Punto neuralgico 2 y 3
+Set id as an Array (isArray = true)
+'''
+def p_pnDimDec2_3(p):
+    '''
+    pnDimDec2_3 : 
+    '''
+    global isArray
+    isArray = True
+
+    # t = popTipos()
+    # t = popOperandos()
+    # t = popMemoria()
+
+
+
+'''
+Punto neuralgico 5 de Elda
+Guardar limite de Columnas
+'''
+def p_pnDimDec5(p):
+    '''
+    pnDimDec5 : 
+    '''
+    global R
+    global numColumnas
+    global directorioFunciones
+    global currentFunc
+    global currentVarName
+
+    columnas = p[-1]
+    if columnas > 0:
+        R = R * columnas # R = (LimSup - LimInf + 1) * R
+        print("PN5Arreglos.  R = ", R)
+        numColumnas = columnas
+
+        directorioFunciones.func_updateDim(currentFunc, currentVarName, 0, columnas)
+    else:
+        sys.exit("Error: Index de arreglo invalido: ", columnas)
+
+'''
+Guarda la cantidad de renglones (Significa que es matriz)
+'''
+def p_pnDimDec6(p):
+    '''
+    pnDimDec6 :
+    '''
+    # global isMatrix
+    global R
+    global numRenglones
+    global directorioFunciones
+    global currentFunc
+    global currentVarName
+
+    isMatrix = True
+    renglones = p[-1]
+    if renglones > 0:
+        R = R * renglones 
+        print("PN6Matriz.  R = ", R)
+        numRenglones = renglones
+
+        directorioFunciones.func_updateDim(currentFunc, currentVarName, renglones, -1)
+    else: 
+        sys.exit("Error. Index menor o igual a cero no es valido")
+        return
+
+'''
+Actualiza el pointer de memoria tomando los espacios necesarios para el arreglo
+'''
+def p_pnDimDec8(p):
+    '''
+    pnDimDec8 : 
+    '''
+    global R
+    global directorioFunciones
+    global currentFunc
+    global currentVarName
+    global isArray
+    # global isMatrix
+    global currentConstArrays
+    NumEspacios = R - 1
+    
+    currentType = directorioFunciones.func_searchVarType(currentFunc, currentVarName)
+
+    update_pointer(currentFunc, currentType, NumEspacios) #Separa los espacios que va a usar para el arreglo o matriz
+    
+    
+    #Reseteo
+    R = 1
+    isArray = False
+    currentConstArrays = []
+
+'''
+Punto neuralgico 2 de Elda para acceder a Arreglos
+
+'''
+def p_pnDimAccess2(p):
+    '''
+    pnDimAccess2 : 
+    '''
+    global isArray
+    global pDim
+    isArray = True
+    
+    varid = popOperandos()
+    varmem = popMemoria()
+    vartipo = popTipos()
+    pDim.append(varid)
+
+'''
+Acceder al indice del arreglo
+'''
+def p_pnArregloAcc(p):
+    '''
+    pnArregloAcc : 
+    '''
+    global isArray
+    global currentFunc
+    global currentVarName
+
+    auxID = popOperandos()
+    auxMem = popMemoria()
+    auxTipo = popTipos()
+
+    auxDIM = pDim.pop()
+    if isArray:
+        if auxTipo != 'int':
+            sys.exit("Error. Es necesario que el tipo sea un entero para acceder al arreglo")
+            return
+        
+        varDimensiones = directorioFunciones.func_getDims(currentFunc, auxDIM)
+
+        if varDimensiones == -1:
+            varDimensiones = directorioFunciones.func_getDims(GBL, auxDIM)
+
+            if varDimensiones == -1:
+                sys.exit("Error. No existe variable dimensionada")
+                return
+            
+        #Cuadruplo verifica
+        QuadGenerate('VERIFICA', auxMem, 0, varDimensiones[0]) #DUDA tamaño -1
+        
+        
+
+        #Si es Matriz...
+        if varDimensiones[1] == 0:
+            #Memoria Base
+            PosicionMemoria = directorioFunciones.func_memoria(currentFunc, auxDIM)
+            if not PosicionMemoria:
+                PosicionMemoria = directorioFunciones.func_memoria(GBL, auxDIM)
+                
+            if PosicionMemoria < 0:
+                sys.exit("Error. Variable no declarada: ", auxDIM)
+                return
+                
+
+            TipoActual = directorioFunciones.func_searchVarType(currentFunc, auxDIM)
+            if not TipoActual:
+                TipoActual = directorioFunciones.func_searchVarType(GBL, auxDIM)
+                
+            if not TipoActual:
+                sys.exit("Error. Variable no declarada: ", auxDIM)
+                return
+                
+
+            tMem = nextAvailTemp('int')
+            QuadGenerate('+', PosicionMemoria, auxMem, tMem)
+
+            valorTMem = '(' + str(tMem) + ')'
+                
+            pushOperando(auxDIM)
+            pushMemoria(valorTMem)
+            pushTipo(TipoActual)
+            isArray = False
+            currentVarName = ''
+        else: #Si es matriz, hay que generar el cuadruplo de *
+            print("\n")
+            print("Si es matriz...")
+            print("\n")
+            print("\n")
+            print("\n")
+            print("\n")
+            print("pOperandos: ", pOperandos)
+            
+            tMem = nextAvailTemp('int')
+            QuadGenerate('*', auxMem, getAddConst(varDimensiones[0]), tMem)
+            pushOperando(tMem)
+            pushMemoria(tMem)
+            pushTipo('int')
+            pDim.append(auxDIM)
+
+            
+            
+
+
+    else: 
+        sys.exit("Error. No se puede acceder al index porque la variable no es dimensionada")
+        return
+
+'''
+Acceder indice de matrixz
+'''
+def p_pnMatrizAcc(p):
+    '''
+    pnMatrizAcc : 
+    '''
+
+    print("MATRIZZZZZZZZZZZ")
+    global isArray
+    global currentVarName
+    global currentFunc
+    global pDim
+    print("pOperandos: ", pOperandos)
+
+    auxID = popOperandos()
+    auxMem = popMemoria()
+    auxTipo = popTipos() 
+
+    auxDIM = pDim.pop()
+
+    if isArray:
+        if auxTipo != 'int':
+            sys.exit("Error. Es necesario que el tipo sea un entero para acceder al arreglo")
+            return
+        
+        #Checa las dimensiones
+        varDimensiones = directorioFunciones.func_getDims(currentFunc, auxDIM)
+        print("MAT: ", auxDIM)
+        if varDimensiones == -1:
+            varDimensiones = directorioFunciones.func_getDims(GBL, auxDIM) #Busca en global
+            if varDimensiones == -1: # si no hay en global...
+                sys.exit("Error. La variable no es matriz...")
+                return
+        
+        #Si obtiene las dimensiones correctamente.....
+        #Genera los cuadruplos
+        QuadGenerate('VERIFICA', auxMem, 0, varDimensiones[1]-1)
+       
+
+        #Memoria Base
+        PosicionMemoria = directorioFunciones.func_memoria(currentFunc, auxDIM)
+        if not PosicionMemoria:
+            PosicionMemoria = directorioFunciones.func_memoria(GBL, auxDIM)
+        if PosicionMemoria < 0:
+            sys.exit("Error. La variable no ha sido declarada: ", auxDIM)
+            return
+        
+        #AHORA checamos los tipos
+        TipoActual = directorioFunciones.func_searchVarType(currentFunc, auxDIM)
+        if not TipoActual:
+            TipoActual = directorioFunciones.func_searchVarType(GBL, auxDIM)
+        
+        if not TipoActual: #Si no está en globales
+            sys.exit("Error. La variable no ha sido declarada: ", auxDIM)
+            return
+        
+        auxID2 = popOperandos()
+        auxMem2 = popMemoria()
+        auxTipo2 = popTipos()
+
+        tMem2 = nextAvailTemp('int')
+        QuadGenerate('+', auxMem2, auxMem, tMem2)
+        pushOperando(tMem2)
+        pushMemoria(tMem2)
+        pushTipo('int')
+
+        tMem3 = nextAvailTemp('int')
+        base = '@' + str(PosicionMemoria)
+        QuadGenerate('+', base, tMem2, tMem3)
+
+        valorTMem = '(' + str(tMem3) + ')'
+
+        pushOperando(auxDIM)
+        pushMemoria(valorTMem)
+        pushTipo(TipoActual)
+
+        isArray = False
+        currentVarName = ''
+
+    else:
+        sys.exit("Error. La variable no es dimensionada y no se puede acceder al indice")
+        return
+
+
+
+
+
+def p_pnActivaArray(p):
+    '''
+    pnActivaArray :    
+    '''
+    global isArray
+    isArray = True
+
 
 parser = yacc.yacc()
 
 # Put all test inside prueba folder
 def main():
     #name = input('File name: ')
-    name = "pruebas/" + "test3" + ".txt" #Para probar, cambia el nombre del archivo
+    name = "pruebas/" + "test4" + ".txt" #Para probar, cambia el nombre del archivo
     print(name)
     try:
         f = open(name,'r', encoding='utf-8')

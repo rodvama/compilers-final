@@ -73,11 +73,11 @@ class TablaVars:
     def var_upadateDims(self, nombre, renglones, columnas):
 
         if self.var_exist(nombre):
-            if columnas < 0: #Se actualizan solo renglones
+            
+            if columnas < 0:
                 self.tabla_variables[nombre]['renglones'] = renglones
             else:
                 self.tabla_variables[nombre]['columnas'] = columnas
-                self.tabla_variables[nombre]['renglones']= renglones #?
             
             print("Dimensiones actualizadas de la variable: ", nombre)
             print("Renglones: ", self.tabla_variables[nombre]['renglones'], "Columnas: ", self.tabla_variables[nombre]['columnas'])

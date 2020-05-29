@@ -694,7 +694,7 @@ def pushConstante(constante):
             if cont_IntConstantes < limite_intConstantes:
                 d_ints[constante] = cont_IntConstantes
                 cont_IntConstantes = cont_IntConstantes + 1
-                #QuadGenerate('Constante Creada', 'int', constante, d_ints[constante])
+                QuadGenerate('CONS', 'int', constante, d_ints[constante])
             else:
                 print(cont_IntConstantes, limite_intConstantes)
                 errorOutOfBounds('Constantes', 'Enteras')
@@ -707,7 +707,7 @@ def pushConstante(constante):
             if cont_FloatConstantes < limite_floatConstantes:
                 d_floats[constante] = cont_FloatConstantes
                 cont_FloatConstantes = cont_FloatConstantes + 1
-                #QuadGenerate('Constante Creada', 'float', constante, d_floats[constante])
+                QuadGenerate('CONS', 'float', constante, d_floats[constante])
             else:
                 errorOutOfBounds('Constantes', 'Flotantes')
         pushOperando(constante)
@@ -715,28 +715,29 @@ def pushConstante(constante):
         pushTipo('float')
     
     elif type(constante) == str:
-        if constante not in d_strs:
-            if cont_StringConstantes < limite_stringsConstantes:
-                d_strs[constante] = cont_StringConstantes
-                cont_StringConstantes += 1
-                #QuadGenerate('Constante Creada', 'string', constante, d_strs[constante])
-            else:
-                errorOutOfBounds('Constantes', 'Strings')
-        pushOperando(constante)
-        pushMemoria(d_strs[constante])
-        pushTipo('string')
-    
-    elif type(constante) == chr: ########## POSIBLE ERROR
-        if constante not in d_ch:
-            if cont_CharConstantes < limite_charConstantes:
-                d_chars[constante] = cont_CharConstantes
-                cont_CharConstantes = cont_CharConstantes + 1
-                #QuadGenerate('Constante Creada', 'char', constante, d_chars[constante])
-            else:
-                errorOutOfBounds('Constantes', 'Chars')
-        pushOperando(constante)
-        pushMemoria(d_chars[constante])
-        pushTipo('char')
+        if len(constante) > 3: #String
+            if constante not in d_strs:
+                if cont_StringConstantes < limite_stringConstantes:
+                    d_strs[constante] = cont_StringConstantes
+                    cont_StringConstantes += 1
+                    print("LENG",len(constante), constante)
+                    QuadGenerate('CONS', 'string', constante, d_strs[constante])
+                else:
+                    errorOutOfBounds('constantes', 'Strings')
+            pushOperando(constante)
+            pushMemoria(d_strs[constante])
+            pushTipo('string')
+        else: #Char
+            if constante not in d_ch:
+                if cont_CharConstantes < limite_charConstantes:
+                    d_ch[constante] = cont_CharConstantes
+                    cont_CharConstantes += 1
+                    QuadGenerate('CONS', 'char', constante, d_ch[constante])
+                else:
+                    errorOutOfBounds('constantes', 'Chars')
+            pushOperando(constante)
+            pushMemoria(d_ch[constante])
+            pushTipo('char')
     else:
         sys.exit("Error: Tipo de Variable desconocida")
 
@@ -764,7 +765,7 @@ def getAddConst(constante):
             if cont_IntConstantes < limite_intConstantes:
                 d_ints[constante] = cont_IntConstantes
                 cont_IntConstantes += 1
-                QuadGenerate('addConstante', 'int', constante, d_ints[constante])
+                QuadGenerate('CONS', 'int', constante, d_ints[constante])
             
             else:
                 errorOutOfBounds('constantes', 'Enteras')
@@ -775,7 +776,7 @@ def getAddConst(constante):
             if cont_FloatConstantes < limite_floatConstantes:
                 d_floats[constante] = cont_FloatConstantes
                 cont_FloatConstantes += 1
-                QuadGenerate('addConstante', 'float', constante, d_floats[constante])
+                QuadGenerate('CONS', 'float', constante, d_floats[constante])
             
             else:
                 errorOutOfBounds('constantes', 'Flotantes')
@@ -787,7 +788,7 @@ def getAddConst(constante):
                 if cont_StringConstantes < limite_stringConstantes:
                     d_strs[constante] = cont_StringConstantes
                     cont_StringConstantes += 1
-                    QuadGenerate('addConstante', 'string', constante, d_strs[constante])
+                    QuadGenerate('CONS', 'string', constante, d_strs[constante])
                 else:
                     errorOutOfBounds('constantes', 'Strings')
             
@@ -798,7 +799,7 @@ def getAddConst(constante):
                 if cont_CharConstantes < limite_charConstantes:
                     d_ch[constante] = cont_CharConstantes
                     cont_CharConstantes += 1
-                    QuadGenerate('addConstante', 'char', constante, d_ch[constante])
+                    QuadGenerate('CONS', 'char', constante, d_ch[constante])
                 else:
                     errorOutOfBounds('constantes', 'Chars')
         
@@ -1699,7 +1700,7 @@ def p_pnSec2(p):
         quad_resultType = cuboSem.getType(quad_leftType, quad_rightType, quad_operator)
 
         if directorioFunciones.var_exist(currentFunc, quad_leftOperand) or directorioFunciones.var_exist(GBL, quad_leftOperand):
-            if quad_leftType == 'error':
+            if quad_resultType == 'error':
                 print("Error: Operacion invalida")
             else:
                 QuadGenerate(quad_operator, quad_rightMem, '', quad_leftMem)
@@ -1873,7 +1874,7 @@ def p_pnCiclos5(p):
         quad_resultType = cuboSem.getType(quad_leftType, quad_rightType, quad_operator)
 
         if directorioFunciones.var_exist(currentFunc, quad_leftOperand) or directorioFunciones.var_exist(GBL, quad_leftOperand):
-            if quad_leftType == 'error':
+            if quad_resultType == 'error':
                 print("Error: Operacion invalida")
             else:
                 QuadGenerate(quad_operator, quad_rightOperand, '', quad_leftOperand)
@@ -2116,7 +2117,7 @@ def p_pnArregloAcc(p):
                 return
             
         #Cuadruplo verifica
-        QuadGenerate('VERIFICA', auxMem, 0, varDimensiones[0]) #DUDA tamaño -1
+        QuadGenerate('VER', auxMem, 0, varDimensiones[0]) #DUDA tamaño -1
         
         
 
@@ -2212,7 +2213,7 @@ def p_pnMatrizAcc(p):
         
         #Si obtiene las dimensiones correctamente.....
         #Genera los cuadruplos
-        QuadGenerate('VERIFICA', auxMem, 0, varDimensiones[1]-1)
+        QuadGenerate('VER', auxMem, 0, varDimensiones[1]-1)
        
 
         #Memoria Base
@@ -2243,7 +2244,7 @@ def p_pnMatrizAcc(p):
         pushTipo('int')
 
         tMem3 = nextAvailTemp('int')
-        base = '@' + str(PosicionMemoria)
+        base = str(PosicionMemoria) # ESta es la base
         QuadGenerate('+', base, tMem2, tMem3)
 
         valorTMem = '(' + str(tMem3) + ')'
@@ -2292,30 +2293,3 @@ def main():
 
 main()
 
-#Test it out
-# data =''' 
-# programa COVID19;
-# var
-# int : A, B, C, D;
-
-# funcion void hola(int x, int y)
-# var
-# float : z, k;
-# {
-
-# }
-# principal()
-# {
-
-# hola(A, C);
-
-# }
-# '''
-# QuadTemporal = ('0', '0', '0', '0')
-# pushQuad(QuadTemporal)
-
-#parser = yacc.yacc()
-#result = parser.parse(data)
-
-#print(result)
-# print(directorioFunciones.func_search(GBL))

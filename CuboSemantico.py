@@ -218,7 +218,7 @@ class CuboSemantico:
             ('char' , 'char' , '|' ) : 'error',
             ('char' , 'char' , '&' ) : 'error',
 
-            ('char' , 'string' , '+' ) : 'error',
+            ('char' , 'string' , '+' ) : 'string',
             ('char' , 'string' , '-' ) : 'error',
             ('char' , 'string' , '*' ) : 'error',
             ('char' , 'string' , '/' ) : 'error',
@@ -275,11 +275,11 @@ class CuboSemantico:
             ('string' , 'float' , '|' ) : 'error',
             ('string' , 'float' , '&' ) : 'error',
 
-            ('string' , 'char' , '+' ) : 'error',
+            ('string' , 'char' , '+' ) : 'string',
             ('string' , 'char' , '-' ) : 'error',
             ('string' , 'char' , '*' ) : 'error',
             ('string' , 'char' , '/' ) : 'error',
-            ('string' , 'char' , '=' ) : 'error', 
+            ('string' , 'char' , '=' ) : 'char', 
             ('string' , 'char' , '==' ) : 'bool',
             ('string' , 'char' , '<' ) : 'error',
             ('string' , 'char' , '>' ) : 'error',

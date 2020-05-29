@@ -1,0 +1,11 @@
+programa COVID19;
+
+var 
+string: i;
+int : j;
+
+principal()
+{   
+    
+    
+}

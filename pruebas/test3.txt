@@ -4,7 +4,8 @@ int : i, j, k;
 float : f;
 
 funcion void uno(int a, int b)
-
+var
+int : x;
 {
 
 si (a > 0) entonces {

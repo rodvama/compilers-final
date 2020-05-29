@@ -2287,6 +2287,8 @@ def main():
         f.close()
     except EOFError:
         print (EOFError)
+    # TODO:Borrar
+    directorioFunciones.func_print(GBL)
 
 main()
 

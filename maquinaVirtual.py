@@ -16,7 +16,7 @@ CONST_TEMPORAL = 'temporal'
 CONST_EJECUCION = 'ejecucion'
 CONST_RETORNO_VALOR = 'retorno'
 CONST_FUNCION_RETORNO = 'funcion'
-ESPACIO_MEMORIA = 100
+ESPACIO_MEMORIA = 1000
 
 mem_GLOBAL = memVirtual('global')
 mem_MAIN = memVirtual('main')
@@ -31,6 +31,32 @@ sigCuaIndice = -1
 pilaTemporal = []
 pilaEjecucion = []
 pilaCorriendo = ''
+
+#Declaracion de espacio de memoria por tipo de memoria
+limite_intGlobales = ESPACIO_MEMORIA
+limite_floatGlobales = limite_intGlobales + ESPACIO_MEMORIA
+limite_stringsGlobales = limite_floatGlobales + ESPACIO_MEMORIA
+limite_charGlobales = limite_stringsGlobales + ESPACIO_MEMORIA
+limite_dfGlobales = limite_charGlobales + ESPACIO_MEMORIA
+
+limite_intLocales = limite_dfGlobales + ESPACIO_MEMORIA
+limite_floatLocales = limite_intLocales + ESPACIO_MEMORIA
+limite_stringsLocales = limite_floatLocales + ESPACIO_MEMORIA
+limite_charLocales = limite_stringsLocales + ESPACIO_MEMORIA
+limite_dfLocales = limite_charLocales + ESPACIO_MEMORIA
+
+limite_intTemporales = limite_dfLocales + ESPACIO_MEMORIA
+limite_floatTemporales = limite_intTemporales + ESPACIO_MEMORIA
+limite_stringsTemporales = limite_floatTemporales + ESPACIO_MEMORIA
+limite_charTemporales = limite_stringsTemporales + ESPACIO_MEMORIA
+limite_dfTemporales = limite_charTemporales + ESPACIO_MEMORIA
+limite_boolTemporales = limite_dfTemporales + ESPACIO_MEMORIA
+
+limite_intConstantes = limite_boolTemporales + ESPACIO_MEMORIA
+limite_floatConstantes = limite_intConstantes + ESPACIO_MEMORIA
+limite_stringsConstantes = limite_floatConstantes + ESPACIO_MEMORIA
+limite_charConstantes = limite_stringsConstantes + ESPACIO_MEMORIA
+limite_dfConstantes = limite_charConstantes + ESPACIO_MEMORIA
 
 def push(pilaNom, mem):
     if pilaNom == "temporal":
@@ -76,87 +102,14 @@ def top(pilaNom):
 
 push(CONST_EJECUCION, mem_MAIN)
 
-'''
-Espacios de memoria:
-+++++++++++++++++++++++
-+globales enteras     + batch_size
-+---------------------+
-+globales flotantes   + batch_size
-+---------------------+
-+globales strings     + batch_size
-+---------------------+
-+globales char        + batch_size
-+---------------------+
-+globales dataframes  + batch_size
-+++++++++++++++++++++++
-+locales enteras      + batch_size
-+---------------------+
-+locales flotantes    + batch_size
-+---------------------+
-+locales strings      + batch_size
-+---------------------+
-+locales char         + batch_size
-+---------------------+
-+locales dataframes   + batch_size
-+++++++++++++++++++++++
-+temp enteras         + batch_size
-+---------------------+
-+temp flotantes       + batch_size
-+---------------------+
-+temp strings         + batch_size
-+---------------------+
-+temp char            + batch_size
-+---------------------+
-+temp dataframes      + batch_size
-+---------------------+
-+temp booleanas       + batch_size
-+++++++++++++++++++++++
-+constantes enteras   + batch_size
-+---------------------+
-+constantes flotantes + batch_size
-+---------------------+
-+constantes strings   + batch_size
-+---------------------+
-+constantes char      + batch_size
-+---------------------+
-+constantes dataframe + batch_size
-+++++++++++++++++++++++
-'''
-#Declaracion de espacio de memoria por tipo de memoria
-limite_intGlobales = ESPACIO_MEMORIA
-limite_floatGlobales = limite_intGlobales + ESPACIO_MEMORIA
-limite_stringsGlobales = limite_floatGlobales + ESPACIO_MEMORIA
-limite_charGlobales = limite_stringsGlobales + ESPACIO_MEMORIA
-limite_dfGlobales = limite_charGlobales + ESPACIO_MEMORIA
-
-limite_intLocales = limite_dfGlobales + ESPACIO_MEMORIA
-limite_floatLocales = limite_intLocales + ESPACIO_MEMORIA
-limite_stringsLocales = limite_floatLocales + ESPACIO_MEMORIA
-limite_charLocales = limite_stringsLocales + ESPACIO_MEMORIA
-limite_dfLocales = limite_charLocales + ESPACIO_MEMORIA
-
-limite_intTemporales = limite_dfLocales + ESPACIO_MEMORIA
-limite_floatTemporales = limite_intTemporales + ESPACIO_MEMORIA
-limite_stringsTemporales = limite_floatTemporales + ESPACIO_MEMORIA
-limite_charTemporales = limite_stringsTemporales + ESPACIO_MEMORIA
-limite_dfTemporales = limite_charTemporales + ESPACIO_MEMORIA
-limite_boolTemporales = limite_dfTemporales + ESPACIO_MEMORIA
-
-limite_intConstantes = limite_boolTemporales + ESPACIO_MEMORIA
-limite_floatConstantes = limite_intConstantes + ESPACIO_MEMORIA
-limite_stringsConstantes = limite_floatConstantes + ESPACIO_MEMORIA
-limite_charConstantes = limite_stringsConstantes + ESPACIO_MEMORIA
-limite_dfConstantes = limite_charConstantes + ESPACIO_MEMORIA
-
-
 def getValor(memVirtual, memDireccion, memTipo):
     global mem_GLOBAL
-    # try:
-    #     if memDireccion[0] == '{' and memDireccion[-1] == '}':
-    #         memDireccion = getValor(memVirtual, memDireccion[1:-1], getTipo(memDireccion[1:-1]))
-    #         memTipo = getTipo(memDireccion)
-    # except:
-    #     pass
+    try:
+        if memDireccion[0] == '(' and memDireccion[-1] == ')':
+            memDireccion = getValor(memVirtual, memDireccion[1:-1], getTipo(memDireccion[1:-1]))
+            memTipo = getTipo(memDireccion)
+    except:
+        pass
     
     valor = -1
     seccion = getSeccion(memDireccion)
@@ -175,12 +128,12 @@ def getValor(memVirtual, memDireccion, memTipo):
 
 def llenarValor(memVirtual, memDireccion, memTipo, valor):
     global mem_GLOBAL
-    # try:
-    #     if memDireccion[0] == '{' and memDireccion[-1] == '}':
-    #         memDireccion = getValor(memVirtual, memDireccion[1:-1], getTipo(memDireccion[1:-1]))
-    #         memTipo = getTipo(memDireccion)
-    # except:
-    #     pass
+    try:
+        if memDireccion[0] == '(' and memDireccion[-1] == ')':
+            memDireccion = getValor(memVirtual, memDireccion[1:-1], getTipo(memDireccion[1:-1]))
+            memTipo = getTipo(memDireccion)
+    except:
+        pass
     
     memTipo = str(memTipo)
     seccion = getSeccion(memDireccion)
@@ -335,7 +288,6 @@ def correr():
             sigCuaIndice = int(pop(CONST_FUNCION_RETORNO));
         # lee
         elif cuadruplo[0] == 'lee':
-        # TODO: Ver lo de los arreglos
             texto = input("> ")
             try:
                 int(texto)
@@ -425,6 +377,9 @@ def correr():
                 arreglo.append(float(auxValor))
             auxTipo = getTipo(cuadruplo[3])
             llenarValor(pilaEjecucion, cuadruplo[3], auxTipo, np.var(arreglo))
+        # elif cuadruplo[0] == "VER":
+        #     tipo = getTipo(cuadruplo[1])
+        #     tipo2 = getTipo(currentEjecucion, quad[1], tipo) 
         elif cuadruplo[0] == 'FINPROGRAMA':
             terminado = True
         # OPERADORES 
@@ -447,7 +402,6 @@ def getArchivo():
     except EOFError:
         print (EOFError)
 
-# TODO: lectura de archivos
 cuadruplos = getArchivo()
 for linea in cuadruplos:
     linea = linea.replace('(','')

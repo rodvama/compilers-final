@@ -8,5 +8,6 @@ int : x;
 
 principal()
 {   
+    cargaArchivo(i, "desktop/test3.txt", 5, 6);
 
 }

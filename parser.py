@@ -408,12 +408,12 @@ def p_esc2(p):
     '''
 
 def p_carga_datos(p):
-    'carga_datos : CARGA LPAREN ID COMMA CTE_STR COMMA ca COMMA ca RPAREN SEMICOLON'
+    'carga_datos : CARGA LPAREN ID pnExp1 COMMA CTE_STR pnCteStr COMMA ca COMMA ca RPAREN SEMICOLON pnCarga'
 
 def p_ca(pa):
     '''
     ca : ID
-       | CTE_INT
+       | CTE_INT pnCteInt
     '''
 
 #Condicionales y Ciclos
@@ -1069,6 +1069,9 @@ def p_pnGOTOprincipal(p):
     QuadGenerate('GOTO', '', '', '')
     pushSaltos(nextQuad() - 1)
 
+'''
+Genera el cuadruplo de GOTO Main
+'''
 def p_pnPrincipal2(p):
     '''
     pnPrincipal2 :
@@ -1079,7 +1082,10 @@ def p_pnPrincipal2(p):
     currentFunc = GBL
     cuadruplos[popSaltos()] = ('GOTO', '', '', nextQuad())
     
-    
+
+'''
+Activa la variable booleana boolDataf cuando se esta declarando un dataframe
+'''
 def p_pnDF(p):
     '''
     pnDF : 
@@ -1087,6 +1093,9 @@ def p_pnDF(p):
     global boolDataf
     boolDataf = True
 
+'''
+Desactiva la variable booleana boolDataf cuando termina la declaracion de variables de tipo dataframe
+'''
 def p_pnDF2(p):
     '''
     pnDF2 :
@@ -2267,16 +2276,49 @@ def p_pnMatrizAcc(p):
         sys.exit("Error. La variable no es dimensionada y no se puede acceder al indice")
         return
 
-
-
-
-
+'''
+Activa el bool isArray para indicar que la variable es un arreglo
+'''
 def p_pnActivaArray(p):
     '''
     pnActivaArray :    
     '''
     global isArray
     isArray = True
+
+
+####### Carga de Archivos#######
+def p_pnCarga(p):
+    '''
+    pnCarga : 
+    '''
+    maxRenglones = popOperandos()
+    maxRenglonesTipo = popTipos()
+    maxRenglonesMem = popMemoria() 
+
+    maxVariables = popOperandos()
+    maxVariablesTipo = popTipos()
+    maxVariablesMem = popMemoria()
+
+    path = popOperandos()
+    pathTipo = popTipos()
+    pathMem = popMemoria()
+
+    dfName = popOperandos()
+    dfTipo = popTipos()
+    dfMem = popMemoria()
+
+    if(pathTipo != 'string'):
+        sys.exit("Error al cargar archivo. El tipo del segundo parametro no es string.")
+    
+    if(dfTipo != 'dataframe'):
+        sys.exit("Error al cargar archivo. El tipo del primer parametro no es dataframe.")
+
+    QuadGenerate("carga", dfMem, path, '?')
+
+    
+
+
 
 
 parser = yacc.yacc()

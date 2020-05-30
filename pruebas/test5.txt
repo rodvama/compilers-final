@@ -1,11 +1,12 @@
 programa COVID19;
 
 var 
-string: i;
-int : j;
+dataframe : i, j;
+int : x;
+
+
 
 principal()
 {   
-    
-    
+
 }

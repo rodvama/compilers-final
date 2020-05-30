@@ -63,7 +63,7 @@ forBool = False
 varFor = ''
 negativo = False
 returnBool = False #sirve para saber si una funcion debe regresar algun valor (si es void o no)
-
+boolDataf = False #Sirve para saber cuando una variable dataframe esta siendo declarada
 
 #Variables para Arreglos y matrices
 isArray = False
@@ -206,34 +206,31 @@ def p_var1(p):
     var1 : var
          | empty
     '''
-    # print("VAR1")
+    
 
 def p_func1(p):
     '''
     func1 : funcion func1
           | empty
     '''
-    # print("FUNC'")
+   
 
 def p_principal(p):
     'principal : PRINCIPAL pnPrincipal2 LPAREN RPAREN bloque'
-    # print("PRINCIPAL")
+    
 
 #DECLARACION DE VARIABLES
 def p_var(p):
     'var : VAR var2'
-    # print("VAR")
 
 def p_var2(p):
-    'var2 : type TWO_DOTS lista_ids var3'
-    # print("VAR2")
+    'var2 : type TWO_DOTS lista_ids pnDF2 var3'
 
 def p_var3(p):
     '''
     var3 : var2
          | empty
     '''
-    # print("VAR3")
 
 def p_type(p):
     '''
@@ -280,7 +277,7 @@ def p_tipo_simple(p):
 
 def p_tipo_compuesto(p):
     '''
-    tipo_compuesto : DATAFRAME pn_1_setCurrentType
+    tipo_compuesto : DATAFRAME pn_1_setCurrentType pnDF
                    | STRING pn_1_setCurrentType
     '''
 
@@ -837,16 +834,16 @@ def QuadGenerateList():
 
 #Funcion que muestra menssaje de error cuando los tipos no coinciden
 def errorTypeMismatch():
-    print('Error: Type Mismatch')
-    sys.exit()
+    sys.exit('Error: Type Mismatch')
+    
 
 #Funcion para mostrar un mensaje de error cuando se llena los maximos posibles valores temporales
 def errorOutOfBounds(tipoMemoria,tipoDato):
-    print("Error: Memoria llena; Muchas {} de tipo {}.".format(tipoMemoria,tipoDato))
-    sys.exit()
+    sys.exit("Error: Memoria llena; Muchas {} de tipo {}.".format(tipoMemoria,tipoDato))
+    
 
 def errorReturnTipo():
-    print("Error: el tipo que intenta retornar no es correcto")
+    sys.exit("Error: el tipo que intenta retornar no es correcto")
 
 ################ Funciones de manejo de memoria##############
 
@@ -1083,7 +1080,19 @@ def p_pnPrincipal2(p):
     cuadruplos[popSaltos()] = ('GOTO', '', '', nextQuad())
     
     
+def p_pnDF(p):
+    '''
+    pnDF : 
+    '''
+    global boolDataf
+    boolDataf = True
 
+def p_pnDF2(p):
+    '''
+    pnDF2 :
+    '''
+    global boolDataf
+    boolDataf = False
 
 
 ##########DIRECTORIO DE FUNCIONES Y TABLA DE VARIABLES#############
@@ -1110,6 +1119,7 @@ def p_pn_2_addVariable(p):
     global currentType
     global currentVarName
     global currentCantVars
+    global boolDataf
 
     varName = p[-1]
     currentVarName = varName
@@ -1119,6 +1129,9 @@ def p_pn_2_addVariable(p):
     directorioFunciones.func_addVar(currentFunc, varName, currentType, 0, 0, PosMem)
     
     currentCantVars += 1
+
+    if boolDataf:
+        QuadGenerate("dataframe", varName, PosMem, '')
   
 
 '''
@@ -1737,7 +1750,6 @@ def p_pnSec4(p):
         if quad_resultType == 'error':
             print("Error: Operacion invalida")
         else:
-            print("HEEEY AQUII")
             QuadGenerate(quad_operator, quad_rightMem, '', quad_operator)
             pushOperador(quad_operator)
             #pushOperando(quad_Operando) #Posible BORRAR

@@ -74,6 +74,9 @@ R = 1 #m0
 dirBase = 0 #Direccion base
 currentConstArrays = []
 
+#Funciones especiales
+nombreFunEsp = ''
+
 '''
 Espacios de memoria:
 +++++++++++++++++++++++
@@ -447,7 +450,7 @@ def p_fev(p):
 
 def p_funciones_especiales(p):
     '''
-    funciones_especiales : fe LPAREN ID COMMA v_exp RPAREN
+    funciones_especiales : fe LPAREN ID pnExp1 COMMA v_exp RPAREN pnFunEsp2
                          | CORRELACIONA pnFunEsp1 LPAREN ID COMMA v_exp COMMA v_exp RPAREN
     '''
 def p_fe(p):
@@ -1382,12 +1385,57 @@ def p_pnFunCall_5_6_llamada(p):
         pushTipo(tipo)
 
 ###### FUNCIONES ESPECIALES #######
+
+'''
+Identifica el nombre de la funcion especial y lo mete a la pila de operandos
+'''
 def p_pnFunEsp1(p):
     '''
     pnFunEsp1 :
     '''
-    nombreFun = str(p[-1])
-    pushOperador(nombreFun)
+    global nombreFunEsp
+    nombreFunEsp = str(p[-1])
+    pFunciones.append(nombreFunEsp)
+    
+'''
+Generacion de cuadriplo de funciones especiales
+'''
+def p_pnFunEsp2(p):
+    '''
+    pnFunEsp2 :
+    '''
+    global pFunciones
+
+    funName = pFunciones.pop()
+
+    indice = popOperandos()
+    indiceTipo = popTipos()
+    indiceMem = popMemoria()
+
+    indice = '@' + str(indice)
+
+    dfName = popOperandos()
+    dfTipo = popTipos()
+    dfMem = popMemoria()
+
+    if(indiceTipo != 'int'):
+        sys.exit("Error en Funcion especial: ",funName)
+    
+    if(dfTipo != 'dataframe'):
+        sys.exit("Error en Funcion especial: ", funName, ". El tipo del primer parametro no es dataframe.")
+    
+    if(funName == 'media' or funName == 'mediana' or funName == 'varianza'):
+        temporal = nextAvailTemp('float')
+        tempTipo = 'float'
+    elif (funName == 'moda'):
+        temporal = nextAvailTemp('int')
+        tempTipo = 'int'
+
+    QuadGenerate(funName, dfMem, indice, temporal)
+    pushOperando(temporal)
+    pushTipo(tempTipo)
+    pushMemoria(temporal)
+
 
 ###### CONSTANTES ###########
 '''
@@ -2317,6 +2365,7 @@ def p_pnCarga(p):
     QuadGenerate("carga", dfMem, path, '?')
 
     
+
 
 
 

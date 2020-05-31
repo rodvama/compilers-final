@@ -78,11 +78,11 @@ keywords = {
     'Variables' : 'VARIABLES',
     'plothist' : 'PLOTHIST',
     'plotline' : 'PLOTLINE',
-    'Media' : 'MEDIA',
-    'Mediana' : 'MEDIANA',
-    'Moda' : 'MODA',
-    'Varianza' : 'VARIANZA',
-    'Correlaciona' : 'CORRELACIONA'
+    'media' : 'MEDIA',
+    'mediana' : 'MEDIANA',
+    'moda' : 'MODA',
+    'varianza' : 'VARIANZA',
+    'correlaciona' : 'CORRELACIONA'
 }
 
 

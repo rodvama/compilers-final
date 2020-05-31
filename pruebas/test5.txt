@@ -1,13 +1,13 @@
 programa COVID19;
 
 var 
-dataframe : i, j;
-int : x;
+dataframe : i;
+float : x;
 
 
 
 principal()
 {   
-    cargaArchivo(i, "desktop/test3.txt", 5, 6);
+    x = moda(i, Variables[3]);
 
 }

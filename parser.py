@@ -838,6 +838,8 @@ def QuadGenerateList():
         contador = contador + 1
 
         file.write(str(quad) + '\n')
+    print("{}.\t{},\t{},\t{},\t{}".format(contador,'FINPROGRAMA','','',''))
+    file.write("('FINPROGRAMA', '', '', '')")
     file.close()
 
 #Funcion que muestra menssaje de error cuando los tipos no coinciden
@@ -2119,7 +2121,6 @@ def p_pnArregloAcc(p):
         #Cuadruplo verifica
         QuadGenerate('VER', auxMem, 0, varDimensiones[0]) #DUDA tamaño -1
         
-        
 
         #Si es Matriz...
         if varDimensiones[1] == 0:
@@ -2131,7 +2132,6 @@ def p_pnArregloAcc(p):
             if PosicionMemoria < 0:
                 sys.exit("Error. Variable no declarada: ", auxDIM)
                 return
-                
 
             TipoActual = directorioFunciones.func_searchVarType(currentFunc, auxDIM)
             if not TipoActual:
@@ -2140,12 +2140,11 @@ def p_pnArregloAcc(p):
             if not TipoActual:
                 sys.exit("Error. Variable no declarada: ", auxDIM)
                 return
-                
 
             tMem = nextAvailTemp('int')
-            QuadGenerate('+', PosicionMemoria, auxMem, tMem)
+            QuadGenerate('+', '{' + str(PosicionMemoria) + '}', auxMem, tMem)
 
-            valorTMem = '(' + str(tMem) + ')'
+            valorTMem = str(tMem) + '!'
                 
             pushOperando(auxDIM)
             pushMemoria(valorTMem)
@@ -2167,11 +2166,6 @@ def p_pnArregloAcc(p):
             pushMemoria(tMem)
             pushTipo('int')
             pDim.append(auxDIM)
-
-            
-            
-
-
     else: 
         sys.exit("Error. No se puede acceder al index porque la variable no es dimensionada")
         return
@@ -2247,7 +2241,7 @@ def p_pnMatrizAcc(p):
         base = str(PosicionMemoria) # ESta es la base
         QuadGenerate('+', base, tMem2, tMem3)
 
-        valorTMem = '(' + str(tMem3) + ')'
+        valorTMem = str(tMem3) + '!'
 
         pushOperando(auxDIM)
         pushMemoria(valorTMem)
@@ -2259,10 +2253,6 @@ def p_pnMatrizAcc(p):
     else:
         sys.exit("Error. La variable no es dimensionada y no se puede acceder al indice")
         return
-
-
-
-
 
 def p_pnActivaArray(p):
     '''
@@ -2288,8 +2278,6 @@ def main():
         f.close()
     except EOFError:
         print (EOFError)
-    # TODO:Borrar
-    directorioFunciones.func_print(GBL)
 
 main()
 

@@ -3,15 +3,19 @@
 # Diseno de compiladores
 # Maquina Virtual
 
+# TODO: STRINGS CHECARLO
+# TODO: ARREGLOS VERIFICAR
+# TODO: Correlacion
+
+
 import sys
 from memVirtual import *
 import numpy as np
 import statistics as stats
 import matplotlib.pyplot as plt
 
-
-CONST_LOCALES = 'locales'
-CONST_GLOBALES = 'globales'
+GBL = 'globales'
+LCL = 'locales'
 CONST_TEMPORAL = 'temporal'
 CONST_EJECUCION = 'ejecucion'
 CONST_RETORNO_VALOR = 'retorno'
@@ -19,7 +23,7 @@ CONST_FUNCION_RETORNO = 'funcion'
 ESPACIO_MEMORIA = 1000
 
 mem_GLOBAL = memVirtual('global')
-mem_MAIN = memVirtual('main')
+mem_PRINCIPAL = memVirtual('principal')
 
 cuaLista = []
 cuaIndice = 0
@@ -59,112 +63,130 @@ limite_charConstantes = limite_stringsConstantes + ESPACIO_MEMORIA
 limite_dfConstantes = limite_charConstantes + ESPACIO_MEMORIA
 
 def push(pilaNom, mem):
-    if pilaNom == "temporal":
+    if pilaNom == CONST_TEMPORAL:
         global pilaTemporal
         pilaTemporal.append(mem)
-    elif pilaNom == "ejecucion":
+    elif pilaNom == CONST_EJECUCION:
         global pilaEjecucion
         pilaEjecucion.append(mem)
-    elif pilaNom == "retorno":
+    elif pilaNom == CONST_RETORNO_VALOR:
         global pilaRetorno
         pilaRetorno.append(mem)
-    elif pilaNom == "funcion":
+    elif pilaNom == CONST_FUNCION_RETORNO:
         global pilaFuncion
         pilaFuncion.append(mem)
 
 def pop(pilaNom):
-    if pilaNom == "temporal":
+    if pilaNom == CONST_TEMPORAL:
         global pilaTemporal
         return pilaTemporal.pop()
-    elif pilaNom == "ejecucion":
+    elif pilaNom == CONST_EJECUCION:
         global pilaEjecucion
         return pilaEjecucion.pop()
-    elif pilaNom == "retorno":
+    elif pilaNom == CONST_RETORNO_VALOR:
         global pilaRetorno
         return pilaRetorno.pop()
-    elif pilaNom == "funcion":
+    elif pilaNom == CONST_FUNCION_RETORNO:
         global pilaFuncion
         return pilaFuncion.pop()
 
 def top(pilaNom):
-    if pilaNom == "temporal":
+    if pilaNom == CONST_TEMPORAL:
         global pilaTemporal
         aux = len(pilaTemporal) - 1
         if (aux < 0):
             return 'vacia'
         return pilaTemporal[aux]
-    elif pilaNom == "ejecucion":
+    elif pilaNom == CONST_EJECUCION:
         global pilaEjecucion
         aux = len(pilaEjecucion) - 1
         if (aux < 0):
             return 'vacia'
         return pilaEjecucion[aux]
 
-push(CONST_EJECUCION, mem_MAIN)
+push(CONST_EJECUCION, mem_PRINCIPAL)
 
 def getValor(memVirtual, memDireccion, memTipo):
     global mem_GLOBAL
+    # XXX: BORRAR
+    # print ("Valor: ", memVirtual, memDireccion, memTipo)
+    # memVirtual.imprimirDir()
+    # mem_GLOBAL.imprimirDir()
     try:
-        if memDireccion[0] == '(' and memDireccion[-1] == ')':
-            memDireccion = getValor(memVirtual, memDireccion[1:-1], getTipo(memDireccion[1:-1]))
+        if memDireccion[-1] == '!':
+            memDireccion = getValor(memVirtual, memDireccion[0:-1], getTipo(memDireccion[0:-1]))
             memTipo = getTipo(memDireccion)
     except:
         pass
-    
-    valor = -1
     seccion = getSeccion(memDireccion)
     try:
-        if seccion == CONST_GLOBALES:
+        if seccion == GBL:
             valor = mem_GLOBAL.obtenerValorDeDireccion(str(memDireccion), str(memTipo))
-        elif seccion == CONST_LOCALES:
+        elif seccion == LCL:
             valor = memVirtual.obtenerValorDeDireccion(str(memDireccion), str(memTipo))
         else:
-            print("Error: No se encontró sección de memoria")
+            print("Error Maquina Virtual: No se encontró sección {} de memoria".format(seccion))
             sys.exit()
     except:
-        print("Error: ", sys.exc_info()[0], " en seccion {}, en direccion {}, en indice {}.".format(seccion, memDireccion, cuaIndice))
+        print("Error Maquina Virtual: ", sys.exc_info()[0], " en seccion {}, en direccion {}, en indice {}.".format(seccion, memDireccion, cuaIndice))
         sys.exit()
     return valor
 
 def llenarValor(memVirtual, memDireccion, memTipo, valor):
     global mem_GLOBAL
+    # XXX: BORRAR
+    # print("LLENAR VALOR ANTES", memDireccion)
+    # memVirtual.imprimirDir()
     try:
-        if memDireccion[0] == '(' and memDireccion[-1] == ')':
-            memDireccion = getValor(memVirtual, memDireccion[1:-1], getTipo(memDireccion[1:-1]))
+        if memDireccion[-1] == '!':
+            # print("LLENAR VALOR ANTES", memDireccion)
+            memDireccion = getValor(memVirtual, memDireccion[0:-1], getTipo(memDireccion[0:-1]))
+            # print("LLENAR VALOR DESPUES", memDireccion)
             memTipo = getTipo(memDireccion)
+            # print("error aqui")
     except:
         pass
-    
     memTipo = str(memTipo)
     seccion = getSeccion(memDireccion)
-    if seccion == CONST_GLOBALES:
+    memDireccion = str(memDireccion)
+
+    if seccion == GBL:
         mem_GLOBAL.guardarValor(memDireccion, memTipo, valor)
-    elif seccion == CONST_LOCALES:
-        memVirtual.guardarValor(memVirtual, memTipo, valor)
+    elif seccion == LCL:
+        memVirtual.guardarValor(memDireccion, memTipo, valor)
     else:
-        print("Error: No se encontró sección de memoria")
+        print("Error Maquina Virtual: No se encontró sección de memoria")
         sys.exit()
+        return
 
 def getSeccion(mem):
     global pilaCorriendo
     try:
-        if mem[0] == '{':
-            mem = getValor(pilaCorriendo, mem[1:-1], getTipo(mem[1:-1]))
+        if mem[-1] == '!':
+            mem = getValor(pilaCorriendo, mem[0:-1], getTipo(mem[0:-1]))
     except:
         pass
     mem = int(mem)
     # GLOBALES y CONSTANTES se guardan donde mismo
     if ((mem >= 0 and mem < limite_dfGlobales) or (mem >= limite_boolTemporales and mem <= limite_dfConstantes)):
-        return CONST_GLOBALES
+        return GBL
     # LOCALES y TEMPORALES se guardan donde mismo
     if ((mem >= limite_dfGlobales and mem < limite_dfLocales) or (mem >= limite_dfLocales and mem < limite_boolTemporales)):
-        return CONST_LOCALES
+        return LCL
+    else:
+        print("Error Maquina Virtual: {} no se encuentra dentro de ninguna seccion".format(mem))
+        sys.exit()
+        return
 
 def getTipo(mem):
     global pilaCorriendo
+    # XXX: BORRAR
+    # print ("TIPO: ", mem[0])
     try: 
-        if mem[0] == '{':
-            mem = getValor(pilaCorriendo, mem[1:-1], getTipo[1:-1])
+        if mem[-1] == '!':
+            mem = getValor(pilaCorriendo, mem[0:-1], getTipo(mem[0:-1]))
+            # XXX: BORRAR
+            # print("tipo entre: ", mem)
     except:
         pass
     mem = int(mem)
@@ -180,48 +202,88 @@ def getTipo(mem):
         return 'string'
     if (mem >= limite_dfTemporales and mem < limite_boolTemporales):
         return 'bool'
+    else:
+        print("Error Maquina Virtual: {} no se encuentra dentro del rango de ningun tipo de variable".format(mem))
+        sys.exit()
+        return
     
 
 def operadores(signo):
-    tipo1 = getTipo(cuadruplo[1])
-    tipo2 = getTipo(cuadruplo[2])
-    valor1 = getValor(pilaCorriendo, cuadruplo[1], tipo1)
-    valor2 = getValor(pilaCorriendo, cuadruplo[2], tipo2)
-
-    if tipo1 == 'int':
-        valor1 = int(valor1)
-    elif tipo1 == 'float':
-        valor1 == float(valor1);
-
-    if tipo2 == 'int':
-        valor2 = int (valor2)
-    elif tipo2 == 'float':
-        valor2 == float(valor2) 
-    
+    global cuadruplo
+    global pilaCorriendo
     if signo == '+':
+        if cuadruplo[1][0] == '{' and cuadruplo[1][-1] == '}': 
+            valor1 = int(cuadruplo[1][1:-1])
+            valor2 = getValor(pilaCorriendo, cuadruplo[2], getTipo(cuadruplo[2]))
+            valor2 = int(valor2)
+        else:
+            # XXX:BORRAR
+            # pilaCorriendo.imprimirDir()
+            tipo1 = getTipo(cuadruplo[1])
+            # XXX:BORRAR
+            # print("tipo1: ", tipo1)
+            tipo2 = getTipo(cuadruplo[2])
+            # XXX:BORRAR
+            # print("tipo2: ", tipo2)
+            valor1 = getValor(pilaCorriendo, cuadruplo[1], tipo1)
+            # XXX:BORRAR
+            # print("valor1: ", valor1)
+            valor2 = getValor(pilaCorriendo, cuadruplo[2], tipo2)
+            # XXX:BORRAR
+            # print("valor2: ", valor2)
+
+            if tipo1 == 'int':
+                valor1 = int(valor1)
+            elif tipo1 == 'float':
+                valor1 == float(valor1);
+
+            if tipo2 == 'int':
+                valor2 = int (valor2)
+            elif tipo2 == 'float':
+                valor2 == float(valor2) 
+            pass
         res = valor1 + valor2
-    elif signo == '-':
-        res = valor1 - valor2
-    elif signo == '*':
-        res = valor1 * valor2
-    elif signo == '/':
-        res = valor1 / valor2
-    elif signo == '==':
-        res = valor1 == valor2
-    elif signo == '<':
-        res = valor1 < valor2
-    elif signo == '>':
-        res = valor1 > valor2
-    elif signo == '<=':
-        res = valor1 <= valor2
-    elif signo == '>=':
-        res = valor1 >= valor2
-    elif signo == '!=':
-        res = valor1 != valor2
-    elif signo == '|':
-        res = True if valor1 == valor2 and valor1 == False and valor2 == False else False
-    elif signo == '&':
-        res = True if valor1 == valor2 and valor1 == True else False
+    else:   
+        tipo1 = getTipo(cuadruplo[1])
+        tipo2 = getTipo(cuadruplo[2])
+        valor1 = getValor(pilaCorriendo, cuadruplo[1], tipo1)
+        valor2 = getValor(pilaCorriendo, cuadruplo[2], tipo2)
+
+        if tipo1 == 'int':
+            valor1 = int(valor1)
+        elif tipo1 == 'float':
+            valor1 == float(valor1);
+
+        if tipo2 == 'int':
+            valor2 = int (valor2)
+        elif tipo2 == 'float':
+            valor2 == float(valor2) 
+
+        if signo == '-':
+            res = valor1 - valor2
+        elif signo == '*':
+            res = valor1 * valor2
+        elif signo == '/':
+            res = valor1 / valor2
+        elif signo == '==':
+            res = valor1 == valor2
+        elif signo == '<':
+            res = valor1 < valor2
+        elif signo == '>':
+            res = valor1 > valor2
+        elif signo == '<=':
+            res = valor1 <= valor2
+        elif signo == '>=':
+            res = valor1 >= valor2
+        elif signo == '!=':
+            res = valor1 != valor2
+        elif signo == '|':
+            res = True if valor1 == valor2 and valor1 == False and valor2 == False else False
+        elif signo == '&':
+            res = True if valor1 == valor2 and valor1 == True else False
+    
+    # XXX:BORRAR
+    # print(cuadruplo[3], getTipo(cuadruplo[3]), res)
 
     llenarValor(pilaCorriendo, cuadruplo[3], getTipo(cuadruplo[3]), res)
 
@@ -238,24 +300,42 @@ def correr():
     while not terminado:
         sigCuaIndice = -1
         pilaCorriendo = top(CONST_EJECUCION)
+        # XXX: BORRAR
+        # print("Indice: ", cuaIndice)
+        # print("Lista size: ",len(cuaLista))
         cuadruplo = cuaLista[cuaIndice]
+
+        # XXX: BORRAR
+        # print(cuadruplo)
 
         # ASIGNACION
         if cuadruplo[0] == '=':
+            # XXX:BORRAR
+            # pilaCorriendo.imprimirDir()
+            # print(cuadruplo[3])
             try:
+                # XXX: BORRAR
+                # print (cuadruplo[1])
                 valor = getValor(pilaCorriendo, cuadruplo[1], getTipo(cuadruplo[1]))
             except:
                 valor = pop(CONST_RETORNO_VALOR)
-                print(valor)
+                # XXX: BORRAR
+                # print("= : ",valor)
+                
             llenarValor(pilaCorriendo, cuadruplo[3], getTipo(cuadruplo[3]), valor)
         # COMANDOS        
+        # CONS
+        elif cuadruplo[0] == 'CONS':
+            llenarValor(mem_GLOBAL, cuadruplo[3], cuadruplo[1], cuadruplo[2])
+            # XXX: BORRAR
+            # pilaCorriendo.imprimirDir()
+
         # GOTO
         elif cuadruplo[0] == 'GOTO':
             sigCuaIndice = int(cuadruplo[3])
         # GOTOF
         elif cuadruplo[0] == 'GOTOF':
-            tipo = getTipo(cuadruplo[1])
-            auxValor = getValor(pilaCorriendo, cuadruplo[1], tipo)
+            auxValor = getValor(pilaCorriendo, cuadruplo[1], getTipo(cuadruplo[1]))
             if not auxValor:
                 sigCuaIndice = int(cuadruplo[3])
         # GOSUB
@@ -268,27 +348,35 @@ def correr():
         elif cuadruplo[0] == 'ERA':
             memNueva = memVirtual(str(cuadruplo[1]))
             push(CONST_TEMPORAL, memNueva)
+            # XXX: BORRAR
+            # print(top(CONST_TEMPORAL))
         # PARAMETER
         elif cuadruplo[0] == 'PARAMETER':
             tipo = getTipo(cuadruplo[1])
             valor = getValor(pilaCorriendo, cuadruplo[1], tipo)
             auxMem = top(CONST_TEMPORAL)
-            mem = auxMem.sigDireccionDisponible(tipo, limite_dfGlobales, ESPACIO_MEMORIA)
-            llenarValor(auxMem, mem, getTipo(mem), valor)
+            direccion = auxMem.sigDireccionDisponible(tipo, limite_dfGlobales, ESPACIO_MEMORIA)
+            # XXX: BORRAR
+            # print("Tipo: ", tipo, " Valor: ", valor, " auxMem: ", auxMem, " direccion: ", direccion)
+            llenarValor(auxMem, direccion, getTipo(direccion), valor)
         # ENDFUNC
         elif cuadruplo[0] == 'ENDFUNC':
             pop(CONST_EJECUCION)
             sigCuaIndice = int(pop(CONST_FUNCION_RETORNO))
         # regresa
         elif cuadruplo[0] == 'regresa':
-            if cuadruplo[3] != '':
+            # TODO: VERIFICAR
+            try:
                 valor = getValor(pilaCorriendo, cuadruplo[3], getTipo(cuadruplo[3]))
-                push(CONST_RETORNO_VALOR, valor)
-            pop(CONST_EJECUCION)
+                push(CONST_RETORNO_VALOR, str(valor))
+            except:
+                push(CONST_RETORNO_VALOR, str(cuadruplo[3]))
+                pass
+            pop(CONST_EJECUCION) #Sacar funcion de la pila, porque se termino de ejecutar
             sigCuaIndice = int(pop(CONST_FUNCION_RETORNO));
         # lee
         elif cuadruplo[0] == 'lee':
-            texto = input("> ")
+            texto = input("<- ")
             try:
                 int(texto)
                 tipo = 'int'
@@ -301,11 +389,19 @@ def correr():
                         str(texto)
                         tipo = 'char' if len(texto) == 1 else 'string'
                     except:
-                        print("Error: {}".format(sys.exc_info()[0], cuaIndice))
+                        print("Error Maquina Virtual: {}".format(sys.exc_info()[0], cuaIndice))
+            auxTipo = getTipo(cuadruplo[1])
+            if tipo == auxTipo:
+                llenarValor(pilaCorriendo, cuadruplo[1], auxTipo, texto)
+            else:
+                print("Error Maquina Virtual: {} es diferente a {}".format(tipo, auxTipo))
+                sys.exit()
+                return
+                
         # escribe
         elif cuadruplo[0] == 'escribe':
             texto = getValor(pilaCorriendo, cuadruplo[1], getTipo(cuadruplo[1]))
-            print(str(texto))
+            print("->",str(texto))
         # FUNCIONES ESPECIALES
         # Media
         elif cuadruplo[0] == 'media':
@@ -365,7 +461,7 @@ def correr():
                 res = stats.mode(arreglo)
                 llenarValor(pilaCorriendo, cuadruplo[3], auxTipo, res)
             except:
-                print("Error: El arreglo no tiene una moda definida, se regresa el ultimo valor.")
+                print("Error Maquina Virtual: El arreglo no tiene una moda definida, se regresa el ultimo valor.")
                 llenarValor(pilaCorriendo, cuadruplo[3], auxTipo, auxValor)
         # varianza
         elif cuadruplo[0] == 'varianza':
@@ -377,9 +473,25 @@ def correr():
                 arreglo.append(float(auxValor))
             auxTipo = getTipo(cuadruplo[3])
             llenarValor(pilaEjecucion, cuadruplo[3], auxTipo, np.var(arreglo))
-        # elif cuadruplo[0] == "VER":
-        #     tipo = getTipo(cuadruplo[1])
-        #     tipo2 = getTipo(currentEjecucion, quad[1], tipo) 
+        # correlation
+        elif cuadruplo[0] == 'correlation':
+            #HACK: TERMINAR
+            return
+        #ARREGLO
+        #VER
+        elif cuadruplo[0] == 'VER':
+            # XXX:BORRAR
+            # print("Entre aqui primero")
+            # HACK: TERMINAR ARREGLOS BIDIMENSIONALES
+            valor = getValor(pilaCorriendo, cuadruplo[1], getTipo(cuadruplo[3]))
+            valor = int(valor)
+            if valor >= int(cuadruplo[3]) or valor < int(cuadruplo[2]):
+                print("Error Maquina Virtual: El valor {} no pertence a los indices.".format(valor))
+                sys.exit()
+                return
+            # XXX: BORRAR
+            # pilaCorriendo.imprimirDir()
+        #FINPROGRAMA
         elif cuadruplo[0] == 'FINPROGRAMA':
             terminado = True
         # OPERADORES 

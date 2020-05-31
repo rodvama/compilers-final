@@ -1,11 +1,13 @@
 programa COVID19;
 
 var 
-int: B[12][9], A[9], j, i, k, p;
-
-
+int: B[12][9], A[9], j, i;
 
 principal()
-{   
+{
+    i = 3;
+    j = 5;
+    A[7] = 4;   
     B[i][A[1]] = i - j;
+    escribe(B[2][2]);
 }

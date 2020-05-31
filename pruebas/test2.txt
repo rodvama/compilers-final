@@ -1,16 +1,19 @@
 programa COVID19;
+
 var
-int : A;
+int : x;
 
 funcion int dos(int x)
+var 
+int: x;
 {
-    
-    regresa(2);
+    x = x + 2;
+    regresa(x);
 }
 
 principal()
 {
-    
-dos(A)
-
+x = 10;
+escribe(dos(3));
+escribe(x);
 }

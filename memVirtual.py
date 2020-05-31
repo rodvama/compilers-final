@@ -20,14 +20,15 @@ class memVirtual:
             'float'     : {},
             'char'      : {},
             'string'    : {},
-            'dataframe' : {},
+            'bool'      : {},
+            'dataframe' : {}
         }
 
     """
     Guardar el valor, en una direccion específica
     """
     def guardarValor(self, direccion, tipo, valor):
-        self.direcciones[str(tipo)][direccion] = valor
+        self.direcciones[str(tipo)][str(direccion)] = valor
         # TODO: BORRAR
         # print("Memoria", direccion)
 
@@ -36,11 +37,13 @@ class memVirtual:
     """
     def obtenerValorDeDireccion(self, direccion, tipo):
         try:
+            # XXX:BORRAR
             # print(self.funNombre, direccion, tipo, self.direcciones[tipo][direccion])
+            # print(self.direcciones)
             valor = self.direcciones[str(tipo)][str(direccion)]
             return valor
         except:
-            print("Error Memoria Virtual: ", sys.exc_info()[0], "No existe, en memoria {}, la direccion {}, de tipo {}.".format( self.funNombre, direccion, tipo))
+            print("Error Memoria Virtual: ", sys.exc_info()[0], "No existe valor, en memoria {} en la direccion {}, de tipo {}.".format( self.funNombre, direccion, tipo))
             raise
 
     """

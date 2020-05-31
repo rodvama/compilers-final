@@ -2,12 +2,16 @@ programa COVID19;
 
 var 
 int: i, j;
-float: p;
+float: p, k;
 
 principal()
 {
 i = 10;
-lee(j)
+j = 2;
+p = 12.5;
+lee(k);
+escribe(k);
+escribe(p*3);
 escribe(i+j);
 escribe(i-j);
 escribe(i*j);

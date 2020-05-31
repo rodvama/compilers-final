@@ -3,9 +3,13 @@
 # Diseno de compiladores
 # Maquina Virtual
 
-# TODO: STRINGS CHECARLO
-# TODO: ARREGLOS VERIFICAR
-# TODO: Correlacion
+# TODO: ARREGLOS VERIFICAR - declarados en parse
+# TODO: Correlacion - Cambiarlo como todos los demas funciones especiales, sacar el arreglo de memoria 
+# y guardarlo en un arreglo local, hacer calculos y guardar respuesta en la direccio que se pida
+# Por esto, pedirle que las funciones especiales se guarden en un temporal si no es que ya lo hace
+# TODO: CARGAR ARCHIVOS - Convertir archivo en un arreglo y guardarlo en la memoria, con su direccion de dataframe
+# TODO: dataframe # Ver que tipo de valor regresa cada funcion
+
 
 
 import sys
@@ -25,6 +29,7 @@ ESPACIO_MEMORIA = 1000
 mem_GLOBAL = memVirtual('global')
 mem_PRINCIPAL = memVirtual('principal')
 
+constLista = []
 cuaLista = []
 cuaIndice = 0
 cuadruplo = ()
@@ -121,9 +126,9 @@ def getValor(memVirtual, memDireccion, memTipo):
     seccion = getSeccion(memDireccion)
     try:
         if seccion == GBL:
-            valor = mem_GLOBAL.obtenerValorDeDireccion(str(memDireccion), str(memTipo))
+            valor = mem_GLOBAL.obtenerValorDeDireccion(memDireccion, memTipo)
         elif seccion == LCL:
-            valor = memVirtual.obtenerValorDeDireccion(str(memDireccion), str(memTipo))
+            valor = memVirtual.obtenerValorDeDireccion(memDireccion, memTipo)
         else:
             print("Error Maquina Virtual: No se encontró sección {} de memoria".format(seccion))
             sys.exit()
@@ -146,9 +151,7 @@ def llenarValor(memVirtual, memDireccion, memTipo, valor):
             # print("error aqui")
     except:
         pass
-    memTipo = str(memTipo)
     seccion = getSeccion(memDireccion)
-    memDireccion = str(memDireccion)
 
     if seccion == GBL:
         mem_GLOBAL.guardarValor(memDireccion, memTipo, valor)
@@ -190,15 +193,15 @@ def getTipo(mem):
     except:
         pass
     mem = int(mem)
-    if ((mem >= 0 and mem < limite_intGlobales) or (mem >= limite_dfGlobales and limite_intLocales) or (mem >= limite_dfLocales and mem < limite_intTemporales) or (mem >= limite_boolTemporales and mem < limite_intConstantes)):
+    if ((mem >= 0 and mem < limite_intGlobales) or (mem >= limite_dfGlobales and mem < limite_intLocales) or (mem >= limite_dfLocales and mem < limite_intTemporales) or (mem >= limite_boolTemporales and mem < limite_intConstantes)):
         return 'int'
-    if ((mem >= limite_intGlobales and mem < limite_floatGlobales) or (mem >= limite_intLocales and limite_floatLocales) or (mem >= limite_intTemporales and mem < limite_floatTemporales) or (mem >= limite_intConstantes and mem < limite_floatConstantes)):
+    if ((mem >= limite_intGlobales and mem < limite_floatGlobales) or (mem >= limite_intLocales and mem < limite_floatLocales) or (mem >= limite_intTemporales and mem < limite_floatTemporales) or (mem >= limite_intConstantes and mem < limite_floatConstantes)):
         return 'float'
-    if ((mem >= limite_floatGlobales and mem < limite_stringsGlobales) or (mem >= limite_floatLocales and limite_stringsLocales) or (mem >= limite_floatTemporales and mem < limite_stringsTemporales) or (mem >= limite_floatConstantes and mem < limite_stringsConstantes)):
+    if ((mem >= limite_floatGlobales and mem < limite_stringsGlobales) or (mem >= limite_floatLocales and  mem < limite_stringsLocales) or (mem >= limite_floatTemporales and mem < limite_stringsTemporales) or (mem >= limite_floatConstantes and mem < limite_stringsConstantes)):
         return 'string'
-    if ((mem >= limite_stringsGlobales and mem < limite_charGlobales) or (mem >= limite_stringsLocales and limite_charLocales) or (mem >= limite_stringsTemporales and mem < limite_charTemporales) or (mem >= limite_stringsConstantes and mem < limite_charConstantes)):
+    if ((mem >= limite_stringsGlobales and mem < limite_charGlobales) or (mem >= limite_stringsLocales and mem <limite_charLocales) or (mem >= limite_stringsTemporales and mem < limite_charTemporales) or (mem >= limite_stringsConstantes and mem < limite_charConstantes)):
         return 'char'
-    if ((mem >= limite_charGlobales and mem < limite_dfGlobales) or (mem >= limite_charLocales and limite_dfLocales) or (mem >= limite_charTemporales and mem < limite_dfTemporales) or (mem >= limite_charConstantes and mem < limite_dfConstantes)):
+    if ((mem >= limite_charGlobales and mem < limite_dfGlobales) or (mem >= limite_charLocales and mem < limite_dfLocales) or (mem >= limite_charTemporales and mem < limite_dfTemporales) or (mem >= limite_charConstantes and mem < limite_dfConstantes)):
         return 'string'
     if (mem >= limite_dfTemporales and mem < limite_boolTemporales):
         return 'bool'
@@ -211,83 +214,83 @@ def getTipo(mem):
 def operadores(signo):
     global cuadruplo
     global pilaCorriendo
-    if signo == '+':
-        if cuadruplo[1][0] == '{' and cuadruplo[1][-1] == '}': 
-            valor1 = int(cuadruplo[1][1:-1])
-            valor2 = getValor(pilaCorriendo, cuadruplo[2], getTipo(cuadruplo[2]))
-            valor2 = int(valor2)
-        else:
-            # XXX:BORRAR
-            # pilaCorriendo.imprimirDir()
+    if signo != 'CONS':
+        if signo == '+':
+            if cuadruplo[1][0] == '{' and cuadruplo[1][-1] == '}': 
+                valor1 = int(cuadruplo[1][1:-1])
+                valor2 = getValor(pilaCorriendo, cuadruplo[2], getTipo(cuadruplo[2]))
+                valor2 = int(valor2)
+            else:
+                # XXX:BORRAR
+                # pilaCorriendo.imprimirDir()
+                tipo1 = getTipo(cuadruplo[1])
+                # XXX:BORRAR
+                # print("tipo1: ", tipo1)
+                tipo2 = getTipo(cuadruplo[2])
+                # XXX:BORRAR
+                # print("tipo2: ", tipo2)
+                valor1 = getValor(pilaCorriendo, cuadruplo[1], tipo1)
+                # XXX:BORRAR
+                # print("valor1: ", valor1)
+                valor2 = getValor(pilaCorriendo, cuadruplo[2], tipo2)
+                # XXX:BORRAR
+                # print("valor2: ", valor2)
+
+                if tipo1 == 'int':
+                    valor1 = int(valor1)
+                elif tipo1 == 'float':
+                    valor1 = float(valor1);
+
+                if tipo2 == 'int':
+                    valor2 = int (valor2)
+                elif tipo2 == 'float':
+                    valor2 = float(valor2) 
+                pass
+            res = valor1 + valor2
+        else:   
             tipo1 = getTipo(cuadruplo[1])
-            # XXX:BORRAR
-            # print("tipo1: ", tipo1)
             tipo2 = getTipo(cuadruplo[2])
-            # XXX:BORRAR
-            # print("tipo2: ", tipo2)
             valor1 = getValor(pilaCorriendo, cuadruplo[1], tipo1)
-            # XXX:BORRAR
-            # print("valor1: ", valor1)
             valor2 = getValor(pilaCorriendo, cuadruplo[2], tipo2)
-            # XXX:BORRAR
-            # print("valor2: ", valor2)
 
             if tipo1 == 'int':
                 valor1 = int(valor1)
             elif tipo1 == 'float':
-                valor1 == float(valor1);
+                valor1 = float(valor1)
 
             if tipo2 == 'int':
-                valor2 = int (valor2)
+                valor2 = int(valor2)
             elif tipo2 == 'float':
-                valor2 == float(valor2) 
-            pass
-        res = valor1 + valor2
-    else:   
-        tipo1 = getTipo(cuadruplo[1])
-        tipo2 = getTipo(cuadruplo[2])
-        valor1 = getValor(pilaCorriendo, cuadruplo[1], tipo1)
-        valor2 = getValor(pilaCorriendo, cuadruplo[2], tipo2)
+                valor2 = float(valor2) 
 
-        if tipo1 == 'int':
-            valor1 = int(valor1)
-        elif tipo1 == 'float':
-            valor1 == float(valor1);
-
-        if tipo2 == 'int':
-            valor2 = int (valor2)
-        elif tipo2 == 'float':
-            valor2 == float(valor2) 
-
-        if signo == '-':
-            res = valor1 - valor2
-        elif signo == '*':
-            res = valor1 * valor2
-        elif signo == '/':
-            res = valor1 / valor2
-        elif signo == '==':
-            res = valor1 == valor2
-        elif signo == '<':
-            res = valor1 < valor2
-        elif signo == '>':
-            res = valor1 > valor2
-        elif signo == '<=':
-            res = valor1 <= valor2
-        elif signo == '>=':
-            res = valor1 >= valor2
-        elif signo == '!=':
-            res = valor1 != valor2
-        elif signo == '|':
-            res = True if valor1 == valor2 and valor1 == False and valor2 == False else False
-        elif signo == '&':
-            res = True if valor1 == valor2 and valor1 == True else False
-    
-    # XXX:BORRAR
-    # print(cuadruplo[3], getTipo(cuadruplo[3]), res)
-
-    llenarValor(pilaCorriendo, cuadruplo[3], getTipo(cuadruplo[3]), res)
+            if signo == '-':
+                res = valor1 - valor2
+            elif signo == '*':
+                res = valor1 * valor2
+            elif signo == '/':
+                res = valor1 / valor2
+            elif signo == '==':
+                res = valor1 == valor2
+            elif signo == '<':
+                res = valor1 < valor2
+            elif signo == '>':
+                res = valor1 > valor2
+            elif signo == '<=':
+                res = valor1 <= valor2
+            elif signo == '>=':
+                res = valor1 >= valor2
+            elif signo == '!=':
+                res = valor1 != valor2
+            elif signo == '|':
+                res = True if valor1 == valor2 and valor1 == False and valor2 == False else False
+            elif signo == '&':
+                res = True if valor1 == valor2 and valor1 == True else False
+        # XXX:BORRAR
+        # print(cuadruplo[3], getTipo(cuadruplo[3]), res)
+        llenarValor(pilaCorriendo, cuadruplo[3], getTipo(cuadruplo[3]), res)
 
 def correr():
+    global constLista
     global cuaLista
     global cuaIndice
     global cuadruplo
@@ -295,6 +298,12 @@ def correr():
     global pilaRetorno
     global sigCuaIndice
     global pilaCorriendo
+
+    for cons in constLista:
+        llenarValor(mem_GLOBAL, cons[3], cons[1], cons[2])
+    
+    #XXX: BORRAR\
+    # mem_GLOBAL.imprimirDir()
 
     terminado = False
     while not terminado:
@@ -307,6 +316,8 @@ def correr():
 
         # XXX: BORRAR
         # print(cuadruplo)
+        # mem_GLOBAL.imprimirDir()
+        # pilaCorriendo.imprimirDir()
 
         # ASIGNACION
         if cuadruplo[0] == '=':
@@ -316,6 +327,7 @@ def correr():
             try:
                 # XXX: BORRAR
                 # print (cuadruplo[1])
+                # print(cuadruplo[1])
                 valor = getValor(pilaCorriendo, cuadruplo[1], getTipo(cuadruplo[1]))
             except:
                 valor = pop(CONST_RETORNO_VALOR)
@@ -325,11 +337,7 @@ def correr():
             llenarValor(pilaCorriendo, cuadruplo[3], getTipo(cuadruplo[3]), valor)
         # COMANDOS        
         # CONS
-        elif cuadruplo[0] == 'CONS':
-            llenarValor(mem_GLOBAL, cuadruplo[3], cuadruplo[1], cuadruplo[2])
-            # XXX: BORRAR
-            # pilaCorriendo.imprimirDir()
-
+        # Se saltará porque ya se agregarón con antelación
         # GOTO
         elif cuadruplo[0] == 'GOTO':
             sigCuaIndice = int(cuadruplo[3])
@@ -397,7 +405,6 @@ def correr():
                 print("Error Maquina Virtual: {} es diferente a {}".format(tipo, auxTipo))
                 sys.exit()
                 return
-                
         # escribe
         elif cuadruplo[0] == 'escribe':
             texto = getValor(pilaCorriendo, cuadruplo[1], getTipo(cuadruplo[1]))
@@ -476,7 +483,7 @@ def correr():
         # correlation
         elif cuadruplo[0] == 'correlation':
             #HACK: TERMINAR
-            return
+            pass
         #ARREGLO
         #VER
         elif cuadruplo[0] == 'VER':
@@ -522,6 +529,11 @@ for linea in cuadruplos:
     linea = linea.replace('\'','')
     linea = linea.replace(' ','')
     cuadruplo = tuple(linea.split(','))
+    if (cuadruplo[0] == 'CONS'):
+        cuadroCONST = (cuadruplo[0], cuadruplo[1], cuadruplo[2], cuadruplo[3])
+        constLista.append(cuadroCONST)
     cuadruplo = (cuadruplo[0], cuadruplo[1], cuadruplo[2], cuadruplo[3])
     cuaLista.append(cuadruplo)
+
+# print(getTipo("17000"))
 correr()

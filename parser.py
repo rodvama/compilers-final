@@ -63,7 +63,7 @@ forBool = False
 varFor = ''
 negativo = False
 returnBool = False #sirve para saber si una funcion debe regresar algun valor (si es void o no)
-
+boolDataf = False #Sirve para saber cuando una variable dataframe esta siendo declarada
 
 #Variables para Arreglos y matrices
 isArray = False
@@ -73,6 +73,9 @@ numColumnas = 0
 R = 1 #m0
 dirBase = 0 #Direccion base
 currentConstArrays = []
+
+#Funciones especiales
+nombreFunEsp = ''
 
 '''
 Espacios de memoria:
@@ -206,34 +209,31 @@ def p_var1(p):
     var1 : var
          | empty
     '''
-    # print("VAR1")
+    
 
 def p_func1(p):
     '''
     func1 : funcion func1
           | empty
     '''
-    # print("FUNC'")
+   
 
 def p_principal(p):
     'principal : PRINCIPAL pnPrincipal2 LPAREN RPAREN bloque'
-    # print("PRINCIPAL")
+    
 
 #DECLARACION DE VARIABLES
 def p_var(p):
     'var : VAR var2'
-    # print("VAR")
 
 def p_var2(p):
-    'var2 : type TWO_DOTS lista_ids var3'
-    # print("VAR2")
+    'var2 : type TWO_DOTS lista_ids pnDF2 var3'
 
 def p_var3(p):
     '''
     var3 : var2
          | empty
     '''
-    # print("VAR3")
 
 def p_type(p):
     '''
@@ -280,7 +280,7 @@ def p_tipo_simple(p):
 
 def p_tipo_compuesto(p):
     '''
-    tipo_compuesto : DATAFRAME pn_1_setCurrentType
+    tipo_compuesto : DATAFRAME pn_1_setCurrentType pnDF
                    | STRING pn_1_setCurrentType
     '''
 
@@ -411,12 +411,12 @@ def p_esc2(p):
     '''
 
 def p_carga_datos(p):
-    'carga_datos : CARGA LPAREN ID COMMA CTE_STR COMMA ca COMMA ca RPAREN SEMICOLON'
+    'carga_datos : CARGA LPAREN ID pnExp1 COMMA CTE_STR pnCteStr COMMA ca COMMA ca RPAREN SEMICOLON pnCarga'
 
 def p_ca(pa):
     '''
     ca : ID
-       | CTE_INT
+       | CTE_INT pnCteInt
     '''
 
 #Condicionales y Ciclos
@@ -450,7 +450,7 @@ def p_fev(p):
 
 def p_funciones_especiales(p):
     '''
-    funciones_especiales : fe LPAREN ID COMMA v_exp RPAREN
+    funciones_especiales : fe LPAREN ID pnExp1 COMMA v_exp RPAREN pnFunEsp2
                          | CORRELACIONA pnFunEsp1 LPAREN ID COMMA v_exp COMMA v_exp RPAREN
     '''
 def p_fe(p):
@@ -844,16 +844,16 @@ def QuadGenerateList():
 
 #Funcion que muestra menssaje de error cuando los tipos no coinciden
 def errorTypeMismatch():
-    print('Error: Type Mismatch')
-    sys.exit()
+    sys.exit('Error: Type Mismatch')
+    
 
 #Funcion para mostrar un mensaje de error cuando se llena los maximos posibles valores temporales
 def errorOutOfBounds(tipoMemoria,tipoDato):
-    print("Error: Memoria llena; Muchas {} de tipo {}.".format(tipoMemoria,tipoDato))
-    sys.exit()
+    sys.exit("Error: Memoria llena; Muchas {} de tipo {}.".format(tipoMemoria,tipoDato))
+    
 
 def errorReturnTipo():
-    print("Error: el tipo que intenta retornar no es correcto")
+    sys.exit("Error: el tipo que intenta retornar no es correcto")
 
 ################ Funciones de manejo de memoria##############
 
@@ -1079,6 +1079,9 @@ def p_pnGOTOprincipal(p):
     QuadGenerate('GOTO', '', '', '')
     pushSaltos(nextQuad() - 1)
 
+'''
+Genera el cuadruplo de GOTO Main
+'''
 def p_pnPrincipal2(p):
     '''
     pnPrincipal2 :
@@ -1089,8 +1092,26 @@ def p_pnPrincipal2(p):
     currentFunc = GBL
     cuadruplos[popSaltos()] = ('GOTO', '', '', nextQuad())
     
-    
 
+'''
+Activa la variable booleana boolDataf cuando se esta declarando un dataframe
+'''
+def p_pnDF(p):
+    '''
+    pnDF : 
+    '''
+    global boolDataf
+    boolDataf = True
+
+'''
+Desactiva la variable booleana boolDataf cuando termina la declaracion de variables de tipo dataframe
+'''
+def p_pnDF2(p):
+    '''
+    pnDF2 :
+    '''
+    global boolDataf
+    boolDataf = False
 
 
 ##########DIRECTORIO DE FUNCIONES Y TABLA DE VARIABLES#############
@@ -1117,6 +1138,7 @@ def p_pn_2_addVariable(p):
     global currentType
     global currentVarName
     global currentCantVars
+    global boolDataf
 
     varName = p[-1]
     currentVarName = varName
@@ -1126,6 +1148,9 @@ def p_pn_2_addVariable(p):
     directorioFunciones.func_addVar(currentFunc, varName, currentType, 0, 0, PosMem)
     
     currentCantVars += 1
+
+    if boolDataf:
+        QuadGenerate("dataframe", varName, PosMem, '')
   
 
 '''
@@ -1367,12 +1392,57 @@ def p_pnFunCall_5_6_llamada(p):
         pushTipo(tipo)
 
 ###### FUNCIONES ESPECIALES #######
+
+'''
+Identifica el nombre de la funcion especial y lo mete a la pila de operandos
+'''
 def p_pnFunEsp1(p):
     '''
     pnFunEsp1 :
     '''
-    nombreFun = str(p[-1])
-    pushOperador(nombreFun)
+    global nombreFunEsp
+    nombreFunEsp = str(p[-1])
+    pFunciones.append(nombreFunEsp)
+    
+'''
+Generacion de cuadriplo de funciones especiales
+'''
+def p_pnFunEsp2(p):
+    '''
+    pnFunEsp2 :
+    '''
+    global pFunciones
+
+    funName = pFunciones.pop()
+
+    indice = popOperandos()
+    indiceTipo = popTipos()
+    indiceMem = popMemoria()
+
+    indice = '@' + str(indice)
+
+    dfName = popOperandos()
+    dfTipo = popTipos()
+    dfMem = popMemoria()
+
+    if(indiceTipo != 'int'):
+        sys.exit("Error en Funcion especial: ",funName)
+    
+    if(dfTipo != 'dataframe'):
+        sys.exit("Error en Funcion especial: ", funName, ". El tipo del primer parametro no es dataframe.")
+    
+    if(funName == 'media' or funName == 'mediana' or funName == 'varianza'):
+        temporal = nextAvailTemp('float')
+        tempTipo = 'float'
+    elif (funName == 'moda'):
+        temporal = nextAvailTemp('int')
+        tempTipo = 'int'
+
+    QuadGenerate(funName, dfMem, indice, temporal)
+    pushOperando(temporal)
+    pushTipo(tempTipo)
+    pushMemoria(temporal)
+
 
 ###### CONSTANTES ###########
 '''
@@ -1744,7 +1814,6 @@ def p_pnSec4(p):
         if quad_resultType == 'error':
             print("Error: Operacion invalida")
         else:
-            print("HEEEY AQUII")
             QuadGenerate(quad_operator, quad_rightMem, '', quad_operator)
             pushOperador(quad_operator)
             #pushOperando(quad_Operando) #Posible BORRAR
@@ -2254,12 +2323,50 @@ def p_pnMatrizAcc(p):
         sys.exit("Error. La variable no es dimensionada y no se puede acceder al indice")
         return
 
+'''
+Activa el bool isArray para indicar que la variable es un arreglo
+'''
 def p_pnActivaArray(p):
     '''
     pnActivaArray :    
     '''
     global isArray
     isArray = True
+
+
+####### Carga de Archivos#######
+def p_pnCarga(p):
+    '''
+    pnCarga : 
+    '''
+    maxRenglones = popOperandos()
+    maxRenglonesTipo = popTipos()
+    maxRenglonesMem = popMemoria() 
+
+    maxVariables = popOperandos()
+    maxVariablesTipo = popTipos()
+    maxVariablesMem = popMemoria()
+
+    path = popOperandos()
+    pathTipo = popTipos()
+    pathMem = popMemoria()
+
+    dfName = popOperandos()
+    dfTipo = popTipos()
+    dfMem = popMemoria()
+
+    if(pathTipo != 'string'):
+        sys.exit("Error al cargar archivo. El tipo del segundo parametro no es string.")
+    
+    if(dfTipo != 'dataframe'):
+        sys.exit("Error al cargar archivo. El tipo del primer parametro no es dataframe.")
+
+    QuadGenerate("carga", dfMem, path, '?')
+
+    
+
+
+
 
 
 parser = yacc.yacc()

@@ -1,11 +1,13 @@
 programa COVID19;
 
 var 
-string: i;
-int : j;
+dataframe : i;
+float : x;
+
+
 
 principal()
 {   
-    
-    
+    x = moda(i, Variables[3]);
+
 }

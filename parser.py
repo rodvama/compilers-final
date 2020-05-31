@@ -760,6 +760,16 @@ def getAddConst(constante):
     global cont_CharConstantes
     global cont_dfConstantes
 
+    if boolDataf:
+        if constante not in d_df:
+            if cont_dfConstantes < limite_dfConstantes:
+                d_df[constante] = cont_dfConstantes
+                cont_dfConstantes += 1
+                QuadGenerate('CONS', 'dataframe', constante, d_df[constante])
+            else:
+                errorOutOfBounds('Constantes', 'dataframes')
+        return d_df[constante]
+
     if type(constante) == int:
         if constante not in d_ints:
             if cont_IntConstantes < limite_intConstantes:
@@ -1150,7 +1160,7 @@ def p_pn_2_addVariable(p):
     currentCantVars += 1
 
     if boolDataf:
-        QuadGenerate("dataframe", varName, PosMem, '')
+        getAddConst(varName)
   
 
 '''

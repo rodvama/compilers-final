@@ -3,10 +3,10 @@ programa COVID19;
 var 
 int: i, j;
 float : p;
-dataframe : x;
+string : s;
 
 principal()
 {
- i = 5;
+ s = "Hola";
 
 }

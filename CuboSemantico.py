@@ -289,11 +289,11 @@ class CuboSemantico:
             ('string' , 'char' , '|' ) : 'error',
             ('string' , 'char' , '&' ) : 'error',
 
-            ('string' , 'string' , '+' ) : 'error',
+            ('string' , 'string' , '+' ) : 'string',
             ('string' , 'string' , '-' ) : 'error',
             ('string' , 'string' , '*' ) : 'error',
             ('string' , 'string' , '/' ) : 'error',
-            ('string' , 'string' , '=' ) : 'error', 
+            ('string' , 'string' , '=' ) : 'string', 
             ('string' , 'string' , '==' ) : 'bool',
             ('string' , 'string' , '<' ) : 'error',
             ('string' , 'string' , '>' ) : 'error',

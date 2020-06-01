@@ -451,6 +451,7 @@ def p_funciones_especiales_void(p):
 def p_funciones_especiales(p):
     '''
     funciones_especiales : fe LPAREN ID pnExp1 COMMA CTE_INT pnCteInt COMMA CTE_INT pnCteInt RPAREN pnFunEsp2
+                         | CORRELACION pnFunEsp1 LPAREN ID pnExp1 COMMA ID pnExp1 COMMA CTE_INT pnCteInt COMMA CTE_INT pnCteInt RPAREN pnFunEsp3
     '''
 def p_fe(p):
     '''
@@ -458,7 +459,6 @@ def p_fe(p):
        | MEDIANA pnFunEsp1
        | MODA pnFunEsp1
        | VARIANZA pnFunEsp1
-       | CORRELACIONA pnFunEsp1
     '''
 
 # def p_v_exp(p):
@@ -914,7 +914,7 @@ def nextAvailMemory(contexto, tipo):
     global cont_StringLocales
     global cont_CharGlobales
     global cont_CharLocales
-    global cont_dfGlobales
+    global cont_dfConstantes
     global cont_dfLocales
 
     posMem = -1
@@ -952,9 +952,9 @@ def nextAvailMemory(contexto, tipo):
                 errorOutOfBounds(GBL, 'Chars')
 
         elif tipo == 'dataframe':
-            if cont_dfGlobales < limite_dfGlobales:
-                posMem = cont_dfGlobales
-                cont_dfGlobales += 1
+            if cont_dfConstantes < limite_dfConstantes:
+                posMem = cont_dfConstantes
+                cont_dfConstantes += 1
             else:
                 errorOutOfBounds(GBL, 'Dataframes')
     #Locales
@@ -989,9 +989,9 @@ def nextAvailMemory(contexto, tipo):
                 errorOutOfBounds('Locales', 'Chars')
 
         elif tipo == 'dataframe':
-            if cont_dfLocales < limite_dfLocales:
-                posMem = cont_dfLocales
-                cont_dfLocales += 1
+            if cont_dfConstantes < limite_dfConstantes:
+                posMem = cont_dfConstantes
+                cont_dfConstantes += 1
             else:
                 errorOutOfBounds('Locales', 'Dataframes')
     return posMem
@@ -1010,8 +1010,8 @@ def update_pointer(contexto, tipo, cont):
     global cont_StringLocales
     global cont_CharGlobales
     global cont_CharLocales
-    global cont_dfGlobales
-    global cont_dfLocales
+    global cont_dfConstantes
+    
 
     if contexto == GBL:
 
@@ -1036,8 +1036,8 @@ def update_pointer(contexto, tipo, cont):
                 print('Error: Overflow Chars Globales')
 
         if tipo == 'dataframe':
-            cont_dfGlobales += cont
-            if cont_dfGlobales > limite_dfGlobales:
+            cont_dfConstantes += cont
+            if cont_dfConstantes > limite_dfConstantes:
                 print('Error: Overflow DF Globales')
     else:
         if tipo == 'int':
@@ -1061,8 +1061,8 @@ def update_pointer(contexto, tipo, cont):
                 print('Error: Overflow Chars Locales')
 
         if tipo == 'dataframe':
-            cont_dfLocales += cont
-            if cont_dfLocales > limite_dfLocales:
+            cont_dfConstantes += cont
+            if cont_dfConstantes > limite_dfConstantes:
                 print('Error: Overflow DF Locales')
 
         
@@ -1161,7 +1161,7 @@ def p_pn_2_addVariable(p):
     currentCantVars += 1
 
     if boolDataf:
-        getAddConst(varName)
+        QuadGenerate('CONS', 'dataframe', varName, PosMem)
   
 
 '''
@@ -1453,6 +1453,54 @@ def p_pnFunEsp2(p):
     pushOperando(temporal)
     pushTipo(tempTipo)
     pushMemoria(temporal)
+
+'''
+Funcion para manejar la funcion especial correlacion y generar sus cuadruplos
+'''
+def p_pnFunEsp3(p):
+    '''
+    pnFunEsp3 : 
+    '''
+    global pFunciones
+
+    funName = pFunciones.pop()
+
+    indice2 = popOperandos()
+    indiceTipo2 = popTipos()
+    indiceMem2 = popMemoria()
+
+    indice1 = popOperandos()
+    indiceTipo1 = popTipos()
+    indiceMem1 = popMemoria()
+
+    dfName2 = popOperandos()
+    dfTipo2 = popTipos()
+    dfMem2 = popMemoria()
+
+    dfName1 = popOperandos()
+    dfTipo1 = popTipos()
+    dfMem1 = popMemoria()
+
+    if(indiceTipo1 == 'int' and indiceTipo2 == 'int'):
+        if(dfTipo1 == 'dataframe' and dfTipo2 == 'dataframe'):
+            temporal = nextAvailTemp('float')
+            tempTipo = 'float'
+
+            dfs = "%" + str(dfMem1) + "#" + str(dfMem2)
+            indxs = "%" + str(int(indice1) - 1) + "#" + str(int(indice2)-1)
+    
+            QuadGenerate('correlacion', dfs, indxs, temporal)
+
+            pushOperando(temporal)
+            pushTipo(tempTipo)
+            pushMemoria(temporal) 
+        else:
+            sys.exit("Error en Funcion Especial Correlaciona. Los primeros dos parametros no son dataframes")
+    else:
+        sys.exit("Error en Funcion Especial Correlaciona. Los indices deben ser enteros")
+
+
+    
 
 
 '''
@@ -2412,7 +2460,7 @@ def p_pnCarga(p):
     if(dfTipo != 'dataframe'):
         sys.exit("Error al cargar archivo. El tipo del primer parametro no es dataframe.")
 
-    QuadGenerate("carga", dfMem, path, '?')
+    QuadGenerate("carga", dfMem, path, '')
 
     
 

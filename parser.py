@@ -718,7 +718,7 @@ def pushConstante(constante):
     elif type(constante) == str:
         if len(constante) > 3: #String
             if constante not in d_strs:
-                if cont_StringConstantes < limite_stringConstantes:
+                if cont_StringConstantes < limite_stringsConstantes:
                     d_strs[constante] = cont_StringConstantes
                     cont_StringConstantes += 1
                     print("LENG",len(constante), constante)
@@ -796,7 +796,7 @@ def getAddConst(constante):
     elif type(constante) == str:
         if len(constante) > 1: #String
             if constante not in d_strs:
-                if cont_StringConstantes < limite_stringConstantes:
+                if cont_StringConstantes < limite_stringsConstantes:
                     d_strs[constante] = cont_StringConstantes
                     cont_StringConstantes += 1
                     QuadGenerate('CONS', 'string', constante, d_strs[constante])
@@ -1392,7 +1392,7 @@ def p_pnFunCall_5_6_llamada(p):
     else:
         print("Error: Mismatch de Argumentos")
         sys.exit()
-        resultE
+        # FIXME:resultE
     
     tipo =  directorioFunciones.directorio_funciones[funcion]['tipo']
     if tipo != 'void':

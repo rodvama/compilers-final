@@ -29,7 +29,7 @@ class memVirtual:
     """
     def guardarValor(self, direccion, tipo, valor):
         self.direcciones[str(tipo)][str(direccion)] = valor
-        # TODO: BORRAR
+        # XXX: BORRAR
         # print("Memoria", direccion)
 
     """

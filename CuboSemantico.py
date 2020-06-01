@@ -52,7 +52,7 @@ class CuboSemantico:
             ('int' , 'float' , '-' ) : 'float',
             ('int' , 'float' , '*' ) : 'float',
             ('int' , 'float' , '/' ) : 'float',
-            ('int' , 'float' , '=' ) : 'int', # TODO: CHECAR QUE ME FUNCIONA
+            ('int' , 'float' , '=' ) : 'int',
             ('int' , 'float' , '==' ) : 'bool',
             ('int' , 'float' , '<' ) : 'bool',
             ('int' , 'float' , '>' ) : 'bool',

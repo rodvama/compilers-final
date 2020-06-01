@@ -1,10 +1,11 @@
 programa COVID19;
 
 var 
-dataframe: i, x;
+dataframe : i;
+float : x;
 
 principal()
 {
-    histograma(i, 3, 5);
-    plotline(i, x, 8);
+    cargaArchivo(i, "pruebas/dataframes/dt1.txt", 1, 5);
+    x = moda(i, 1, 4);
 }

@@ -907,7 +907,7 @@ def nextAvailMemory(contexto, tipo):
     global cont_StringLocales
     global cont_CharGlobales
     global cont_CharLocales
-    global cont_dfGlobales
+    global cont_dfConstantes
     global cont_dfLocales
 
     posMem = -1
@@ -945,9 +945,9 @@ def nextAvailMemory(contexto, tipo):
                 errorOutOfBounds(GBL, 'Chars')
 
         elif tipo == 'dataframe':
-            if cont_dfGlobales < limite_dfGlobales:
-                posMem = cont_dfGlobales
-                cont_dfGlobales += 1
+            if cont_dfConstantes < limite_dfConstantes:
+                posMem = cont_dfConstantes
+                cont_dfConstantes += 1
             else:
                 errorOutOfBounds(GBL, 'Dataframes')
     #Locales
@@ -982,9 +982,9 @@ def nextAvailMemory(contexto, tipo):
                 errorOutOfBounds('Locales', 'Chars')
 
         elif tipo == 'dataframe':
-            if cont_dfLocales < limite_dfLocales:
-                posMem = cont_dfLocales
-                cont_dfLocales += 1
+            if cont_dfConstantes < limite_dfConstantes:
+                posMem = cont_dfConstantes
+                cont_dfConstantes += 1
             else:
                 errorOutOfBounds('Locales', 'Dataframes')
     return posMem
@@ -1003,8 +1003,8 @@ def update_pointer(contexto, tipo, cont):
     global cont_StringLocales
     global cont_CharGlobales
     global cont_CharLocales
-    global cont_dfGlobales
-    global cont_dfLocales
+    global cont_dfConstantes
+    
 
     if contexto == GBL:
 
@@ -1029,8 +1029,8 @@ def update_pointer(contexto, tipo, cont):
                 print('Error: Overflow Chars Globales')
 
         if tipo == 'dataframe':
-            cont_dfGlobales += cont
-            if cont_dfGlobales > limite_dfGlobales:
+            cont_dfConstantes += cont
+            if cont_dfConstantes > limite_dfConstantes:
                 print('Error: Overflow DF Globales')
     else:
         if tipo == 'int':
@@ -1054,8 +1054,8 @@ def update_pointer(contexto, tipo, cont):
                 print('Error: Overflow Chars Locales')
 
         if tipo == 'dataframe':
-            cont_dfLocales += cont
-            if cont_dfLocales > limite_dfLocales:
+            cont_dfConstantes += cont
+            if cont_dfConstantes > limite_dfConstantes:
                 print('Error: Overflow DF Locales')
 
         
@@ -1154,7 +1154,7 @@ def p_pn_2_addVariable(p):
     currentCantVars += 1
 
     if boolDataf:
-        getAddConst(varName)
+        QuadGenerate('CONS', 'dataframe', varName, PosMem)
   
 
 '''
@@ -2415,7 +2415,7 @@ def p_pnCarga(p):
     if(dfTipo != 'dataframe'):
         sys.exit("Error al cargar archivo. El tipo del primer parametro no es dataframe.")
 
-    QuadGenerate("carga", dfMem, path, '?')
+    QuadGenerate("carga", dfMem, path, '')
 
     
 

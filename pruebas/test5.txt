@@ -1,12 +1,10 @@
 programa COVID19;
 
 var 
-int: i, j;
-float : p;
-string : s;
+dataframe: i, x;
 
 principal()
 {
- s = "Hola";
-
+    histograma(i, 3, 5);
+    plotline(i, x, 8);
 }

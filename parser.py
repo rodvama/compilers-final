@@ -74,8 +74,7 @@ R = 1 #m0
 dirBase = 0 #Direccion base
 currentConstArrays = []
 
-#Funciones especiales
-nombreFunEsp = ''
+
 
 '''
 Espacios de memoria:
@@ -415,7 +414,7 @@ def p_carga_datos(p):
 
 def p_ca(pa):
     '''
-    ca : ID
+    ca : ID pnExp1
        | CTE_INT pnCteInt
     '''
 
@@ -440,18 +439,18 @@ def p_no_condicional(p): #For
 def p_funciones_especiales_void(p):
     '''
     funciones_especiales_void : VARIABLES pnFunEsp1 LPAREN ID COMMA ID COMMA ID RPAREN SEMICOLON
-                              | fev LPAREN ID COMMA v_exp RPAREN SEMICOLON
+                              | HISTOGRAMA pnFunEsp1 LPAREN ID pnExp1 COMMA CTE_INT pnCteInt COMMA CTE_INT pnCteInt RPAREN SEMICOLON pnFunEspVoid1
+                              | PLOTLINE pnFunEsp1 LPAREN ca COMMA ca COMMA CTE_INT pnCteInt RPAREN SEMICOLON pnFunEspVoid1
     '''
-def p_fev(p):
-    '''
-    fev : PLOTHIST pnFunEsp1
-        | PLOTLINE pnFunEsp1
-    '''
+# def p_fev(p):
+#     '''
+#     fev : HISTOGRAMA pnFunEsp1
+#         | PLOTLINE pnFunEsp1
+#     '''
 
 def p_funciones_especiales(p):
     '''
-    funciones_especiales : fe LPAREN ID pnExp1 COMMA v_exp RPAREN pnFunEsp2
-                         | CORRELACIONA pnFunEsp1 LPAREN ID COMMA v_exp COMMA v_exp RPAREN
+    funciones_especiales : fe LPAREN ID pnExp1 COMMA CTE_INT pnCteInt COMMA CTE_INT pnCteInt RPAREN pnFunEsp2
     '''
 def p_fe(p):
     '''
@@ -459,9 +458,11 @@ def p_fe(p):
        | MEDIANA pnFunEsp1
        | MODA pnFunEsp1
        | VARIANZA pnFunEsp1
+       | CORRELACIONA pnFunEsp1
     '''
-def p_v_exp(p):
-    'v_exp : VARIABLES  LBRACK exp RBRACK'
+
+# def p_v_exp(p):
+#     'v_exp : VARIABLES  LBRACK exp RBRACK'
 
 
 
@@ -1403,12 +1404,10 @@ def p_pnFunEsp1(p):
     '''
     pnFunEsp1 :
     '''
-    global nombreFunEsp
-    nombreFunEsp = str(p[-1])
-    pFunciones.append(nombreFunEsp)
+    pFunciones.append(str(p[-1]))
     
 '''
-Generacion de cuadriplo de funciones especiales
+Generacion de cuadriplo de funciones especiales que regresan valor
 '''
 def p_pnFunEsp2(p):
     '''
@@ -1418,34 +1417,77 @@ def p_pnFunEsp2(p):
 
     funName = pFunciones.pop()
 
-    indice = popOperandos()
-    indiceTipo = popTipos()
-    indiceMem = popMemoria()
+    indice2 = popOperandos()
+    indiceTipo2 = popTipos()
+    indiceMem2 = popMemoria()
 
-    indice = '@' + str(indice)
+    indice1 = popOperandos()
+    indiceTipo1 = popTipos()
+    indiceMem1 = popMemoria()
 
     dfName = popOperandos()
     dfTipo = popTipos()
     dfMem = popMemoria()
 
-    if(indiceTipo != 'int'):
-        sys.exit("Error en Funcion especial: ",funName)
+    if(indiceTipo1 != 'int' or indiceTipo2 != 'int'):
+        sys.exit("Error en Funcion especial: {}".format(funName))
     
-    if(dfTipo != 'dataframe'):
-        sys.exit("Error en Funcion especial: ", funName, ". El tipo del primer parametro no es dataframe.")
-    
-    if(funName == 'media' or funName == 'mediana' or funName == 'varianza'):
-        temporal = nextAvailTemp('float')
-        tempTipo = 'float'
-    elif (funName == 'moda'):
-        temporal = nextAvailTemp('int')
-        tempTipo = 'int'
+    if(dfTipo == 'string' or dfTipo == 'char'):
+        sys.exit("Error en Funcion especial: {} . El tipo del primer parametro no es dataframe o arreglo de enteros o flotantes.".format(funName))
 
-    QuadGenerate(funName, dfMem, indice, temporal)
+    temporal = nextAvailTemp('float')
+    tempTipo = 'float'
+    indice1 = indice1 - 1
+    indice2 = indice2 - 1
+
+    indices = '%' + str(indice1) + '#' + str(indice2)
+
+    QuadGenerate(funName, dfMem, indices, temporal)
     pushOperando(temporal)
     pushTipo(tempTipo)
     pushMemoria(temporal)
 
+
+'''
+Funcion para generar cuadruplos de funciones especiales void que grafican
+'''
+def p_pnFunEspVoid1(p):
+    '''
+    pnFunEspVoid1 : 
+    '''
+    funName = pFunciones.pop()
+
+    parName3 = popOperandos()
+    parTipo3 = popTipos()
+    parMem3 = popMemoria()
+
+    parName2 = popOperandos()
+    parTipo2 = popTipos()
+    parMem2 = popMemoria()
+
+    parName1 = popOperandos()
+    parTipo1 = popTipos()
+    parMem1 = popMemoria()
+
+    if (funName == 'histograma'):
+        if(parTipo1 == 'dataframe' or parTipo1 == 'int' or parTipo1 == 'float'):
+            if( parTipo2 == 'int' and parTipo3 == 'int'):
+                QuadGenerate("histograma", parMem1, int(parName2)-1, int(parName3)-1)
+            else:
+                sys.exit("Error en Funciones Especiales Void (Histograma). El tipo del segundo y tercer parametro debe ser int.")
+        else:
+            sys.exit("Error en Funciones Especiales Void (Histograma). El tipo del primer parametro debe ser dataframe, int o float.")
+    elif (funName == 'plotline'):
+        if((parTipo1 == 'dataframe' or parTipo1 == 'int' or parTipo1 == 'float') and (parTipo2 == 'dataframe' or parTipo2 == 'int' or parTipo2 == 'float') and (parTipo1 == parTipo2)):
+            if(parTipo3 == 'int'):
+                QuadGenerate("plotline", parMem1, parMem2, parMem3)
+            else:
+                sys.exit("Error en Funciones Especiales Void (Plotline). El tipo del tercer parametro debe ser entera")
+            
+        else:
+            sys.exit("Error en Funciones Especiales Void (Plotline). El tipo del primer y segundo parametro debe ser dataframe o constante entera o flotante")
+
+    
 
 ###### CONSTANTES ###########
 '''
@@ -2191,11 +2233,11 @@ def p_pnArregloAcc(p):
                 return
             
         #Cuadruplo verifica
-        QuadGenerate('VER', auxMem, 0, varDimensiones[0]) #DUDA tamaño -1
+        QuadGenerate('VER', auxMem, 0, varDimensiones[0]-1) 
         
         
 
-        #Si es Matriz...
+        #Si no es Matriz...
         if varDimensiones[1] == 0:
             #Memoria Base
             PosicionMemoria = directorioFunciones.func_memoria(currentFunc, auxDIM)
@@ -2236,7 +2278,7 @@ def p_pnArregloAcc(p):
             print("pOperandos: ", pOperandos)
             
             tMem = nextAvailTemp('int')
-            QuadGenerate('*', auxMem, getAddConst(varDimensiones[0]), tMem)
+            QuadGenerate('*', auxMem, getAddConst(varDimensiones[1]-1), tMem)
             pushOperando(tMem)
             pushMemoria(tMem)
             pushTipo('int')
@@ -2319,6 +2361,7 @@ def p_pnMatrizAcc(p):
 
         tMem3 = nextAvailTemp('int')
         base = str(PosicionMemoria) # ESta es la base
+        base = "{" + base + "}"
         QuadGenerate('+', base, tMem2, tMem3)
 
         valorTMem = '(' + str(tMem3) + ')'

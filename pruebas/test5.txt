@@ -1,11 +1,11 @@
 programa COVID19;
 
 var 
-dataframe : i;
+dataframe : i, j;
 float : x;
 
 principal()
 {
-    cargaArchivo(i, "pruebas/dataframes/dt1.txt", 1, 5);
-    x = moda(i, 1, 4);
+    
+    x = correlacion(i, j, 1, 4);
 }

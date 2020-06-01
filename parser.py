@@ -451,6 +451,7 @@ def p_funciones_especiales_void(p):
 def p_funciones_especiales(p):
     '''
     funciones_especiales : fe LPAREN ID pnExp1 COMMA CTE_INT pnCteInt COMMA CTE_INT pnCteInt RPAREN pnFunEsp2
+                         | CORRELACION pnFunEsp1 LPAREN ID pnExp1 COMMA ID pnExp1 COMMA CTE_INT pnCteInt COMMA CTE_INT pnCteInt RPAREN pnFunEsp3
     '''
 def p_fe(p):
     '''
@@ -458,7 +459,6 @@ def p_fe(p):
        | MEDIANA pnFunEsp1
        | MODA pnFunEsp1
        | VARIANZA pnFunEsp1
-       | CORRELACIONA pnFunEsp1
     '''
 
 # def p_v_exp(p):
@@ -1446,6 +1446,54 @@ def p_pnFunEsp2(p):
     pushOperando(temporal)
     pushTipo(tempTipo)
     pushMemoria(temporal)
+
+'''
+Funcion para manejar la funcion especial correlacion y generar sus cuadruplos
+'''
+def p_pnFunEsp3(p):
+    '''
+    pnFunEsp3 : 
+    '''
+    global pFunciones
+
+    funName = pFunciones.pop()
+
+    indice2 = popOperandos()
+    indiceTipo2 = popTipos()
+    indiceMem2 = popMemoria()
+
+    indice1 = popOperandos()
+    indiceTipo1 = popTipos()
+    indiceMem1 = popMemoria()
+
+    dfName2 = popOperandos()
+    dfTipo2 = popTipos()
+    dfMem2 = popMemoria()
+
+    dfName1 = popOperandos()
+    dfTipo1 = popTipos()
+    dfMem1 = popMemoria()
+
+    if(indiceTipo1 == 'int' and indiceTipo2 == 'int'):
+        if(dfTipo1 == 'dataframe' and dfTipo2 == 'dataframe'):
+            temporal = nextAvailTemp('float')
+            tempTipo = 'float'
+
+            dfs = "%" + str(dfMem1) + "#" + str(dfMem2)
+            indxs = "%" + str(int(indice1) - 1) + "#" + str(int(indice2)-1)
+    
+            QuadGenerate('correlacion', dfs, indxs, temporal)
+
+            pushOperando(temporal)
+            pushTipo(tempTipo)
+            pushMemoria(temporal) 
+        else:
+            sys.exit("Error en Funcion Especial Correlaciona. Los primeros dos parametros no son dataframes")
+    else:
+        sys.exit("Error en Funcion Especial Correlaciona. Los indices deben ser enteros")
+
+
+    
 
 
 '''

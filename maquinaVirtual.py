@@ -420,31 +420,6 @@ def correr():
                 arreglo.append(float(auxValor))
             auxTipo = getTipo(cuadruplo[3])
             llenarValor(pilaCorriendo, cuadruplo[3], auxTipo, np.mean(arreglo))
-        # plothist
-        elif cuadruplo[0] == 'plothist':
-            base = int(cuadruplo[1])
-            col = int(cuadruplo[2])
-            auxBins = getValor(pilaCorriendo, int(cuadruplo[3]), getTipo(int(cuadruplo[3])))
-            auxBins = int(auxBins)
-            auxArray = []
-            for x in range(col - 1):
-                auxArray.append(getValor(pilaCorriendo, base+x, getTipo(base+x)))
-            plt.hist(auxArray, bins=auxBins)
-            plt.show()
-            plt.close()
-        # plotline
-        elif cuadruplo[0] == 'plotline':
-            col = int(cuadruplo[3])
-            base1 = int(cuadruplo[1])
-            base2 = int(cuadruplo[2])
-            arreglo1 = []
-            arreglo2 = []
-            for x in range(col -1):
-                arreglo1.append(getValor(pilaCorriendo, base1+x, getTipo(base1+x)))
-                arreglo2.append(getValor(pilaCorriendo, base2+x, getTipo(base2+x)))
-            plt.plot(arreglo1, arreglo2)
-            plt.show()
-            plt.close()
         # Mediana
         elif cuadruplo[0] == 'mediana':
             arreglo = []
@@ -484,16 +459,25 @@ def correr():
         elif cuadruplo[0] == 'correlation':
             #HACK: TERMINAR
             pass
+        # plothist
+        elif cuadruplo[0] == 'histograma':
+            #HACK: TERMINAR
+
+            pass
+        # plotline
+        elif cuadruplo[0] == 'plotline':
+            #HACK: TERMINAR
+            pass
         #ARREGLO
         #VER
         elif cuadruplo[0] == 'VER':
             # XXX:BORRAR
             # print("Entre aqui primero")
-            # HACK: TERMINAR ARREGLOS BIDIMENSIONALES
-            valor = getValor(pilaCorriendo, cuadruplo[1], getTipo(cuadruplo[3]))
-            valor = int(valor)
-            if valor >= int(cuadruplo[3]) or valor < int(cuadruplo[2]):
-                print("Error Maquina Virtual: El valor {} no pertence a los indices.".format(valor))
+            valor = int(getValor(pilaCorriendo, cuadruplo[1], getTipo(cuadruplo[1])))
+            if valor != 0: #HACK: Se aceptan indices negativos?
+                valor = valor - 1 # Para que se vuelva índice y se prueba.
+            if valor > int(cuadruplo[3]) or valor < int(cuadruplo[2]):
+                print("Error Maquina Virtual: El valor {} no pertence a los indices.".format(valor+1))
                 sys.exit()
                 return
             # XXX: BORRAR
@@ -535,5 +519,4 @@ for linea in cuadruplos:
     cuadruplo = (cuadruplo[0], cuadruplo[1], cuadruplo[2], cuadruplo[3])
     cuaLista.append(cuadruplo)
 
-# print(getTipo("17000"))
 correr()

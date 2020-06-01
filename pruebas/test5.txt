@@ -2,11 +2,9 @@ programa COVID19;
 
 var 
 int: i, j;
-float : p;
 dataframe : x;
 
 principal()
 {
  i = 5;
-
 }

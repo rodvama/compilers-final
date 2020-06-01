@@ -67,6 +67,6 @@ class memVirtual:
     Imprimir diccionario de la memoria
     """
     def imprimirDir(self):
-        print("Nombre {}: \n".format(self.funNombre))
+        print("Nombre {}: ".format(self.funNombre))
         print(self.direcciones)
         print("\n")

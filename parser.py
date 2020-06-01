@@ -2198,7 +2198,7 @@ def p_pnArregloAcc(p):
                 return
             
         #Cuadruplo verifica
-        QuadGenerate('VER', auxMem, 0, varDimensiones[0]) #DUDA tamaño -1
+        QuadGenerate('VER', auxMem, 0, varDimensiones[0]-1) #DUDA tamaño -1
         
 
         #Si es Matriz...
@@ -2240,7 +2240,7 @@ def p_pnArregloAcc(p):
             print("pOperandos: ", pOperandos)
             
             tMem = nextAvailTemp('int')
-            QuadGenerate('*', auxMem, getAddConst(varDimensiones[0]), tMem)
+            QuadGenerate('*', auxMem, getAddConst(varDimensiones[1]-1), tMem)
             pushOperando(tMem)
             pushMemoria(tMem)
             pushTipo('int')
@@ -2318,7 +2318,7 @@ def p_pnMatrizAcc(p):
 
         tMem3 = nextAvailTemp('int')
         base = str(PosicionMemoria) # ESta es la base
-        QuadGenerate('+', base, tMem2, tMem3)
+        QuadGenerate('+','{' + str(base) + '}', tMem2, tMem3)
 
         valorTMem = str(tMem3) + '!'
 

@@ -1,15 +1,20 @@
 programa COVID19;
 
 var 
-int: i, j, p;
-
-funcion int fact(int j)
-var float: k;
-{
-regresa(j);
-}
+int: i, j;
+float: p, k;
 
 principal()
 {
-lee(p);
+i = 10;
+j = 2;
+p = 12.5;
+lee(k);
+escribe(k);
+escribe(p*3);
+escribe(i+j);
+escribe(i-j);
+escribe(i*j);
+escribe(i/j);
+
 }

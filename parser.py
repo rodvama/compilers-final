@@ -74,54 +74,6 @@ R = 1 #m0
 dirBase = 0 #Direccion base
 currentConstArrays = []
 
-
-
-'''
-Espacios de memoria:
-+++++++++++++++++++++++
-+globales enteras     + ESPACIO MEMORIA
-+---------------------+
-+globales flotantes   + ESPACIO MEMORIA
-+---------------------+
-+globales strings     + ESPACIO MEMORIA
-+---------------------+
-+globales char       + ESPACIO MEMORIA
-+---------------------+
-+globales dataframes  + ESPACIO MEMORIA
-+++++++++++++++++++++++
-+locales enteras      + ESPACIO MEMORIA
-+---------------------+
-+locales flotantes    + ESPACIO MEMORIA
-+---------------------+
-+locales strings      + ESPACIO MEMORIA
-+---------------------+
-+locales char         + ESPACIO MEMORIA
-+---------------------+
-+locales dataframes   + ESPACIO MEMORIA
-+++++++++++++++++++++++
-+temp enteras         + ESPACIO MEMORIA
-+---------------------+
-+temp flotantes       + ESPACIO MEMORIA
-+---------------------+
-+temp strings         + ESPACIO MEMORIA
-+---------------------+
-+temp char            + ESPACIO MEMORIA
-+---------------------+
-+temp dataframes      + ESPACIO MEMORIA
-+---------------------+
-+temp booleanas       + ESPACIO MEMORIA
-+++++++++++++++++++++++
-+constantes enteras   + ESPACIO MEMORIA
-+---------------------+
-+constantes flotantes + ESPACIO MEMORIA
-+---------------------+
-+constantes strings   + ESPACIO MEMORIA
-+---------------------+
-+constantes char      + ESPACIO MEMORIA
-+---------------------+
-+constantes dataframe    + ESPACIO MEMORIA
-+++++++++++++++++++++++
-'''
 #Declaracion de espacio de memoria por tipo de memoria
 limite_intGlobales = ESPACIO_MEMORIA
 limite_floatGlobales = limite_intGlobales + ESPACIO_MEMORIA
@@ -144,8 +96,8 @@ limite_boolTemporales = limite_dfTemporales + ESPACIO_MEMORIA
 
 limite_intConstantes = limite_boolTemporales + ESPACIO_MEMORIA
 limite_floatConstantes = limite_intConstantes + ESPACIO_MEMORIA
-limite_stringConstantes = limite_floatConstantes + ESPACIO_MEMORIA
-limite_charConstantes = limite_stringConstantes + ESPACIO_MEMORIA
+limite_stringsConstantes = limite_floatConstantes + ESPACIO_MEMORIA
+limite_charConstantes = limite_stringsConstantes + ESPACIO_MEMORIA
 limite_dfConstantes = limite_charConstantes + ESPACIO_MEMORIA
 
 
@@ -176,7 +128,7 @@ cont_BoolTemporales = limite_dfTemporales
 cont_IntConstantes = limite_boolTemporales
 cont_FloatConstantes = limite_intConstantes
 cont_StringConstantes = limite_floatConstantes
-cont_CharConstantes = limite_stringConstantes
+cont_CharConstantes = limite_stringsConstantes
 cont_dfConstantes = limite_charConstantes
 
 
@@ -718,7 +670,7 @@ def pushConstante(constante):
     elif type(constante) == str:
         if len(constante) > 3: #String
             if constante not in d_strs:
-                if cont_StringConstantes < limite_stringConstantes:
+                if cont_StringConstantes < limite_stringsConstantes:
                     d_strs[constante] = cont_StringConstantes
                     cont_StringConstantes += 1
                     print("LENG",len(constante), constante)
@@ -796,7 +748,7 @@ def getAddConst(constante):
     elif type(constante) == str:
         if len(constante) > 1: #String
             if constante not in d_strs:
-                if cont_StringConstantes < limite_stringConstantes:
+                if cont_StringConstantes < limite_stringsConstantes:
                     d_strs[constante] = cont_StringConstantes
                     cont_StringConstantes += 1
                     QuadGenerate('CONS', 'string', constante, d_strs[constante])
@@ -842,9 +794,16 @@ def QuadGenerateList():
     print("-------Lista de Cuadruplos: ")
 
     contador = 0
+    # Opción de leer tuplas directamente - TODO: Arreglar
+    file = open("obj.txt", "w+")
     for quad in cuadruplos:
         print("{}.\t{},\t{},\t{},\t{}".format(contador,quad[0],quad[1],quad[2],quad[3]))
         contador = contador + 1
+
+        file.write(str(quad) + '\n')
+    print("{}.\t{},\t{},\t{},\t{}".format(contador,'FINPROGRAMA','','',''))
+    file.write("('FINPROGRAMA', '', '', '')")
+    file.close()
 
 #Funcion que muestra menssaje de error cuando los tipos no coinciden
 def errorTypeMismatch():
@@ -1385,7 +1344,7 @@ def p_pnFunCall_5_6_llamada(p):
     else:
         print("Error: Mismatch de Argumentos")
         sys.exit()
-        resultE
+        # FIXME:resultE
     
     tipo =  directorioFunciones.directorio_funciones[funcion]['tipo']
     if tipo != 'void':
@@ -2283,8 +2242,6 @@ def p_pnArregloAcc(p):
         #Cuadruplo verifica
         QuadGenerate('VER', auxMem, 0, varDimensiones[0]-1) 
         
-        
-
         #Si no es Matriz...
         if varDimensiones[1] == 0:
             #Memoria Base
@@ -2295,7 +2252,6 @@ def p_pnArregloAcc(p):
             if PosicionMemoria < 0:
                 sys.exit("Error. Variable no declarada: ", auxDIM)
                 return
-                
 
             TipoActual = directorioFunciones.func_searchVarType(currentFunc, auxDIM)
             if not TipoActual:
@@ -2304,12 +2260,11 @@ def p_pnArregloAcc(p):
             if not TipoActual:
                 sys.exit("Error. Variable no declarada: ", auxDIM)
                 return
-                
 
             tMem = nextAvailTemp('int')
-            QuadGenerate('+', PosicionMemoria, auxMem, tMem)
+            QuadGenerate('+', '{' + str(PosicionMemoria) + '}', auxMem, tMem)
 
-            valorTMem = '(' + str(tMem) + ')'
+            valorTMem = str(tMem) + '!'
                 
             pushOperando(auxDIM)
             pushMemoria(valorTMem)
@@ -2331,11 +2286,6 @@ def p_pnArregloAcc(p):
             pushMemoria(tMem)
             pushTipo('int')
             pDim.append(auxDIM)
-
-            
-            
-
-
     else: 
         sys.exit("Error. No se puede acceder al index porque la variable no es dimensionada")
         return
@@ -2409,10 +2359,9 @@ def p_pnMatrizAcc(p):
 
         tMem3 = nextAvailTemp('int')
         base = str(PosicionMemoria) # ESta es la base
-        base = "{" + base + "}"
-        QuadGenerate('+', base, tMem2, tMem3)
+        QuadGenerate('+','{' + str(base) + '}', tMem2, tMem3)
 
-        valorTMem = '(' + str(tMem3) + ')'
+        valorTMem = str(tMem3) + '!'
 
         pushOperando(auxDIM)
         pushMemoria(valorTMem)
@@ -2475,15 +2424,15 @@ parser = yacc.yacc()
 
 # Put all test inside prueba folder
 def main():
-    #name = input('File name: ')
-    name = "pruebas/" + "test5" + ".txt" #Para probar, cambia el nombre del archivo
+    name = input('File name: ')
+    name = "pruebas/" + name + ".txt" #Para probar, cambia el nombre del archivo
     print(name)
     try:
         f = open(name,'r', encoding='utf-8')
-        QuadTemporal = ('0', '0', '0', '0')
-        pushQuad(QuadTemporal)
+        # QuadTemporal = ('0', '0', '0', '0')
+        # pushQuad(QuadTemporal)
         result = parser.parse(f.read())
-        print(result)
+        # print(result)
         f.close()
     except EOFError:
         print (EOFError)

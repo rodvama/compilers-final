@@ -3,7 +3,6 @@
 # Diseno de compiladores
 # Clase Memoria Virtual
 import sys
-
 """
 Esta clase permitirá manejar la memoria de la maquina virtual,
 mediante instancias, que seran generadas para cada funcion recibida,
@@ -14,15 +13,15 @@ class memVirtual:
     def __init__(self, fun):
         # Guardamos el nombre de funcion al que pertenece la tabla
         self.funNombre = fun
-        # Declaramos diccionario para las direcciones de la tabla de variable
+        # Declaramos diccionario para las direcciones de valores constantes
         self.direcciones = {
-            #tipo       #direcciones
+            #tipo       #direcciones : valor
             'int'       : {},
             'float'     : {},
             'char'      : {},
             'string'    : {},
             'bool'      : {},
-            'DataFrame' : {}
+            'dataframe' : {}
         }
 
     """
@@ -30,6 +29,9 @@ class memVirtual:
     """
     def guardarValor(self, direccion, tipo, valor):
         self.direcciones[str(tipo)][str(direccion)] = valor
+        # XXX: BORRAR
+        # print("Memoria", self.direcciones)
+        # print("GUARDAR: " , self.funNombre, direccion, tipo, self.direcciones[tipo][direccion])
 
     """
     Obtener el valor de una direccion en específico
@@ -39,8 +41,11 @@ class memVirtual:
             valor = self.direcciones[str(tipo)][str(direccion)]
             return valor
         except:
-            print("Error: ", sys.exc_info()[0], " en memoria {}, tipo {}, nombre de la funcion {}.".format(direccion, tipo, self.funNombre))
+            print("Error Memoria Virtual: ", sys.exc_info()[0], "No existe valor, en memoria {} en la direccion {}, de tipo {}.".format( self.funNombre, direccion, tipo))
             raise
+        # XXX:BORRAR
+        # print("OBTENER: ", self.funNombre, direccion, tipo, self.direcciones[tipo][direccion])
+        # print(self.direcciones)
 
     """
     Obtener la siguiente dirreccion disponible
@@ -54,7 +59,7 @@ class memVirtual:
             aux = tam * 2
         elif tipo == 'string':
             aux = tam * 3
-        elif tipo == 'bool':
+        elif tipo == 'dataframe':
             aux = tam * 4
 
         return direccion_inicial + aux + len(self.direcciones[tipo])
@@ -63,5 +68,6 @@ class memVirtual:
     Imprimir diccionario de la memoria
     """
     def imprimirDir(self):
-        print("Nombre de memoria {}: \n".format(self.funNombre))
+        print("Nombre {}: ".format(self.funNombre))
         print(self.direcciones)
+        print("\n")

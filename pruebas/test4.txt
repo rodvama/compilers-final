@@ -1,11 +1,23 @@
 programa COVID19;
 
 var 
-int: B[12][9], A[9], j, i, k, p;
+int: A[8][10], j, i;
+char: d;
 
-
+funcion int uno(int x)
+{
+    A[x][j] = x / 2;
+    regresa(A[x][j]);
+}
 
 principal()
-{   
-    B[i][A[1]] = i - j;
+{
+    d = 'j';
+    i = 8;
+    j = 5;
+    A[i][j] = j;
+    escribe('d');
+    escribe(d);
+    escribe(A[i][j]);
+    escribe(uno(A[i][j]));
 }

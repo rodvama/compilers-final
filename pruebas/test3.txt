@@ -4,7 +4,8 @@ int : i, j, k;
 float : f;
 
 funcion void uno(int a, int b)
-
+var
+int : x;
 {
 
 si (a > 0) entonces {
@@ -37,7 +38,6 @@ principal()
 i = 2; 
 k = i + 1;
 f = 3.14;
-
 mientras( i > 0) haz {
     escribe(dos(i+k, f*3) + 3);
     escribe(i, j*2, f*2+1.5);

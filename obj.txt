@@ -9,5 +9,6 @@
 ('CONS', 'int', 3, 16002)
 ('carga', 20000, '"pruebas/dataframes/dt2.txt"', '')
 ('CONS', 'int', 10, 16003)
-('plotline', 20001, 20000, 16003)
+('plotline', 20000, 20001, 16003)
+('histograma', 20000, 0, 0)
 ('FINPROGRAMA', '', '', '')

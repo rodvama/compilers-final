@@ -542,7 +542,10 @@ def correr():
                     try:
                         a = np.histogram(subArreglo)
                         plt.hist(a)
+                        plt.savefig("histograma.png")
                         plt.show()
+                        print("WARNING Maquina Virtual: En caso de que no se vea la imagen, se guardo como histograma.png")
+                        plt.close()                    
                     except:
                         print("Error no se logro graficar el histograma")
                         sys.exit()
@@ -550,7 +553,10 @@ def correr():
                 try:
                     a = np.histogram(arr)
                     plt.hist(a)
+                    plt.savefig("histograma.png")
                     plt.show()
+                    print("WARNING Maquina Virtual: En caso de que no se vea la imagen, se guardo como histograma.png")
+                    plt.close()
                 except:
                     print("Error no se logro graficar el histograma")
                     sys.exit()
@@ -576,7 +582,10 @@ def correr():
                             plt.plot(axisX,subArreglo1, label='Dataframe 1')
                             plt.plot(axisX,subArreglo2, label='Dataframe 2')
                             plt.legend()
+                            plt.savefig("plotline.png")
                             plt.show()
+                            print("WARNING Maquina Virtual: En caso de que no se vea la imagen, se guardo como plotline.png")
+                            plt.close()
                         except:
                             print("Error no se logro graficar")
                             sys.exit()
@@ -587,7 +596,10 @@ def correr():
                         plt.plot(axisX,arr1, label='Dataframe 1')
                         plt.plot(axisX,arr2, label='Dataframe 2')
                         plt.legend()
+                        plt.savefig("plotline.png")
                         plt.show()
+                        print("WARNING Maquina Virtual: En caso de que no se vea la imagen, se guardo como plotline.png")
+                        plt.close()
                     except:
                         print("Error no se logro graficar")
                         sys.exit()

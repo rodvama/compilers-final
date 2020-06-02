@@ -30,21 +30,22 @@ class memVirtual:
     def guardarValor(self, direccion, tipo, valor):
         self.direcciones[str(tipo)][str(direccion)] = valor
         # XXX: BORRAR
-        # print("Memoria", direccion)
+        # print("Memoria", self.direcciones)
+        # print("GUARDAR: " , self.funNombre, direccion, tipo, self.direcciones[tipo][direccion])
 
     """
     Obtener el valor de una direccion en específico
     """
     def obtenerValorDeDireccion(self, direccion, tipo):
         try:
-            # XXX:BORRAR
-            # print(self.funNombre, direccion, tipo, self.direcciones[tipo][direccion])
-            # print(self.direcciones)
             valor = self.direcciones[str(tipo)][str(direccion)]
             return valor
         except:
             print("Error Memoria Virtual: ", sys.exc_info()[0], "No existe valor, en memoria {} en la direccion {}, de tipo {}.".format( self.funNombre, direccion, tipo))
             raise
+        # XXX:BORRAR
+        # print("OBTENER: ", self.funNombre, direccion, tipo, self.direcciones[tipo][direccion])
+        # print(self.direcciones)
 
     """
     Obtener la siguiente dirreccion disponible

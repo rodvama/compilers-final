@@ -3,15 +3,15 @@
 # Diseno de compiladores
 # Maquina Virtual
 
-# TODO: ERRORES EN FOTOS
-
-
-
 import sys
 from memVirtual import *
 import numpy as np
 import statistics as statistics
 import matplotlib.pyplot as plt
+
+
+# TODO: COMENTARIOS
+# TODO: FUNCIONES PA GRAFICAR
 
 GBL = 'globales'
 LCL = 'locales'
@@ -108,10 +108,6 @@ push(CONST_EJECUCION, mem_PRINCIPAL)
 
 def getValor(memVirtual, memDireccion, memTipo):
     global mem_GLOBAL
-    # XXX: BORRAR
-    # print ("Valor: ", memVirtual, memDireccion, memTipo)
-    # memVirtual.imprimirDir()
-    # mem_GLOBAL.imprimirDir()
     try:
         if memDireccion[-1] == '!':
             memDireccion = getValor(memVirtual, memDireccion[0:-1], getTipo(memDireccion[0:-1]))
@@ -134,16 +130,10 @@ def getValor(memVirtual, memDireccion, memTipo):
 
 def llenarValor(memVirtual, memDireccion, memTipo, valor):
     global mem_GLOBAL
-    # XXX: BORRAR
-    # print("LLENAR VALOR ANTES", memDireccion)
-    # memVirtual.imprimirDir()
     try:
         if memDireccion[-1] == '!':
-            # print("LLENAR VALOR ANTES", memDireccion)
             memDireccion = getValor(memVirtual, memDireccion[0:-1], getTipo(memDireccion[0:-1]))
-            # print("LLENAR VALOR DESPUES", memDireccion)
             memTipo = getTipo(memDireccion)
-            # print("error aqui")
     except:
         pass
     seccion = getSeccion(memDireccion)
@@ -178,13 +168,9 @@ def getSeccion(mem):
 
 def getTipo(mem):
     global pilaCorriendo
-    # XXX: BORRAR
-    # print ("TIPO: ", mem[0])
     try: 
         if mem[-1] == '!':
             mem = getValor(pilaCorriendo, mem[0:-1], getTipo(mem[0:-1]))
-            # XXX: BORRAR
-            # print("tipo entre: ", mem)
     except:
         pass
     mem = int(mem)
@@ -214,20 +200,10 @@ def operadores(signo):
             valor2 = getValor(pilaCorriendo, cuadruplo[2], getTipo(cuadruplo[2]))
             valor2 = int(valor2)
         else:
-            # XXX:BORRAR
-            # pilaCorriendo.imprimirDir()
             tipo1 = getTipo(cuadruplo[1])
-            # XXX:BORRAR
-            # print("tipo1: ", tipo1)
             tipo2 = getTipo(cuadruplo[2])
-            # XXX:BORRAR
-            # print("tipo2: ", tipo2)
             valor1 = getValor(pilaCorriendo, cuadruplo[1], tipo1)
-            # XXX:BORRAR
-            # print("valor1: ", valor1)
             valor2 = getValor(pilaCorriendo, cuadruplo[2], tipo2)
-            # XXX:BORRAR
-            # print("valor2: ", valor2)
 
             if tipo1 == 'int':
                 valor1 = int(valor1)
@@ -278,8 +254,7 @@ def operadores(signo):
             res = True if valor1 == valor2 and valor1 == False and valor2 == False else False
         elif signo == '&':
             res = True if valor1 == valor2 and valor1 == True else False
-    # XXX:BORRAR
-    # print(cuadruplo[3], getTipo(cuadruplo[3]), res)
+
     llenarValor(pilaCorriendo, cuadruplo[3], getTipo(cuadruplo[3]), res)
 
 def correr():
@@ -294,17 +269,11 @@ def correr():
 
     for cons in constLista:
         llenarValor(mem_GLOBAL, cons[3], cons[1], cons[2])
-    
-    #XXX: BORRAR
-    # mem_GLOBAL.imprimirDir()
 
     terminado = False
     while not terminado:
         sigCuaIndice = -1
         pilaCorriendo = top(CONST_EJECUCION)
-        # XXX: BORRAR
-        # print("Indice: ", cuaIndice)
-        # print("Lista size: ",len(cuaLista))
         cuadruplo = cuaLista[cuaIndice]
 
         # XXX: BORRAR
@@ -314,18 +283,10 @@ def correr():
 
         # ASIGNACION
         if cuadruplo[0] == '=':
-            # XXX:BORRAR
-            # pilaCorriendo.imprimirDir()
-            # print(cuadruplo[3])
             try:
-                # XXX: BORRAR
-                # print (cuadruplo[1])
-                # print(cuadruplo[1])
                 valor = getValor(pilaCorriendo, cuadruplo[1], getTipo(cuadruplo[1]))
             except:
                 valor = pop(CONST_RETORNO_VALOR)
-                # XXX: BORRAR
-                # print("= : ",valor)
                 
             llenarValor(pilaCorriendo, cuadruplo[3], getTipo(cuadruplo[3]), valor)
         # COMANDOS        
@@ -349,16 +310,12 @@ def correr():
         elif cuadruplo[0] == 'ERA':
             memNueva = memVirtual(str(cuadruplo[1]))
             push(CONST_TEMPORAL, memNueva)
-            # XXX: BORRAR
-            # print(top(CONST_TEMPORAL))
         # PARAMETER
         elif cuadruplo[0] == 'PARAMETER':
             tipo = getTipo(cuadruplo[1])
             valor = getValor(pilaCorriendo, cuadruplo[1], tipo)
             auxMem = top(CONST_TEMPORAL)
             direccion = auxMem.sigDireccionDisponible(tipo, limite_dfGlobales, ESPACIO_MEMORIA)
-            # XXX: BORRAR
-            # print("Tipo: ", tipo, " Valor: ", valor, " auxMem: ", auxMem, " direccion: ", direccion)
             llenarValor(auxMem, direccion, getTipo(direccion), valor)
         # ENDFUNC
         elif cuadruplo[0] == 'ENDFUNC':
@@ -405,179 +362,154 @@ def correr():
         # Mediana
         elif cuadruplo[0] == 'mediana':
             subArreglo = []
-            # FIXME: Checar que direccion se le pondra a la moda para el tipo
             tipo = getTipo(cuadruplo[3])
             arreglo = getValor(mem_GLOBAL, cuadruplo[1], getTipo(cuadruplo[1]))
             aux = cuadruplo[2].split('#')
-            #XXX:BORRAR
-            # print(aux)
-            if (aux[1] != '-1-1'):#FIXME: Cambiarlo a -2 cuando este el parse
-                de = int(aux[0][1:])
+            if (aux[0] != '0' and aux[1] != '0'): #Si vienen 0 significa que es todo el arreglo
+                de = int(aux[0][1:]) 
                 a = int(aux[1][:])
+                # Si es -1, significa que es 0
+                if (aux[0] == -1):
+                    de = 0
+                if (aux[1] == -1):
+                    a = 0
                 for r in range(de,a+1): subArreglo.append(arreglo[r])
                 try:
-                    #XXX: BORRAR
-                    # print(subArreglo)
                     llenarValor(pilaCorriendo, cuadruplo[3], tipo, statistics.median(subArreglo))
                 except:
-                    #FIXME: verficar si dejar el mensaje de error o no
                     print("Error Maquina Virtual: El arreglo no tiene mediana, en el rango de {} a {}".format(de, a))
                     sys.exit()
                     return
             else:
-                #XXX BORRAR
-                # print(arreglo)
                 try:
                     llenarValor(pilaCorriendo, cuadruplo[3], tipo, statistics.median(arreglo))
                 except:
-                    #FIXME: verficar si dejar el mensaje de error o no
                     print("Error Maquina Virtual: El arreglo no tiene mediana en todo el archivo")
                     sys.exit()
                     return
         # Media
         elif cuadruplo[0] == 'media':
             subArreglo = []
-            # FIXME: Checar que direccion se le pondra a la moda para el tipo
             tipo = getTipo(cuadruplo[3])
             arreglo = getValor(mem_GLOBAL, cuadruplo[1], getTipo(cuadruplo[1]))
             aux = cuadruplo[2].split('#')
-            #XXX:BORRAR
-            # print(aux)
-            if (aux[1] != '-1-1'):#FIXME: Cambiarlo a -2 cuando este el parse
-                de = int(aux[0][1:])
+            if (aux[0] != '0' and aux[1] != '0'): #Si vienen 0 significa que es todo el arreglo
+                de = int(aux[0][1:]) 
                 a = int(aux[1][:])
+                # Si es -1, significa que es 0
+                if (aux[0] == -1):
+                    de = 0
+                if (aux[1] == -1):
+                    a = 0
                 for r in range(de,a+1): subArreglo.append(arreglo[r])
                 try:
-                    #XXX: BORRAR
-                    # print(subArreglo)
                     llenarValor(pilaCorriendo, cuadruplo[3], tipo, statistics.mean(subArreglo))
                 except:
-                    #FIXME: verficar si dejar el mensaje de error o no
                     print("Error Maquina Virtual: El arreglo no tiene mediana, en el rango de {} a {}".format(de, a))
                     sys.exit()
                     return
             else:
-                #XXX BORRAR
-                # print(arreglo)
                 try:
                     llenarValor(pilaCorriendo, cuadruplo[3], tipo, statistics.mean(arreglo))
                 except:
-                    #FIXME: verficar si dejar el mensaje de error o no
                     print("Error Maquina Virtual: El arreglo no tiene mediana en todo el archivo")
                     sys.exit()
                     return
         # moda
         elif cuadruplo[0] == 'moda':
             subArreglo = []
-            # FIXME: Checar que direccion se le pondra a la moda para el tipo
             tipo = getTipo(cuadruplo[3])
             arreglo = getValor(mem_GLOBAL, cuadruplo[1], getTipo(cuadruplo[1]))
             aux = cuadruplo[2].split('#')
-            #XXX:BORRAR
-            # print(aux)
-            if (aux[1] != '-1-1'):#FIXME: Cambiarlo a -2 cuando este el parse
-                de = int(aux[0][1:])
+            if (aux[0] != '0' and aux[1] != '0'): #Si vienen 0 significa que es todo el arreglo
+                de = int(aux[0][1:]) 
                 a = int(aux[1][:])
+                # Si es -1, significa que es 0
+                if (aux[0] == -1):
+                    de = 0
+                if (aux[1] == -1):
+                    a = 0
                 for r in range(de,a+1): subArreglo.append(arreglo[r])
                 try:
-                    #XXX: BORRAR
-                    print(subArreglo)
                     llenarValor(pilaCorriendo, cuadruplo[3], tipo, statistics.mode(subArreglo))
                 except:
-                    #FIXME: verficar si dejar el mensaje de error o no
                     print("Error Maquina Virtual: El arreglo no tiene moda o tiene mas de una, en el rango de {} a {}".format(de, a))
                     sys.exit()
                     return
             else:
-                #XXX BORRAR
-                # print(arreglo)
                 try:
                     llenarValor(pilaCorriendo, cuadruplo[3], tipo, statistics.mode(arreglo))
                 except:
-                    #FIXME: verficar si dejar el mensaje de error o no
                     print("Error Maquina Virtual: El arreglo no tiene moda o tiene mas de una, en todo el archivo")
                     sys.exit()
                     return
         # varianza
         elif cuadruplo[0] == 'varianza':
             subArreglo = []
-            # FIXME: Checar que direccion se le pondra a la moda para el tipo
             tipo = getTipo(cuadruplo[3])
             arreglo = getValor(mem_GLOBAL, cuadruplo[1], getTipo(cuadruplo[1]))
             aux = cuadruplo[2].split('#')
-            #XXX:BORRAR
-            # print(aux)
-            if (aux[1] != '-1-1'):#FIXME: Cambiarlo a -2 cuando este el parse
+            if (aux[0] != '0' and aux[1] != '0'): #Si vienen 0 significa que es todo el arreglo
                 de = int(aux[0][1:]) 
                 a = int(aux[1][:])
+                # Si es -1, significa que es 0
+                if (aux[0] == -1):
+                    de = 0
+                if (aux[1] == -1):
+                    a = 0
                 for r in range(de,a+1): subArreglo.append(arreglo[r])
                 try:
-                    # XXX:BORRAR
-                    print(subArreglo)
                     llenarValor(pilaCorriendo, cuadruplo[3], tipo, statistics.variance(subArreglo))
                 except:
-                    #FIXME: verficar si dejar el mensaje de error o no
                     print("Error Maquina Virtual: Error al calcular la varianza, del rango de {} a {}".format(de, a))
                     sys.exit()
                     return
             else:
-                #XXX BORRAR
-                # print(arreglo)
                 try:
                     llenarValor(pilaCorriendo, cuadruplo[3], tipo, statistics.variance(arreglo))
                 except:
-                    #FIXME: verficar si dejar el mensaje de error o no
                     print("Error Maquina Virtual: Error al calcular la varianza, en todo el archivo")
                     sys.exit()
                     return
         # correlation
-        # FIXME: Verficar que funcione todo
         elif cuadruplo[0] == 'correlacion':
             subArreglo1 = []
             subArreglo2 = []
             cuadAUX = cuadruplo[1].split('#')
-            #XXX:BORRAR
-            # print(cuadAUX)
             tipo1 = getTipo(cuadAUX[0][1:])
             tipo2 = getTipo(cuadAUX[1][:])
-            #XXX:BORRAR
-            # print(tipo1, cuadAUX[0][1:])
-            # print(tipo2, cuadAUX[1][:])
-            # #FIXME:Verificar esta logica y ver cual usar o como usar para el llenar valor
-            # if tipo1 != tipo2:
-            #     print("Error Maquina Virtual: {} no es igual a {}".format(tipo1,tipo2))
             arr1 = getValor(mem_GLOBAL, cuadAUX[0][1:],tipo1)
             arr2 = getValor(mem_GLOBAL, cuadAUX[1][:],tipo2)
+            if (len(arr1) == len(arr2)):
+                aux = cuadruplo[2].split("#")
+                if (aux[0] != '0' and aux[1] != '0'): #Si vienen 0 significa que es todo el arreglo
+                    de = int(aux[0][1:]) 
+                    a = int(aux[1][:])
+                    # Si es -1, significa que es 0
+                    if (aux[0] == -1):
+                        de = 0
+                    if (aux[1] == -1):
+                        a = 0
+                    for r in range(de,a+1): 
+                        subArreglo1.append(arr1[r])
+                        subArreglo2.append(arr2[r])
+                    try:
+                        i = np.corrcoef(subArreglo1,subArreglo2)
+                    except:
+                        print("Error Maquina Virtual: Error al calcular la varianza, del rango de {} a {}".format(de, a))
+                        sys.exit()
+                        return
+                else:
+                    try:
+                        i = np.corrcoef(arr1, arr2)
+                    except:
+                        print("Error Maquina Virtual: Error al calcular la correlacion")
+                        sys.exit()
+                        return
+                llenarValor(pilaCorriendo, cuadruplo[3], getTipo(cuadruplo[3]), i[0][1])
 
-            aux = cuadruplo[2].split("#")
-            if (aux[1] != '-1-1'):#FIXME: Cambiarlo a -2 cuando este el parse
-                de = int(aux[0][1:]) 
-                a = int(aux[1][:])
-                for r in range(de,a+1): 
-                    subArreglo1.append(arr1[r])
-                    subArreglo2.append(arr2[r])
-                try:
-                    # XXX:BORRAR
-                    # print(subArreglo)
-                    llenarValor(pilaCorriendo, cuadruplo[3], tipo1, np.correlate(np.array(subArreglo1).astype(np.float), np.array(subArreglo2).astype(np.float)))
-                except:
-                    #FIXME: verficar si dejar el mensaje de error o no
-                    print("Error Maquina Virtual: Error al calcular la varianza, del rango de {} a {}".format(de, a))
-                    sys.exit()
-                    return
-            else:
-                #XXX BORRAR
-                print(arr1)
-                print(arr2)
-                print(np.correlate(np.array(arr1).astype(np.float), np.array(arr2).astype(np.float)))
-                try:
-
-                    llenarValor(pilaCorriendo, cuadruplo[3], tipo1, np.correlate(np.array(arr1).astype(np.float), np.array(arr2).astype(np.float)))
-                except:
-                    #FIXME: verficar si dejar el mensaje de error o no
-                    print("Error Maquina Virtual: Error al calcular la correlacion")
-                    sys.exit()
-                    return
+            else: 
+                print("Error Maquina Virtual: Los cuadrupos no son del mismo tamaño")
         # # plothist
         # elif cuadruplo[0] == 'histograma':
         #     #TODO: TERMINAR
@@ -608,8 +540,6 @@ def correr():
         #ARREGLO
         #VER
         elif cuadruplo[0] == 'VER':
-            # XXX:BORRAR
-            # print("Entre aqui primero")
             valor = int(getValor(pilaCorriendo, cuadruplo[1], getTipo(cuadruplo[1])))
             if valor != 0:
                 valor = valor - 1 # Para que se vuelva índice y se prueba.
@@ -617,8 +547,6 @@ def correr():
                 print("Error Maquina Virtual: El valor {} no pertence a los indices.".format(valor+1))
                 sys.exit()
                 return
-            # XXX: BORRAR
-            # pilaCorriendo.imprimirDir()
         #FINPROGRAMA
         elif cuadruplo[0] == 'FINPROGRAMA':
             terminado = True

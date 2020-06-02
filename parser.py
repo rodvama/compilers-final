@@ -74,54 +74,6 @@ R = 1 #m0
 dirBase = 0 #Direccion base
 currentConstArrays = []
 
-
-
-'''
-Espacios de memoria:
-+++++++++++++++++++++++
-+globales enteras     + ESPACIO MEMORIA
-+---------------------+
-+globales flotantes   + ESPACIO MEMORIA
-+---------------------+
-+globales strings     + ESPACIO MEMORIA
-+---------------------+
-+globales char        + ESPACIO MEMORIA
-+---------------------+
-+globales dataframes  + ESPACIO MEMORIA
-+++++++++++++++++++++++
-+locales enteras      + ESPACIO MEMORIA
-+---------------------+
-+locales flotantes    + ESPACIO MEMORIA
-+---------------------+
-+locales strings      + ESPACIO MEMORIA
-+---------------------+
-+locales char         + ESPACIO MEMORIA
-+---------------------+
-+locales dataframes   + ESPACIO MEMORIA
-+++++++++++++++++++++++
-+temp enteras         + ESPACIO MEMORIA
-+---------------------+
-+temp flotantes       + ESPACIO MEMORIA
-+---------------------+
-+temp strings         + ESPACIO MEMORIA
-+---------------------+
-+temp char            + ESPACIO MEMORIA
-+---------------------+
-+temp dataframes      + ESPACIO MEMORIA
-+---------------------+
-+temp booleanas       + ESPACIO MEMORIA
-+++++++++++++++++++++++
-+constantes enteras   + ESPACIO MEMORIA
-+---------------------+
-+constantes flotantes + ESPACIO MEMORIA
-+---------------------+
-+constantes strings   + ESPACIO MEMORIA
-+---------------------+
-+constantes char      + ESPACIO MEMORIA
-+---------------------+
-+constantes dataframe + ESPACIO MEMORIA
-+++++++++++++++++++++++
-'''
 #Declaracion de espacio de memoria por tipo de memoria
 limite_intGlobales = ESPACIO_MEMORIA
 limite_floatGlobales = limite_intGlobales + ESPACIO_MEMORIA

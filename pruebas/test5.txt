@@ -2,12 +2,16 @@ programa COVID19;
 
 var 
 dataframe : i, j;
-float h, f;
+float: h, f, c;
 
 principal()
 {
     cargaArchivo(i, "pruebas/dataframes/dt1.txt", 1, 5);
-    cargaArchivo(j, "pruebas/dataframes/dt2.txt", 1 ,3)
+    cargaArchivo(j, "pruebas/dataframes/dt2.txt", 1 ,3);
+    h = mediana(i,-1,-1);
+    f = mediana(j,-1,-1);
+    escribe(h);
+    escribe(f);
     h = moda(i,-1,-1);
     f = moda(j,-1,-1);
     escribe(h);
@@ -20,10 +24,6 @@ principal()
     f = media(j,-1,-1);
     escribe(h);
     escribe(f);    
-    h = mediana(i,-1,-1);
-    f = mediana(j,-1,-1);
-    escribe(h);
-    escribe(f);
     c = correlacion(i, j, -1,-1);
     escribe(c);
 }

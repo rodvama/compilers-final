@@ -21,6 +21,4 @@ principal()
         x = x + 1;
 
     }
-    
-
 }

@@ -1,0 +1,12 @@
+programa COVID19;
+
+var 
+int : A[7];
+float : B[18];
+
+principal()
+{
+    ordena(A);
+    ordena(B);
+
+}

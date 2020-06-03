@@ -82,7 +82,8 @@ keywords = {
     'mediana' : 'MEDIANA',
     'moda' : 'MODA',
     'varianza' : 'VARIANZA',
-    'correlacion' : 'CORRELACION'
+    'correlacion' : 'CORRELACION',
+    'ordena' : 'ORDENA'
 }
 
 

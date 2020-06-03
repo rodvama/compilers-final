@@ -15,14 +15,14 @@
   <h3>python3 maquinaVirtual.py</h3>
 
 <h3>Declaraciones</h3>
-<p>var int i;</p>
-<p>var float j;</p>
-<p>var char 'c';</p>
-<p>var string 'ejemplo';</p>
-<p>var dataframe: f;</p>
+<p>var int : i;</p>
+<p>var float : j;</p>
+<p>var char : 'c';</p>
+<p>var string : 'ejemplo';</p>
+<p>var dataframe : f;</p>
 
 <h2>Arreglos</h2>
-<h3>Asignacion</h3>
+<h3>Asignación</h3>
 <p>A[indicie] = valor;</p>
 <p>A[indice][indice] = valor;</p>
 

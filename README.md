@@ -89,7 +89,7 @@
 <p>c = correlacion(dataframe1, dataframe2, indice inferior, indice superior);</p>
 
 <h2>Histograma</h2>
-<p>histogram(dataframe1, indice inferior, indice superor);</p>
+<p>histograma(dataframe1, indice inferior, indice superor);</p>
 
 <h2>PlotLine</h2>
 <p>plotline(dataframe1, dataframe2, numero de tamaño);

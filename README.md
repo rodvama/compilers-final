@@ -23,9 +23,9 @@
 
 <h3>Asignacion</h3>
 <p>i = 5;</p>
-<p>j = 7.5</p>
-<p>c = 'h'</p>
-<p>s = "Hola"</p>
+<p>j = 7.5;</p>
+<p>c = 'h';</p>
+<p>s = "Hola";</p>
 
 <h2>Arreglos</h2>
 <h3>Asignación</h3>

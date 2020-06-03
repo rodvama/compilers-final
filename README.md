@@ -12,14 +12,20 @@
  <h3> Introducir el nombre del archivo a compilar.</h3>
 <p> Genera un archivo obj.txt, el cual se ejecuta en la máquina virtual.</p>
 <h2>Ejecucion</h2>
-  <h3>python3 maquinaVirtual.py</h3>
+ <h3>python3 maquinaVirtual.py</h3>
 
 <h3>Declaraciones</h3>
 <p>var int : i;</p>
 <p>var float : j;</p>
-<p>var char : 'c';</p>
-<p>var string : 'ejemplo';</p>
-<p>var dataframe : f;</p>
+<p>var char : c;</p>
+<p>var string : s;</p>
+<p>var dataframe : d;</p>
+
+<h3>Asignacion</h3>
+<p>i = 5;</p>
+<p>j = 7.5</p>
+<p>c = 'h'</p>
+<p>s = "Hola"</p>
 
 <h2>Arreglos</h2>
 <h3>Asignación</h3>

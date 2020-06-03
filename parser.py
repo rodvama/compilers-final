@@ -393,12 +393,8 @@ def p_funciones_especiales_void(p):
     funciones_especiales_void : VARIABLES pnFunEsp1 LPAREN ID COMMA ID COMMA ID RPAREN SEMICOLON
                               | HISTOGRAMA pnFunEsp1 LPAREN ID pnExp1 COMMA CTE_INT pnCteInt COMMA CTE_INT pnCteInt RPAREN SEMICOLON pnFunEspVoid1
                               | PLOTLINE pnFunEsp1 LPAREN ca COMMA ca COMMA CTE_INT pnCteInt RPAREN SEMICOLON pnFunEspVoid1
+                              | ORDENA pnFunEsp1 LPAREN ID pnExp1 RPAREN SEMICOLON pnFunEspVoid2
     '''
-# def p_fev(p):
-#     '''
-#     fev : HISTOGRAMA pnFunEsp1
-#         | PLOTLINE pnFunEsp1
-#     '''
 
 def p_funciones_especiales(p):
     '''
@@ -1494,7 +1490,33 @@ def p_pnFunEspVoid1(p):
         else:
             sys.exit("Error en Funciones Especiales Void (Plotline). El tipo del primer y segundo parametro debe ser dataframe o constante entera o flotante")
 
-    
+'''
+Funcion para manejar y generar cuadruplos para la funcion especial ordena
+'''
+def p_pnFunEspVoid2(p):
+    '''
+    pnFunEspVoid2 : 
+    '''
+    funName = pFunciones.pop()
+    parName1 = popOperandos()
+    parTipo1 = popTipos()
+    parMem1 = popMemoria()
+
+    column = directorioFunciones.directorio_funciones[currentFunc]['variables'].tabla_variables[parName1]['columnas']
+    if not column:
+        column = directorioFunciones.directorio_funciones[GBL]['variables'].tabla_variables[parName1]['columnas']
+
+    if not column:
+        sys.exit("Error en la funcion especial ORDENA. El arreglo del parametro no existe")
+
+    temporal = nextAvailTemp(parTipo1)
+
+    QuadGenerate(funName, parMem1, column, temporal)
+
+    pushOperando(temporal)
+    pushTipo(parTipo1)
+    pushMemoria(temporal) 
+
 
 ###### CONSTANTES ###########
 '''
@@ -1872,6 +1894,9 @@ def p_pnSec4(p):
             #pushMemoria(quad_Operando) #Posible BORRAR
             #pushTipo(quad_resultType) #Possible BORRAR
 
+'''
+Hace pop a la pila de operadores
+'''
 def p_pnSec5(p):
     '''
     pnSec5 : 
@@ -2178,7 +2203,6 @@ def p_pnDimDec8(p):
     global currentFunc
     global currentVarName
     global isArray
-    # global isMatrix
     global currentConstArrays
     NumEspacios = R - 1
     
@@ -2386,6 +2410,7 @@ def p_pnActivaArray(p):
 
 
 ####### Carga de Archivos#######
+
 def p_pnCarga(p):
     '''
     pnCarga : 

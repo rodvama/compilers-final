@@ -1,0 +1,20 @@
+programa COVID19;
+var
+int: j;
+
+funcion int factorial(int n)
+{
+    si (n > 1) entonces {
+        regresa(n * factorial(n-1));
+    }
+    sino {
+        regresa(1);
+    }
+}
+
+principal()
+{
+    escribe("Introduce número");
+    lee(j);
+    escribe(factorial(j));
+}

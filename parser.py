@@ -1472,6 +1472,8 @@ def p_pnFunEsp4(p):
     if not column:
         sys.exit("Error en la funcion especial encuentra. El arreglo del parametro no existe")
 
+    column = "%" + str(column) + "#" + str(indice2)
+
     if(indiceTipo1 == indiceTipo2):
         temporal = nextAvailTemp('int')
         QuadGenerate(funName, indiceMem1, column, temporal)

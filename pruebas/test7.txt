@@ -1,0 +1,19 @@
+programa COVID19;
+var
+int: j, w;
+
+funcion int reFibonacci(int n)
+{
+    si (n == 1 | n == 0) entonces {
+        regresa(n);
+    } sino {
+        regresa(reFibonacci(n-2));
+    }
+}
+
+principal()
+{
+    lee(j);
+    w = reFibonacci(j);
+    escribe(w);
+}

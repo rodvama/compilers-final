@@ -1,0 +1,26 @@
+programa COVID19;
+var
+int: j[3][3], w[3][3] , c, x;
+
+principal()
+{
+    c = 2;
+    x = 0;
+    mientras (c != -1) haz {
+        j[x][c] = c;
+        w[c][x] = x;
+        c = c-1;
+        x = x + 1;
+    }
+    c = 2;
+    x = 0;
+    mientras (c != -1) haz {
+        escribe(j[x][c]);
+        escribe(w[c][x]);
+        c = c-1;
+        x = x + 1;
+
+    }
+    
+
+}

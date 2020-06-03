@@ -321,7 +321,7 @@ def p_di(p):
     '''
 
 def p_llamada(p):
-    'llamada :  ID pnFunCall_1_2 LPAREN llamada1 RPAREN pnFunCall_5_6_llamada'
+    'llamada :  ID pnFunCall_1_2 LPAREN pnExp6 llamada1 RPAREN pnExp7 pnFunCall_5_6_llamada'
     p[0] = 'llamada'
     
 

@@ -83,7 +83,8 @@ keywords = {
     'moda' : 'MODA',
     'varianza' : 'VARIANZA',
     'correlacion' : 'CORRELACION',
-    'ordena' : 'ORDENA'
+    'ordena' : 'ORDENA',
+    'encontrar' : 'ENCONTRAR'
 }
 
 

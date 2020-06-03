@@ -400,6 +400,7 @@ def p_funciones_especiales(p):
     '''
     funciones_especiales : fe LPAREN ID pnExp1 COMMA CTE_INT pnCteInt COMMA CTE_INT pnCteInt RPAREN pnFunEsp2
                          | CORRELACION pnFunEsp1 LPAREN ID pnExp1 COMMA ID pnExp1 COMMA CTE_INT pnCteInt COMMA CTE_INT pnCteInt RPAREN pnFunEsp3
+                         | ENCONTRAR pnFunEsp1 LPAREN ID pnExp1 COMMA var_cte RPAREN pnFunEsp4
     '''
 def p_fe(p):
     '''
@@ -1447,9 +1448,32 @@ def p_pnFunEsp3(p):
     else:
         sys.exit("Error en Funcion Especial Correlaciona. Los indices deben ser enteros")
 
+'''
+Funcion para manejar la funcion especial encuentra y generar sus cuadruplos
+'''
+def p_pnFunEsp4(p):
+    '''
+    pnFunEsp4 : 
+    '''
+    funName = pFunciones.pop()
 
-    
+    indice2 = popOperandos()
+    indiceTipo2 = popTipos()
+    indiceMem2 = popMemoria()
 
+    indice1 = popOperandos()
+    indiceTipo1 = popTipos()
+    indiceMem1 = popMemoria()
+
+    if(indiceTipo1 == indiceTipo2):
+        temporal = nextAvailTemp('int')
+        QuadGenerate(funName, indiceMem1, "", temporal)
+        pushOperando(temporal)
+        pushTipo('int')
+        pushMemoria(temporal)
+
+    else:
+        sys.exit("Error en funcion Encuentra. El arreglo y el valor a encontrar deben ser del mismo tipo")
 
 '''
 Funcion para generar cuadruplos de funciones especiales void que grafican

@@ -967,52 +967,52 @@ def update_pointer(contexto, tipo, cont):
         if tipo == 'int':
             cont_IntGlobales += cont
             if cont_IntGlobales > limite_intGlobales:
-                print('Error: Overflow Enteras Globales')
+                sys.exit('Error: Overflow Enteras Globales')
         
         if tipo == 'float':
             cont_FloatGlobales += cont
             if cont_FloatGlobales > limite_floatGlobales:
-                print('Error: Overflow Flotantes Globales')
+                sys.exit('Error: Overflow Flotantes Globales')
         
         if tipo == 'string':
             cont_StringGlobales += cont
             if cont_StringGlobales > limite_stringsGlobales:
-                print('Error: Overflow Strings Globales')
+                sys.exit('Error: Overflow Strings Globales')
         
         if tipo == 'char':
             cont_CharGlobales += cont
             if cont_CharGlobales > limite_charGlobales:
-                print('Error: Overflow Chars Globales')
+                sys.exit('Error: Overflow Chars Globales')
 
         if tipo == 'dataframe':
             cont_dfConstantes += cont
             if cont_dfConstantes > limite_dfConstantes:
-                print('Error: Overflow DF Globales')
+                sys.exit('Error: Overflow DF Globales')
     else:
         if tipo == 'int':
             cont_IntLocales += cont
             if cont_IntLocales > limite_intLocales:
-                print('Error: Overflow Enteras Locales')
+                sys.exit('Error: Overflow Enteras Locales')
         
         if tipo == 'float':
             cont_FloatLocales += cont
             if cont_FloatLocales > limite_floatLocales:
-                print('Error: Overflow Flotantes Locales')
+                sys.exit('Error: Overflow Flotantes Locales')
         
         if tipo == 'string':
             cont_StringLocales += cont
             if cont_StringLocales > limite_stringsLocales:
-                print('Error: Overflow Strings Locales')
+                sys.exit('Error: Overflow Strings Locales')
         
         if tipo == 'char':
             cont_CharLocales += cont
             if cont_CharLocales > limite_charLocales:
-                print('Error: Overflow Chars Locales')
+                sys.exit('Error: Overflow Chars Locales')
 
         if tipo == 'dataframe':
             cont_dfConstantes += cont
             if cont_dfConstantes > limite_dfConstantes:
-                print('Error: Overflow DF Locales')
+                sys.exit('Error: Overflow DF Locales')
 
         
 def popMemoria():
@@ -1465,9 +1465,16 @@ def p_pnFunEsp4(p):
     indiceTipo1 = popTipos()
     indiceMem1 = popMemoria()
 
+    column = directorioFunciones.directorio_funciones[currentFunc]['variables'].tabla_variables[indice1]['columnas']
+    if not column:
+        column = directorioFunciones.directorio_funciones[GBL]['variables'].tabla_variables[indice1]['columnas']
+
+    if not column:
+        sys.exit("Error en la funcion especial encuentra. El arreglo del parametro no existe")
+
     if(indiceTipo1 == indiceTipo2):
         temporal = nextAvailTemp('int')
-        QuadGenerate(funName, indiceMem1, "", temporal)
+        QuadGenerate(funName, indiceMem1, column, temporal)
         pushOperando(temporal)
         pushTipo('int')
         pushMemoria(temporal)
@@ -1914,9 +1921,7 @@ def p_pnSec4(p):
         else:
             QuadGenerate(quad_operator, quad_rightMem, '', quad_operator)
             pushOperador(quad_operator)
-            #pushOperando(quad_Operando) #Posible BORRAR
-            #pushMemoria(quad_Operando) #Posible BORRAR
-            #pushTipo(quad_resultType) #Possible BORRAR
+            
 
 '''
 Hace pop a la pila de operadores
@@ -2158,12 +2163,6 @@ def p_pnDimDec2_3(p):
     '''
     global isArray
     isArray = True
-
-    # t = popTipos()
-    # t = popOperandos()
-    # t = popMemoria()
-
-
 
 '''
 Punto neuralgico 5 de Elda
@@ -2478,10 +2477,7 @@ def main():
     print(name)
     try:
         f = open(name,'r', encoding='utf-8')
-        # QuadTemporal = ('0', '0', '0', '0')
-        # pushQuad(QuadTemporal)
         result = parser.parse(f.read())
-        # print(result)
         f.close()
     except EOFError:
         print (EOFError)

@@ -1,0 +1,28 @@
+NO FUNCIONA
+programa COVID19;
+var
+int: j, w;
+
+funcion int fibonacci(int r)
+var
+int : a, b, c, contador;
+{
+    contador = 0;
+    a = 0;
+    b = 1;
+    mientras (contador <= r) haz {
+
+        c = a + b;
+        a = b;
+        b = c;
+        contador = contador + 1;
+    }
+    regresa (c - a);
+}
+
+principal()
+{
+    lee(j);
+    w = fibonacci(j);
+    escribe(w);
+}

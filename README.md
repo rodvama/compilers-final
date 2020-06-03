@@ -1,4 +1,4 @@
-# compilers-final
+# compilers-final - COVID19--
 <h3>Nombre de equipo: Los contagiados por la pandemia</h2>
 <h3>Lenguaje: Python</h2>
 <h3>Librerias extras: PLY, numpy, matplolib, statistics</h2>
@@ -22,7 +22,7 @@
 <p>var dataframe: f;</p>
 
 <h2>Arreglos</h2>
-<h3>Declaracion</h3>
+<h3>Asignacion</h3>
 <p>A[indicie] = valor;</p>
 <p>A[indice][indice] = valor;</p>
 

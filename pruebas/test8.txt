@@ -1,12 +1,12 @@
 programa COVID19;
 
 var 
-int : A[7];
+int : A[7], y;
 float : B[18];
 
 principal()
 {
     ordena(A);
-    ordena(B);
+    y = encontrar(B, 5.0);
 
 }

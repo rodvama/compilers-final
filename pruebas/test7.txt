@@ -2,18 +2,23 @@ programa COVID19;
 var
 int: j, w;
 
-funcion int reFibonacci(int n)
+funcion int fib(int n)
 {
-    si (n == 1 | n == 0) entonces {
-        regresa(n);
-    } sino {
-        regresa(reFibonacci(n-2));
+    si (n == 1) entonces {
+        regresa(1);
+    }
+    si (n == 0) entonces {
+        regresa(0);
+    }
+    si (n > 1) entonces {
+        escribe(n-2);
+        regresa(fib(n-2));
     }
 }
 
 principal()
 {
     lee(j);
-    w = reFibonacci(j);
+    w = fib(j);
     escribe(w);
 }

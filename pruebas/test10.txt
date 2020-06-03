@@ -1,6 +1,7 @@
 programa COVID19;
-var
-int: j[5], h, x, n;
+
+var 
+int: i, j[5], h, x, n;
 
 principal()
 {
@@ -14,13 +15,6 @@ principal()
         h = h + 1;
         x = x - 1;
     }
-    j[3] = 3;
-    ordena(j);
-    x = n - 1;
-    h = 0;
-    mientras (x > 0) haz {
-        escribe(j[h]);
-        h = h + 1;
-        x = x - 1;
-    }
+    
+    escribe(encontrar(j, 3));
 }

@@ -367,6 +367,64 @@ def correr():
         elif cuadruplo[0] == 'escribe':
             texto = getValor(pilaCorriendo, cuadruplo[1], getTipo(cuadruplo[1]))
             print("->",str(texto))
+        #ARREGLO
+        #VER
+        elif cuadruplo[0] == 'VER':
+            valor = int(getValor(pilaCorriendo, cuadruplo[1], getTipo(cuadruplo[1])))
+            if valor != 0:
+                valor = valor - 1 # Para que se vuelva índice y se prueba.
+            if valor > int(cuadruplo[3]) or valor < int(cuadruplo[2]):
+                print("Error Maquina Virtual: El valor {} no pertence a los indices.".format(valor+1))
+                sys.exit()
+                return
+        elif cuadruplo[0] == 'ordena':
+            inicio = int(cuadruplo[1])
+            tam = int(cuadruplo[2])
+            tipo = getTipo(cuadruplo[1])
+            arr = []
+            for i in range (0, tam-1):
+                valor = getValor(pilaCorriendo, inicio + i, tipo)
+                 try:
+                    int(texto)
+                    tipo = 'int'
+                except:
+                    try:
+                        float(texto)
+                        tipo = 'float'
+                except:
+                    try:
+                        str(texto)
+                        tipo = 'char' if len(texto) == 1 else 'string'
+                    except:
+                        print("Error Maquina Virtual: {}".format(sys.exc_info()[0], cuaIndice))
+                
+                arr.append(valor)
+            arr.sort()
+            for i in range (0, tam-1): llenarValor(pilaCorriendo, inicio + i, tipo, arr[i])
+        elif cuadruplo[0] == 'encuentra':
+            tam = int(cuadruplo[2])
+            tipo = getTipo(cuadruplo[1])
+            aux = cuadruplo[2].split('#')
+            tam = int(aux[0][1:]) 
+            buscado = int(aux[1][:])
+            arr = []
+            for i in range (0, tam-1):
+                valor = getValor(pilaCorriendo, inicio + i, tipo)
+                try:
+                    int(texto)
+                    tipo = 'int'
+                except:
+                    try:
+                        float(texto)
+                        tipo = 'float'
+                except:
+                    try:
+                        str(texto)
+                        tipo = 'char' if len(texto) == 1 else 'string'
+                    except:
+                        print("Error Maquina Virtual: {}".format(sys.exc_info()[0], cuaIndice))
+                arr.append(valor)
+            llenarValor(pilaCorriendo, cuadruplo[3], tipo, arr.index(buscado))
         # FUNCIONES ESPECIALES
         # Mediana
         elif cuadruplo[0] == 'mediana':
@@ -624,17 +682,7 @@ def correr():
                         pass
                 arreglo.append(val)
             llenarValor(mem_GLOBAL, cuadruplo[1], getTipo(cuadruplo[1]), arreglo)
-        #ARREGLO
-        #VER
-        elif cuadruplo[0] == 'VER':
-            valor = int(getValor(pilaCorriendo, cuadruplo[1], getTipo(cuadruplo[1])))
-            if valor != 0:
-                valor = valor - 1 # Para que se vuelva índice y se prueba.
-            if valor > int(cuadruplo[3]) or valor < int(cuadruplo[2]):
-                print("Error Maquina Virtual: El valor {} no pertence a los indices.".format(valor+1))
-                sys.exit()
-                return
-        #FINPROGRAMA
+                #FINPROGRAMA
         elif cuadruplo[0] == 'FINPROGRAMA':
             terminado = True
         # OPERADORES 

@@ -1,3 +1,4 @@
+NO FUNCIONA
 programa COVID19;
 var
 int: j, w;

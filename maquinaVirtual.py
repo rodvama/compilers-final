@@ -384,45 +384,44 @@ def correr():
             arr = []
             for i in range (0, tam-1):
                 valor = getValor(pilaCorriendo, inicio + i, tipo)
-                 try:
-                    int(texto)
-                    tipo = 'int'
+                try:
+                    int(valor)
+                    valor = int(valor)
                 except:
                     try:
-                        float(texto)
-                        tipo = 'float'
-                except:
-                    try:
-                        str(texto)
-                        tipo = 'char' if len(texto) == 1 else 'string'
+                        float(valor)
+                        valor = float(valor)
                     except:
-                        print("Error Maquina Virtual: {}".format(sys.exc_info()[0], cuaIndice))
-                
+                        try:
+                            str(valor)
+                            tipo = 'char' if len(valor) == 1 else 'string'
+                        except:
+                            print("Error Maquina Virtual: {}".format(sys.exc_info()[0], cuaIndice))
                 arr.append(valor)
             arr.sort()
             for i in range (0, tam-1): llenarValor(pilaCorriendo, inicio + i, tipo, arr[i])
-        elif cuadruplo[0] == 'encuentra':
-            tam = int(cuadruplo[2])
+        elif cuadruplo[0] == 'encontrar':
+            inicio = int(cuadruplo[1])
             tipo = getTipo(cuadruplo[1])
             aux = cuadruplo[2].split('#')
-            tam = int(aux[0][1:]) 
+            tam = int(aux[0][1:])
             buscado = int(aux[1][:])
             arr = []
             for i in range (0, tam-1):
                 valor = getValor(pilaCorriendo, inicio + i, tipo)
                 try:
-                    int(texto)
-                    tipo = 'int'
+                    int(valor)
+                    valor = int(valor)
                 except:
                     try:
-                        float(texto)
-                        tipo = 'float'
-                except:
-                    try:
-                        str(texto)
-                        tipo = 'char' if len(texto) == 1 else 'string'
+                        float(valor)
+                        valor = float(valor)
                     except:
-                        print("Error Maquina Virtual: {}".format(sys.exc_info()[0], cuaIndice))
+                        try:
+                            str(valor)
+                            valor = 'char' if len(valor) == 1 else 'string'
+                        except:
+                            print("Error Maquina Virtual: {}".format(sys.exc_info()[0], cuaIndice))
                 arr.append(valor)
             llenarValor(pilaCorriendo, cuadruplo[3], tipo, arr.index(buscado))
         # FUNCIONES ESPECIALES

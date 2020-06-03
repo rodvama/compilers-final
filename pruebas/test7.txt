@@ -12,7 +12,7 @@ funcion int fib(int n)
     }
     si (n > 1) entonces {
         escribe(n-2);
-        regresa(fib(n-2));
+        regresa(fib(n-1) + fib(n-2));
     }
 }
 

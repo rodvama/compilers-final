@@ -1,5 +1,4 @@
-NO FUNCIONA
-programa COVID19;
+programa fiboCic;
 var
 int: j, w;
 

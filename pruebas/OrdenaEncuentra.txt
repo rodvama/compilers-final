@@ -1,0 +1,47 @@
+programa OrdenaEncuentra;
+var
+int: j[5], h, x, n;
+
+principal()
+{
+    h = 0;
+    escribe("Tamaño del arreglo");
+    lee(n);
+    x = n - 1;
+
+    mientras (x > 0) haz {
+        j[h] = 4 * 9 / x;
+        h = h + 1;
+        x = x - 1;
+    }
+    j[2] = 23;
+    j[1] = 33;
+    j[4] = 8;
+
+    x = n - 1;
+    h = 0;
+    escribe("Arreglo Desorneado: ");
+    mientras (x > 0) haz {
+        escribe(j[h]);
+        h = h + 1;
+        x = x - 1;
+    }
+    escribe(" - ");
+    j[3] = 4;
+    escribe("Encontrar el 4 : ");
+    escribe(encontrar(j, 4));
+    ordena(j);
+    escribe(" - ");
+    escribe("Encontrar el 4: ");
+    escribe(encontrar(j, 4));
+    escribe(" - ");
+
+    x = n - 1;
+    h = 0;
+    escribe("Arreglo Ordenado: ");
+    mientras (x > 0) haz {
+        escribe(j[h]);
+        h = h + 1;
+        x = x - 1;
+    }
+}

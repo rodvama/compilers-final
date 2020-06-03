@@ -1,0 +1,23 @@
+programa factorialCic;
+var 
+int : j;
+
+funcion int factorial(int n)
+var
+int : i, fact;
+{
+    i = 1;
+    fact = 1;
+    mientras (i <= n) haz {
+        fact = fact * i;
+        i = i + 1;
+    }
+    regresa(fact);
+}
+
+principal()
+{
+    escribe("Introduce número");
+    lee(j);
+    escribe(factorial(j));
+}

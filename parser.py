@@ -1345,10 +1345,10 @@ def p_pnFunCall_5_6_llamada(p):
     
     tipo =  directorioFunciones.directorio_funciones[funcion]['tipo']
     if tipo != 'void':
-        quad_resultIndex = nextAvailTemp(tipo)
-        QuadGenerate('=', funcion,'', quad_resultIndex)
-        pushOperando(quad_resultIndex)
-        pushMemoria(quad_resultIndex)
+        temporal = nextAvailTemp(tipo)
+        QuadGenerate('=', funcion,'', temporal)
+        pushOperando(temporal)
+        pushMemoria(temporal)
         pushTipo(tipo)
 
 ###### FUNCIONES ESPECIALES #######
@@ -1701,25 +1701,25 @@ def p_pnExp4(p):
     pnExp4 : 
     '''
     if topOperador() in OP_SUMARESTA:
-        quad_rightOperand = popOperandos()
-        quad_rightType = popTipos()
-        quad_rightMem = popMemoria()
-        quad_leftOperand = popOperandos()
-        quad_leftMem = popMemoria()
-        quad_leftType = popTipos()
-        quad_operator = popOperadores()
+        rightOperand = popOperandos()
+        rightType = popTipos()
+        rightMem = popMemoria()
+        leftOperand = popOperandos()
+        leftMem = popMemoria()
+        leftType = popTipos()
+        operator = popOperadores()
 
         global cuboSem
-        quad_resultType = cuboSem.getType(quad_leftType, quad_rightType, quad_operator)
+        resultType = cuboSem.getType(leftType, rightType, operator)
 
-        if quad_resultType == 'error':
+        if resultType == 'error':
             errorTypeMismatch()
         else:
-            quad_resultIndex = nextAvailTemp(quad_resultType)
-            QuadGenerate(quad_operator, quad_leftMem, quad_rightMem, quad_resultIndex)
-            pushOperando(quad_resultIndex)
-            pushMemoria(quad_resultIndex)
-            pushTipo(quad_resultType)
+            temporal = nextAvailTemp(resultType)
+            QuadGenerate(operator, leftMem, rightMem, temporal)
+            pushOperando(temporal)
+            pushMemoria(temporal)
+            pushTipo(resultType)
 
 
 '''Checa si el top de la pila de operadores es un * o / para generar el cuadruplo  '''
@@ -1729,25 +1729,25 @@ def p_pnExp5(p):
     '''
     if topOperador() in OP_MULTDIV:
         
-        quad_rightOperand = popOperandos()
-        quad_rightType = popTipos()
-        quad_rightMem = popMemoria()
-        quad_leftOperand = popOperandos()
-        quad_leftMem = popMemoria()
-        quad_leftType = popTipos()
-        quad_operator = popOperadores()
+        rightOperand = popOperandos()
+        rightType = popTipos()
+        rightMem = popMemoria()
+        leftOperand = popOperandos()
+        leftMem = popMemoria()
+        leftType = popTipos()
+        operator = popOperadores()
 
         global cuboSem
-        quad_resultType = cuboSem.getType(quad_leftType, quad_rightType, quad_operator)
+        resultType = cuboSem.getType(leftType, rightType, operator)
 
-        if quad_resultType == 'error':
+        if resultType == 'error':
             print('Error: Type Mismatch')
         else:
-            quad_resultIndex = nextAvailTemp(quad_resultType)
-            QuadGenerate(quad_operator, quad_leftMem, quad_rightMem, quad_resultIndex)
-            pushOperando(quad_resultIndex)
-            pushMemoria(quad_resultIndex)
-            pushTipo(quad_resultType)
+            temporal = nextAvailTemp(resultType)
+            QuadGenerate(operator, leftMem, rightMem, temporal)
+            pushOperando(temporal)
+            pushMemoria(temporal)
+            pushTipo(resultType)
 
 '''Agrega fondo falso '''
 def p_pnExp6(p):
@@ -1784,25 +1784,25 @@ def p_pnExp9(p):
     pnExp9 : 
     '''
     if topOperador() in OP_REL:
-        quad_rightOperand = popOperandos()
-        quad_rightType = popTipos()
-        quad_rightMem = popMemoria()
-        quad_leftOperand = popOperandos()
-        quad_leftMem = popMemoria()
-        quad_leftType = popTipos()
-        quad_operator = popOperadores()
+        rightOperand = popOperandos()
+        rightType = popTipos()
+        rightMem = popMemoria()
+        leftOperand = popOperandos()
+        leftMem = popMemoria()
+        leftType = popTipos()
+        operator = popOperadores()
 
         global cuboSem
-        quad_resultType = cuboSem.getType(quad_leftType, quad_rightType, quad_operator)
+        resultType = cuboSem.getType(leftType, rightType, operator)
 
-        if quad_resultType == 'error':
+        if resultType == 'error':
             print('Error: Type Mismatch')
         else:
-            quad_resultIndex = nextAvailTemp(quad_resultType)
-            QuadGenerate(quad_operator, quad_leftMem, quad_rightMem, quad_resultIndex)
-            pushOperando(quad_resultIndex)
-            pushMemoria(quad_resultIndex)
-            pushTipo(quad_resultType)
+            temporal = nextAvailTemp(resultType)
+            QuadGenerate(operator, leftMem, rightMem, temporal)
+            pushOperando(temporal)
+            pushMemoria(temporal)
+            pushTipo(resultType)
 
 '''
 Meter un operador logico a pila de operadores
@@ -1824,25 +1824,25 @@ def p_pnExp11(p):
     pnExp11 : 
     '''
     if topOperador() in OP_LOGICOS:
-        quad_rightOperand = popOperandos()
-        quad_rightType = popTipos()
-        quad_rightMem = popMemoria()
-        quad_leftOperand = popOperandos()
-        quad_leftMem = popMemoria()
-        quad_leftType = popTipos()
-        quad_operator = popOperadores()
+        rightOperand = popOperandos()
+        rightType = popTipos()
+        rightMem = popMemoria()
+        leftOperand = popOperandos()
+        leftMem = popMemoria()
+        leftType = popTipos()
+        operator = popOperadores()
 
         global cuboSem
-        quad_resultType = cuboSem.getType(quad_leftType, quad_rightType, quad_operator)
+        resultType = cuboSem.getType(leftType, rightType, operator)
 
-        if quad_resultType == 'error':
+        if resultType == 'error':
             print('Error: Type Mismatch')
         else:
-            quad_resultIndex = nextAvailTemp(quad_resultType)
-            QuadGenerate(quad_operator, quad_leftMem, quad_rightMem, quad_resultIndex)
-            pushOperando(quad_resultIndex)
-            pushMemoria(quad_resultIndex)
-            pushTipo(quad_resultType)
+            temporal = nextAvailTemp(resultType)
+            QuadGenerate(operator, leftMem, rightMem, temporal)
+            pushOperando(temporal)
+            pushMemoria(temporal)
+            pushTipo(resultType)
 
 
 '''
@@ -1865,24 +1865,24 @@ def p_pnSec2(p):
     pnSec2 : 
     '''
     if topOperador() in OP_ASIG:
-        quad_rightOperand = popOperandos()
-        quad_rightType = popTipos()
-        quad_rightMem = popMemoria()
-        quad_leftOperand = popOperandos()
-        quad_leftMem = popMemoria()
-        quad_leftType = popTipos()
-        quad_operator = popOperadores()
+        rightOperand = popOperandos()
+        rightType = popTipos()
+        rightMem = popMemoria()
+        leftOperand = popOperandos()
+        leftMem = popMemoria()
+        leftType = popTipos()
+        operator = popOperadores()
 
         global cuboSem
         global directorioFunciones
 
-        quad_resultType = cuboSem.getType(quad_leftType, quad_rightType, quad_operator)
+        resultType = cuboSem.getType(leftType, rightType, operator)
 
-        if directorioFunciones.var_exist(currentFunc, quad_leftOperand) or directorioFunciones.var_exist(GBL, quad_leftOperand):
-            if quad_resultType == 'error':
+        if directorioFunciones.var_exist(currentFunc, leftOperand) or directorioFunciones.var_exist(GBL, leftOperand):
+            if resultType == 'error':
                 print("Error: Operacion invalida")
             else:
-                QuadGenerate(quad_operator, quad_rightMem, '', quad_leftMem)
+                QuadGenerate(operator, rightMem, '', leftMem)
         else:
             print("Error al intentar asignar una variable")
 
@@ -1911,18 +1911,18 @@ def p_pnSec4(p):
     global cuboSem
     if topOperador() in OP_SECUENCIALES:
         print("Voy a ejecutar pnSEc4")
-        quad_Operando = popOperandos()
-        quad_rightType = popTipos()
-        quad_rightMem = popMemoria()
-        quad_operator = popOperadores()
+        Operando = popOperandos()
+        rightType = popTipos()
+        rightMem = popMemoria()
+        operator = popOperadores()
 
-        quad_resultType = cuboSem.getType(quad_operator, quad_rightType, '')
+        resultType = cuboSem.getType(operator, rightType, '')
 
-        if quad_resultType == 'error':
+        if resultType == 'error':
             print("Error: Operacion invalida")
         else:
-            QuadGenerate(quad_operator, quad_rightMem, '', quad_operator)
-            pushOperador(quad_operator)
+            QuadGenerate(operator, rightMem, '', operator)
+            pushOperador(operator)
             
 
 '''
@@ -2041,22 +2041,22 @@ def p_pnCiclos5(p):
     pnCiclos5 : 
     '''
     if topOperador() in OP_ASIG:
-        quad_rightOperand = popOperandos()
-        quad_rightType = popTipos()
-        quad_leftOperand = popOperandos()
-        quad_leftType = popTipos()
-        quad_operator = popOperadores()
+        rightOperand = popOperandos()
+        rightType = popTipos()
+        leftOperand = popOperandos()
+        leftType = popTipos()
+        operator = popOperadores()
 
         global cuboSem
         global directorioFunciones
 
-        quad_resultType = cuboSem.getType(quad_leftType, quad_rightType, quad_operator)
+        resultType = cuboSem.getType(leftType, rightType, operator)
 
-        if directorioFunciones.var_exist(currentFunc, quad_leftOperand) or directorioFunciones.var_exist(GBL, quad_leftOperand):
-            if quad_resultType == 'error':
+        if directorioFunciones.var_exist(currentFunc, leftOperand) or directorioFunciones.var_exist(GBL, leftOperand):
+            if resultType == 'error':
                 print("Error: Operacion invalida")
             else:
-                QuadGenerate(quad_operator, quad_rightOperand, '', quad_leftOperand)
+                QuadGenerate(operator, rightOperand, '', leftOperand)
         else:
             print("Error")
 
@@ -2089,22 +2089,22 @@ def p_pnCiclos7(p):
     pnCiclos7 :
     '''
     if topOperador() in OP_REL:
-        quad_rightOperand = popOperandos()
-        quad_rightType = popTipos()
-        quad_leftOperand = popOperandos()
-        quad_leftType = popTipos()
-        quad_operator = popOperadores()
+        rightOperand = popOperandos()
+        rightType = popTipos()
+        leftOperand = popOperandos()
+        leftType = popTipos()
+        operator = popOperadores()
         
         global cuboSem
-        quad_resultType = cuboSem.getType(quad_leftType, quad_rightType, quad_operator)
+        resultType = cuboSem.getType(leftType, rightType, operator)
         
-        if quad_resultType == 'error':
+        if resultType == 'error':
             print('Error: Type Mismatch')
         else:
-            quad_resultIndex = nextAvailTemp(quad_resultType)
-            QuadGenerate(quad_operator, quad_leftOperand, quad_rightOperand, quad_resultIndex)
-            pushOperando(quad_resultIndex)
-            pushTipo(quad_resultType)
+            temporal = nextAvailTemp(resultType)
+            QuadGenerate(operator, leftOperand, rightOperand, temporal)
+            pushOperando(temporal)
+            pushTipo(resultType)
             
         exp_type = popTipos()
         if (exp_type != 'bool' or exp_type == 'error'):
@@ -2197,7 +2197,6 @@ def p_pnDimDec6(p):
     '''
     pnDimDec6 :
     '''
-    # global isMatrix
     global R
     global numRenglones
     global directorioFunciones
@@ -2234,7 +2233,6 @@ def p_pnDimDec8(p):
     currentType = directorioFunciones.func_searchVarType(currentFunc, currentVarName)
 
     update_pointer(currentFunc, currentType, NumEspacios) #Separa los espacios que va a usar para el arreglo o matriz
-    
     
     #Reseteo
     R = 1
@@ -2347,12 +2345,10 @@ def p_pnMatrizAcc(p):
     pnMatrizAcc : 
     '''
 
-    print("MATRIZZZZZZZZZZZ")
     global isArray
     global currentVarName
     global currentFunc
     global pDim
-    print("pOperandos: ", pOperandos)
 
     auxID = popOperandos()
     auxMem = popMemoria()
@@ -2367,7 +2363,6 @@ def p_pnMatrizAcc(p):
         
         #Checa las dimensiones
         varDimensiones = directorioFunciones.func_getDims(currentFunc, auxDIM)
-        print("MAT: ", auxDIM)
         if varDimensiones == -1:
             varDimensiones = directorioFunciones.func_getDims(GBL, auxDIM) #Busca en global
             if varDimensiones == -1: # si no hay en global...
@@ -2464,18 +2459,11 @@ def p_pnCarga(p):
 
     QuadGenerate("carga", dfMem, path, '')
 
-    
-
-
-
-
-
 parser = yacc.yacc()
 
-# Put all test inside prueba folder
 def main():
     name = input('File name: ')
-    name = "pruebas/" + name + ".txt" #Para probar, cambia el nombre del archivo
+    name = "pruebas/" + name + ".txt" 
     print(name)
     try:
         f = open(name,'r', encoding='utf-8')

@@ -1,4 +1,4 @@
-programa COVID19;
+programa ArreglosMatrices;
 
 var 
 int: A[8][10], j, i;

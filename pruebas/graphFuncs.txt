@@ -1,4 +1,4 @@
-programa COVID19;
+programa graphFuncs;
 
 var 
 dataframe: j, i;
@@ -9,6 +9,7 @@ principal()
     cargaArchivo(j, "pruebas/dataframes/dt2.txt", 1 ,3);
 
     plotline(j, i, 10);
-    histograma(j, 1, -1);
+    histograma(j, -1, -1);
+    
 
 }

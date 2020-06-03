@@ -1,4 +1,4 @@
-programa COVID19;
+programa llamadaFunc;
 
 var
 int : x;

@@ -64,9 +64,6 @@
 <p>mientras(j != i) haz {...}</p>
 <p>desde j = 0 hasta 10 hacer {...}</p>
 
-<h3>Ejemplos</h3>
-<p>desde i hasta j hacer {...}</p>
-
 <h2>Carga de archivos</h2>
 <p>lee("nombre");</p>
 
@@ -74,16 +71,16 @@
 <p>cargaArchivo(dataframe, "nombre");</p>
 
 <h2>Moda</h2>
-<p>c = moda(dataframe, indice inferior, indice superior</p>
+<p>c = moda(dataframe, indice inferior, indice superior);</p>
 
 <h2>Mediana</h2>
-<p>c = mediana(dataframe, indice inferior, indice superior</p>
+<p>c = mediana(dataframe, indice inferior, indice superior);</p>
 
 <h2>Varianza</h2>
-<p>c = varianza(dataframe, indice inferior, indice superior</p>
+<p>c = varianza(dataframe, indice inferior, indice superior);</p>
 
 <h2>Media</h2>
-<p>c = media(dataframe, indice inferior, indice superior</p>
+<p>c = media(dataframe, indice inferior, indice superior);</p>
 
 <h2>Coeficiente de correlación</h2>
 <p>c = correlacion(dataframe1, dataframe2, indice inferior, indice superior);</p>
